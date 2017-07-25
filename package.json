@@ -32,7 +32,9 @@
     "webpack": "^2.6.1",
     "webpack-dev-server": "^2.4.5"
   },
-  "dependencies": {},
+  "dependencies": {
+    "aframe": "^0.6.1"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/delapuente/aframe-spa-skeleton.git"
