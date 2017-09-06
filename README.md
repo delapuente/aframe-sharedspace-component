@@ -1,5 +1,5 @@
-# A-Frame SPA skeleton
-> Webpack-powered A-Frame SPA skeleton
+# A-Frame Chat
+> VR chat powered by A-Frame
 
 ## Install
 You will need `node` and `npm` installed in your system. Once installed, simply run the following command from the root of the project:
