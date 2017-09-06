@@ -42,7 +42,7 @@ class AFrameEntityObserver {
   }
 
   check() {
-    Array.from(this._observables.keys()).forEach(entity => this._checkChanges(entity));
+    Array.from(this._observables.keys()).forEach(entity => this._collectChanges(entity));
   }
 
   _recordEntity(entity) {
@@ -67,7 +67,7 @@ class AFrameEntityObserver {
     return utils.styleParser.stringify(stringifiedData);
   }
 
-  _checkChanges(entity) {
+  _collectChanges(entity) {
     const changes = [];
     Object.values(entity.components).forEach(component => {
       const change = this._getChanges(entity, component)

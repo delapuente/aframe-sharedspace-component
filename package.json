@@ -33,7 +33,9 @@
     "webpack-dev-server": "^2.4.5"
   },
   "dependencies": {
-    "aframe": "^0.6.1"
+    "aframe": "^0.6.1",
+    "signalhub": "^4.8.0",
+    "webrtc-swarm": "^2.8.0"
   },
   "repository": {
     "type": "git",
