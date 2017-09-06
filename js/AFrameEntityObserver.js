@@ -9,6 +9,8 @@ import { schema as schemaUtils, utils } from 'aframe';
  *
  * To keep it synchronized with the render loop, call it inside the `tick`
  * method of a component or system.
+ *
+ * TODO: Optimize by not comparing with the stringifyed version.
  */
 class AFrameEntityObserver {
 
@@ -71,19 +73,17 @@ class AFrameEntityObserver {
       const change = this._getChanges(entity, component)
       if (change) {
         const [oldValue, newValue] = change;
-        changes.push({ name: component.name, oldValue, newValue });
+        changes.push({
+          type: 'components',
+          target: entity,
+          componentName: component.name,
+          oldValue,
+          newValue
+        });
       }
     });
     if (changes.length) {
-      changes.forEach(change => {
-        this._callback({
-          type: 'components',
-          target: entity,
-          componentName: change.name,
-          oldValue: change.oldValue,
-          newValue: change.newValue
-        });
-      });
+      this._callback(changes, this);
     }
   }
 
