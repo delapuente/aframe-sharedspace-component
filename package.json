@@ -10,7 +10,8 @@
     "deploy": "npm run build && npm run copy && gh-pages -d site",
     "postdeploy": "npm run clean",
     "predeploy": "npm run clean && shx mkdir -p site",
-    "start": "webpack-dev-server",
+    "start": "concurrently \"npm run signalhub\" \"webpack-dev-server\"",
+    "signalhub": "signalhub listen -p 9000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -34,6 +35,7 @@
   },
   "dependencies": {
     "aframe": "^0.6.1",
+    "concurrently": "^3.5.0",
     "signalhub": "^4.8.0",
     "webrtc-swarm": "^2.8.0"
   },
