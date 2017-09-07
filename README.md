@@ -9,7 +9,7 @@ $ npm install
 ```
 
 ## Develop
-Issuing the following command will run a local server with live-reload listening in port `8080`:
+Issuing the following command will run a local server with live-reload listening at port `8080` and a WebRTC signaling server at port `9000`:
 
 ```bash
 $ npm start
