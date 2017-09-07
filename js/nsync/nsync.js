@@ -8,7 +8,7 @@ import { SceneTree } from './SceneTree';
  * remote scenes synchronized. It stands for network synchronized.
  * TODO: Investigate takeRecords()
  */
-AFRAME.registerSystem('nsync', {
+export default AFRAME.registerSystem('nsync', {
 
   schema: {
     session: { default: 'room-101' },
