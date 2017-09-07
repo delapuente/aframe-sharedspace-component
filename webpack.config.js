@@ -22,6 +22,7 @@ module.exports = {
   devtool: 'eval-source-map',
   devServer: {
     contentBase: [path.resolve(__dirname), path.resolve(__dirname, 'assets')],
-    watchContentBase: true
+    watchContentBase: true,
+    disableHostCheck: true
   }
 };
