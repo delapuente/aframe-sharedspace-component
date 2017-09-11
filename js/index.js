@@ -1,12 +1,12 @@
-import * as AFRAME from 'aframe';
-import 'aframe-look-at-component';
+import './patch';
 import signalhub from 'signalhub';
 import WebRtcSwarm from 'webrtc-swarm';
 
 const scene = document.querySelector('a-scene');
+const assets = document.querySelector('a-assets');
 const table = scene.querySelector('.table');
 const placementHeight = 1.5;
-const placementRadius = parseInt(table.getAttribute('radius')) + 0.3;
+const placementRadius = parseFloat(table.getAttribute('radius')) + 0.3;
 const [roomName, host] = location.search.substr(1).split(':');
 const amIHost = !host;
 const server = 'localhost:9000';
@@ -15,17 +15,20 @@ const participantList = [];
 
 let swarm;
 let nextRoomPosition = 1;
-let syncCounter = 1;
+let syncCounter = 0;
 
 if (scene.hasLoaded) { initP2P(); }
 else { scene.addEventListener('loaded', () => initP2P()); }
 
 function initP2P() {
-  const hub = signalhub(roomName || 'room-101', [server]);
-  window.swarm = swarm = new WebRtcSwarm(hub);
-  swarm.on('peer', onPeer);
-  swarm.on('disconnect', onDisconnect);
-  initMyself();
+  navigator.mediaDevices.getUserMedia({ audio: true })
+  .then(stream => {
+    const hub = signalhub(roomName || 'room-101', [server]);
+    window.swarm = swarm = new WebRtcSwarm(hub, { stream });
+    swarm.on('peer', onPeer);
+    swarm.on('disconnect', onDisconnect);
+    initMyself();
+  }, () => console.log('algo fue mal'));
 }
 
 function initMyself() {
@@ -49,18 +52,18 @@ function onDisconnect(peer, id) {
 }
 
 function onGuess(peer, id) {
-  addParticipant(id, id);
+  addParticipant(id, id, peer.stream);
   broadcast(listMessage(participantList));
 }
 
 function listMessage(list) {
-  return { list };
+  return { type: 'list', list };
 }
 
 function broadcast(msg) {
+  syncCounter++;
   msg.sync = syncCounter;
   swarm.peers.forEach(peer => peer.send(JSON.stringify(msg)));
-  syncCounter++;
 }
 
 function onCandidate(peer, id) {
@@ -78,28 +81,45 @@ function getHostData(data) {
   const currentParticipants = participantList.length;
   const newParticipants = data.list.slice(currentParticipants);
   newParticipants.forEach(id => addParticipant(id, id));
+  syncCounter = data.sync;
 }
 
-function addParticipant(name, id) {
+function addParticipant(name, id, stream) {
+  const isMe = swarm.me === id;
+
   participantList.push(id);
+
   const folk = document.createElement('a-plane');
+  folk.id = `peer:${id}`;
   folk.setAttribute('width', '0.5');
   folk.setAttribute('height', '0.5');
   folk.setAttribute('text', `value: ${name}`);
-  folk.setAttribute('look-at', getStraightSight());
-  folk.setAttribute('position', getPosition(nextRoomPosition));
-  folk.id = `peer:${id}`;
-  scene.appendChild(folk);
-  requestAnimationFrame(() => {
-    folk.removeAttribute('look-at');
-    if (swarm.me === id) {
-      const camera = document.createElement('a-entity');
-      camera.setAttribute('camera', 'userHeight: 0');
-      camera.setAttribute('look-controls', 'enabled:true');
-      camera.setAttribute('rotation', '0 180 0');
-      folk.appendChild(camera);
-    }
-  });
+
+  if (stream) {
+    console.log('Streaming from ', stream);
+    const audio = document.createElement('audio');
+    audio.id = `peer-source:${id}`;
+    audio.srcObject = stream;
+    assets.appendChild(audio);
+    folk.setAttribute('sound', `src: #${audio.id}; autoplay: true`);
+  }
+
+  const position = getPosition(nextRoomPosition);
+
+  if (isMe) {
+    const camera = document.createElement('a-entity');
+    camera.setAttribute('camera', 'user-height: 0');
+    camera.setAttribute('look-controls', 'enabled: true');
+    camera.setAttribute('position', position);
+    camera.appendChild(folk);
+    folk.setAttribute('rotation', '0 180 0');
+    scene.appendChild(camera);
+  }
+  else {
+    folk.setAttribute('position', position);
+    scene.appendChild(folk);
+  }
+
   nextRoomPosition++;
 }
 
