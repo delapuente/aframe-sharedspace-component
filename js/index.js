@@ -101,7 +101,7 @@ function addParticipant(name, id, stream) {
     audio.id = `peer-source:${id}`;
     audio.srcObject = stream;
     assets.appendChild(audio);
-    folk.setAttribute('sound', `src: #${audio.id}; autoplay: true`);
+    folk.setAttribute('sound', `src: #${audio.id}`);
   }
 
   const position = getPosition(nextRoomPosition);
