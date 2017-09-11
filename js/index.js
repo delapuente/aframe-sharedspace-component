@@ -1,4 +1,5 @@
 import './positional-audio-patch';
+import { registerComponent } from 'aframe';
 import signalhub from 'signalhub';
 import WebRtcSwarm from 'webrtc-swarm';
 
@@ -19,6 +20,12 @@ let syncCounter = 0;
 
 if (scene.hasLoaded) { initP2P(); }
 else { scene.addEventListener('loaded', () => initP2P()); }
+
+registerComponent('peer', {
+  tick() {
+    broadcast(rotationMessage(this.el.getAttribute('rotation')));
+  }
+});
 
 function initP2P() {
   navigator.mediaDevices.getUserMedia({ audio: true })
@@ -43,8 +50,17 @@ function initMyself() {
 
 function onPeer(peer, id) {
   console.log(`Connecting with peer ${id}`);
-  peers.set(id, { peer });
+  peers.set(id, peer);
+  peer.on('data', updateRotation.bind(undefined, id));
   (amIHost ? onGuess(peer, id) : onCandidate(peer, id));
+}
+
+function updateRotation(id, data) {
+  data = JSON.parse(data);
+  if (data.type !== 'rotation') { return; }
+  const el = document.getElementById(`peer-${id}`);
+  const { x, y, z } = data.rotation;
+  el.setAttribute('rotation', { x: -x, y: y + 180, z });
 }
 
 function onDisconnect(peer, id) {
@@ -58,6 +74,10 @@ function onGuess(peer, id) {
 
 function listMessage(list) {
   return { type: 'list', list };
+}
+
+function rotationMessage(rotation) {
+  return { type: 'rotation', rotation };
 }
 
 function broadcast(msg) {
@@ -75,12 +95,16 @@ function onCandidate(peer, id) {
 
 function getHostData(data) {
   data = JSON.parse(data);
+  if (data.type !== 'list') { return; }
   const isOutOfDate = data.sync <= syncCounter;
   if (isOutOfDate) { return; }
 
   const currentParticipants = participantList.length;
   const newParticipants = data.list.slice(currentParticipants);
-  newParticipants.forEach(id => addParticipant(id, id));
+  newParticipants.forEach(id => {
+    const stream = peers.get(id) && peers.get(id).stream;
+    addParticipant(id, id, stream);
+  });
   syncCounter = data.sync;
 }
 
@@ -90,7 +114,7 @@ function addParticipant(name, id, stream) {
   participantList.push(id);
 
   const folk = document.createElement('a-plane');
-  folk.id = `peer:${id}`;
+  folk.id = `peer-${id}`;
   folk.setAttribute('width', '0.5');
   folk.setAttribute('height', '0.5');
   folk.setAttribute('text', `value: ${name}`);
@@ -98,7 +122,7 @@ function addParticipant(name, id, stream) {
   if (stream) {
     console.log('Streaming from ', stream);
     const audio = document.createElement('audio');
-    audio.id = `peer-source:${id}`;
+    audio.id = `peer-${id}-source`;
     audio.srcObject = stream;
     assets.appendChild(audio);
     folk.setAttribute('sound', `src: #${audio.id}`);
@@ -108,11 +132,11 @@ function addParticipant(name, id, stream) {
 
   if (isMe) {
     const camera = document.createElement('a-entity');
+    camera.setAttribute('peer', '');
     camera.setAttribute('camera', 'user-height: 0');
     camera.setAttribute('look-controls', 'enabled: true');
     camera.setAttribute('position', position);
     camera.appendChild(folk);
-    folk.setAttribute('rotation', '0 180 0');
     scene.appendChild(camera);
   }
   else {
