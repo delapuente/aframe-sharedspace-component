@@ -1,28 +1,6 @@
 import * as AFRAME from 'aframe';
-const THREE = AFRAME.THREE;
 
 var warn = AFRAME.utils.debug('components:sound:warn');
-
-const { play } = THREE.Audio.prototype;
-
-THREE.Audio.prototype.setAudioElement = function (audioElement) {
-  this.audioElement = audioElement;
-  this.sourceType = 'audio-element';
-  this.source = this.context.createMediaStreamSource(audioElement.srcObject);
-  this.buffer = {};
-  return this;
-};
-
-THREE.Audio.prototype.play = function () {
-  if (this.sourceType !== 'audio-element' || this.isPlaying) {
-    return play.call(this);
-  }
-
-  this.audioElement.muted = true;
-  this.connect();
-  this.audioElement.play();
-  return this;
-};
 
 AFRAME.components.sound.schema.src.parse = function assetParse (value) {
   var el;
@@ -85,37 +63,31 @@ Sound.prototype.update = function (oldData) {
   // All sound values set. Load in `src`.
   if (srcChanged) {
     var self = this;
+    var isStream = (data.src.srcObject instanceof MediaStream);
 
+    if (isStream) {
+      var stream = data.src.srcObject;
+      self.pool.children.forEach(function (sound) {
+        sound.setNodeSource(sound.context.createMediaStreamSource(stream));
+      });
+      self.loaded = true;
+      self.el.emit('sound-loaded');
+      return;
+    }
+
+    var src = data.src.src;
     this.loaded = false;
-    if (typeof data.src === 'string') {
-      this.audioLoader.load(data.src, function (buffer) {
-        self.pool.children.forEach(function (sound) {
-          sound.setBuffer(buffer);
-        });
-        self.loaded = true;
-
-        // Remove this key from cache, otherwise we can't play it again
-        AFRAME.THREE.Cache.remove(data.src);
-        if (self.data.autoplay || self.mustPlay) { self.playSound(); }
-        self.el.emit('sound-loaded');
+    this.audioLoader.load(src, function (buffer) {
+      self.pool.children.forEach(function (sound) {
+        sound.setBuffer(buffer);
       });
-    }
-    else {
-      var audioEl = data.src;
-      audioEl.addEventListener('loadeddata', function onEnoughData() {
-        if (audioEl.readyState === 4) {
-          audioEl.removeEventListener('loadeddata', onEnoughData);
+      self.loaded = true;
 
-          self.pool.children.forEach(function (sound) {
-            sound.setAudioElement(audioEl);
-          });
-          self.loaded = true;
+      // Remove this key from cache, otherwise we can't play it again
+      AFRAME.THREE.Cache.remove(src);
+      if (self.data.autoplay || self.mustPlay) { self.playSound(); }
+      self.el.emit('sound-loaded');
+    });
 
-          console.log('shoud play');
-          if (self.data.autoplay || self.mustPlay) { self.playSound(); }
-          self.el.emit('sound-loaded');
-        }
-      });
-    }
   }
 };

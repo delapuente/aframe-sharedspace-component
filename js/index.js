@@ -1,4 +1,4 @@
-import './patch';
+import './positional-audio-patch';
 import signalhub from 'signalhub';
 import WebRtcSwarm from 'webrtc-swarm';
 
