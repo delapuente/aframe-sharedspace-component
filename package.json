@@ -38,7 +38,7 @@
     "aframe": "^0.6.1",
     "concurrently": "^3.5.0",
     "signalhub": "^4.8.0",
-    "webrtc-swarm": "^2.8.0"
+    "webrtc-swarm": "delapuente/webrtc-swarm#stream-support"
   },
   "repository": {
     "type": "git",

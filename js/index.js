@@ -3,6 +3,8 @@ import { registerComponent } from 'aframe';
 import signalhub from 'signalhub';
 import WebRtcSwarm from 'webrtc-swarm';
 
+localStorage.removeItem('debug');
+
 const scene = document.querySelector('a-scene');
 const assets = document.querySelector('a-assets');
 const table = scene.querySelector('.table');
@@ -10,7 +12,7 @@ const placementHeight = 1.5;
 const placementRadius = parseFloat(table.getAttribute('radius')) + 0.3;
 const [roomName, host] = location.search.substr(1).split(':');
 const amIHost = !host;
-const server = 'localhost:9000';
+const server = 'https://36179e44.eu.ngrok.io' || 'localhost:9000';
 const peers = new Map();
 const participantList = [];
 
@@ -30,12 +32,21 @@ registerComponent('peer', {
 function initP2P() {
   navigator.mediaDevices.getUserMedia({ audio: true })
   .then(stream => {
+    console.log(`Publishing audio ${stream.id}`);
     const hub = signalhub(roomName || 'room-101', [server]);
-    window.swarm = swarm = new WebRtcSwarm(hub, { stream });
+    window.swarm = swarm = new WebRtcSwarm(hub, {
+      stream,
+      offerConstraints: {
+        mandatory: {
+          OfferToReceiveAudio: true,
+          OfferToReceiveVideo: true
+        }
+      }
+    });
     swarm.on('peer', onPeer);
     swarm.on('disconnect', onDisconnect);
     initMyself();
-  }, () => console.log('algo fue mal'));
+  }, (e) => console.log('getUserMedia() failed:', e));
 }
 
 function initMyself() {
@@ -51,6 +62,7 @@ function initMyself() {
 function onPeer(peer, id) {
   console.log(`Connecting with peer ${id}`);
   peers.set(id, peer);
+  peer.on('stream', (stream) => console.log(`Recieving audio ${stream.id}`));
   peer.on('data', updateRotation.bind(undefined, id));
   (amIHost ? onGuess(peer, id) : onCandidate(peer, id));
 }
