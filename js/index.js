@@ -12,8 +12,8 @@ const placementHeight = 1.5;
 const placementRadius = parseFloat(table.getAttribute('radius')) + 0.3;
 const [roomName, host] = location.search.substr(1).split(':');
 const amIHost = !host;
-const server = 'https://36179e44.eu.ngrok.io' || 'localhost:9000';
-const peers = new Map();
+const server = 'https://signaling.eu.ngrok.io' || 'localhost:9000';
+const peers = window.peers = new Map();
 const participantList = [];
 
 let swarm;
@@ -32,7 +32,6 @@ registerComponent('peer', {
 function initP2P() {
   navigator.mediaDevices.getUserMedia({ audio: true })
   .then(stream => {
-    console.log(`Publishing audio ${stream.id}`);
     const hub = signalhub(roomName || 'room-101', [server]);
     window.swarm = swarm = new WebRtcSwarm(hub, {
       stream,
@@ -43,6 +42,8 @@ function initP2P() {
         }
       }
     });
+    console.log('Me:', swarm.me);
+    console.log(`Publishing audio ${stream.id}`);
     swarm.on('peer', onPeer);
     swarm.on('disconnect', onDisconnect);
     initMyself();
@@ -52,7 +53,7 @@ function initP2P() {
 function initMyself() {
   if (amIHost) {
     const me = swarm.me;
-    addParticipant(me, me);
+    addParticipant(me, me, null, nextRoomPosition++);
     const url = new URL(location.href);
     url.search += `:${me}`;
     history.pushState({} , '', url.href);
@@ -65,12 +66,15 @@ function onPeer(peer, id) {
   peer.on('stream', (stream) => console.log(`Recieving audio ${stream.id}`));
   peer.on('data', updateRotation.bind(undefined, id));
   (amIHost ? onGuess(peer, id) : onCandidate(peer, id));
+  checkWaitingLists();
 }
 
 function updateRotation(id, data) {
   data = JSON.parse(data);
   if (data.type !== 'rotation') { return; }
   const el = document.getElementById(`peer-${id}`);
+  if (!el) { return; }
+
   const { x, y, z } = data.rotation;
   el.setAttribute('rotation', { x: -x, y: y + 180, z });
 }
@@ -80,7 +84,7 @@ function onDisconnect(peer, id) {
 }
 
 function onGuess(peer, id) {
-  addParticipant(id, id, peer.stream);
+  addParticipant(id, id, peer.stream, nextRoomPosition++);
   broadcast(listMessage(participantList));
 }
 
@@ -111,16 +115,54 @@ function getHostData(data) {
   const isOutOfDate = data.sync <= syncCounter;
   if (isOutOfDate) { return; }
 
+  syncCounter = data.sync;
   const currentParticipants = participantList.length;
   const newParticipants = data.list.slice(currentParticipants);
   newParticipants.forEach(id => {
-    const stream = peers.get(id) && peers.get(id).stream;
-    addParticipant(id, id, stream);
+    const roomPosition = nextRoomPosition++;
+    waitForParticipants([id]).then(() => {
+      const stream = peers.get(id) && peers.get(id).stream;
+      addParticipant(id, id, stream, roomPosition);
+    });
   });
-  syncCounter = data.sync;
 }
 
-function addParticipant(name, id, stream) {
+var waitingLists = [];
+
+function waitForParticipants(participants) {
+  const waitingList = new Set(participants);
+  updateWaitingList(waitingList);
+
+  const stillWaiting = waitingList.size > 0;
+  return stillWaiting ? (new Promise(fulfill => {
+    waitingLists.push([waitingList, fulfill]);
+  })) : Promise.resolve();
+}
+
+function checkWaitingLists() {
+  for (let i = 0, l = waitingLists.length; i < l; i++) {
+    const [waitingList, fulfill] = waitingLists.shift();
+    updateWaitingList(waitingList);
+
+    const stillWaiting = waitingList.size > 0;
+    if (stillWaiting) {
+      waitingLists.push([waitingList, fulfill]);
+    }
+    else {
+      fulfill();
+    }
+  }
+}
+
+function updateWaitingList(waitingList) {
+  for (const id of waitingList) {
+    if (peers.has(id) || id === swarm.me) {
+      waitingList.delete(id);
+    }
+  }
+}
+
+function addParticipant(name, id, stream, roomPosition) {
   const isMe = swarm.me === id;
 
   participantList.push(id);
@@ -132,15 +174,15 @@ function addParticipant(name, id, stream) {
   folk.setAttribute('text', `value: ${name}`);
 
   if (stream) {
-    console.log('Streaming from ', stream);
-    const audio = document.createElement('audio');
+    console.log('Streaming from', stream);
+    const audio = new Audio();
     audio.id = `peer-${id}-source`;
     audio.srcObject = stream;
     assets.appendChild(audio);
     folk.setAttribute('sound', `src: #${audio.id}`);
   }
 
-  const position = getPosition(nextRoomPosition);
+  const position = getPosition(roomPosition);
 
   if (isMe) {
     const camera = document.createElement('a-entity');
@@ -155,8 +197,6 @@ function addParticipant(name, id, stream) {
     folk.setAttribute('position', position);
     scene.appendChild(folk);
   }
-
-  nextRoomPosition++;
 }
 
 function getStraightSight() {
