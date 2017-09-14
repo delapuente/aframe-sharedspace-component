@@ -63,7 +63,7 @@ function initMyself() {
 function onPeer(peer, id) {
   console.log(`Connecting with peer ${id}`);
   peers.set(id, peer);
-  peer.on('stream', (stream) => console.log(`Recieving audio ${stream.id}`));
+  peer.on('stream', stream => peer.stream = stream);
   peer.on('data', updateRotation.bind(undefined, id));
   (amIHost ? onGuess(peer, id) : onCandidate(peer, id));
   checkWaitingLists();
