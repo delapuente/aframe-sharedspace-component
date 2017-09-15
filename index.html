@@ -6,21 +6,15 @@
   <script defer src="dist/bundle.js"></script>
 </head>
 <body>
-  <a-scene stats sharedspace="signaling: https://signaling.eu.ngrok.io">
+  <a-scene stats>
     <a-assets>
-      <a-mixin id="folk"
-               place-around="center: 0 0 0; radius: 1; height: 1"
-               guest="sync: position, rotation">
-      </a-mixin>
     </a-assets>
-    <a-entity space="name: happy-birthday; host: salva; onguess: #avatar">
+    <a-entity sharedspace="audio: true; provider: https://signaling.eu.ngrok.io">
       <a-entity environment></a-entity>
       <a-plane rotation="-90 0 0" width="15" height="15" color="#777"></a-plane>
       <a-cylinder class="table" position="0 0.8 0" radius="1.5" height="0.3" color="brown"></a-cylinder>
+      <a-sphere id="avatar" position-around></a-sphere>
     </a-entity>
   </a-scene>
-  <template id="avatar">
-    <a-sphere mixins="folk"></a-sphere>
-  </template>
 </body>
 </html>
