@@ -12,8 +12,8 @@ class GuestList {
   }
 
   remove(guest) {
-    const index =  this._list.indexOf(guest);
-    this._list[guest] = null;
+    const index = this._list.indexOf(guest);
+    this._list[index] = null;
   }
 
   equals(another) {
