@@ -21,6 +21,7 @@ export default registerComponent('sharedspace', {
   },
 
   init() {
+    this._role = 'unknown';
     this._enterTime = Date.now();
 
     const { audio } = this.data;
@@ -67,23 +68,68 @@ export default registerComponent('sharedspace', {
     this._list = new GuestList(this._enterTime, [this.data.me]);
     this._rtc.onpeer = bind(this._onPeer, this);
     this._rtc.onlist = bind(this._onList, this);
+    this._rtc.onleave = bind(this._onLeave, this);
   },
 
   _onPeer(id) {
     log('on peer:', id);
-    this._list.add(id);
-    this._broadcastList();
-    this.el.emit('enterguest', { id });
-    // TODO: Add avatar automatically
+    if (this._role !== 'guest') {
+      this._list.add(id);
+      this._broadcastList();
+      this.el.emit('enterguest', { guest: id });
+      // TODO: Add avatar automatically if enabled
+    }
   },
 
+  _onLeave(id) {
+    log('on leave:', id);
+    this._takeover(id);
+    if (this._role !== 'guest') {
+      this._list.remove(id);
+      this._broadcastList();
+      this.el.emit('leaveguest', { guest: id });
+      // TODO: Remove avatar automatically (always)
+    }
+  },
+
+  /*
+   * Becomes the host if the current host is leaving and it is the next.
+   */
+  _takeover(leavingGuest) {
+    const hostLeft = leavingGuest === this._list.host();
+    const meIsNext = this.data.me === this._list.nextHost();
+    if (hostLeft && meIsNext) {
+      log('taking over');
+      this._role = 'host';
+    }
+  },
+
+  /*
+   * TODO: The surface of the RTC API related to the list should be attacked by
+   * an specific class.
+   */
   _onList(msg) {
+    log('on list:', msg);
+
+    const notFromHost = this._list.host() !== msg.from;
+    if (this._role !== 'unknown' && notFromHost) {
+      log('ignoring list because it\'s not coming from host');
+      return;
+    }
+
     const remoteList = new GuestList(msg.timestamp, msg.list);
-    log('on list:', remoteList);
     if (this._list.equals(remoteList)) { return; }
-    const bestList = this._selectList(this._list, remoteList);
-    log('best list:', bestList);
-    this._updateList(bestList);
+
+    let nextList = remoteList;
+    if (this._role === 'unknown') {
+      nextList = this._selectList(this._list, remoteList);
+      this._role = (nextList === this._list) ? 'host' : 'guest';
+
+      log('best list:', nextList);
+      log('role:', this._role);
+    }
+
+    this._updateList(nextList);
   },
 
   /**
@@ -109,6 +155,7 @@ export default registerComponent('sharedspace', {
   },
 
   _broadcastList() {
+    log('broadcasting list:', this._list);
     const msg = listMessage(this._list);
     this._rtc.broadcast(msg);
   }

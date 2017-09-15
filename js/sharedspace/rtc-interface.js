@@ -20,6 +20,7 @@ class RTCInterface {
   }
 
   connect() {
+    this._peers = new Map();
     this._swarm = new WebRtcSwarm(this._hub, {
       uuid: this._id,
       stream: this._stream,
@@ -35,26 +36,34 @@ class RTCInterface {
   }
 
   broadcast(msg) {
-    Object.keys(this._swarm.remotes).forEach(id => this.send(id, msg));
+    Array.from(this._peers.keys()).forEach(id => this.send(id, msg));
   }
 
   send(destination, msg={}) {
-    msg.from = this._swarm.me;
-    this._swarm.remotes[destination].send(JSON.stringify(msg))
+    msg.from = this.me;
+    const data = JSON.stringify(msg);
+    log('sending data:', data)
+    this._peers.get(destination).send(data)
   }
 
   _onPeer(peer, id) {
-    this._setupPeer(peer);
+    this._peers.set(id, peer);
+    this._setupPeer(peer, id);
     this.onpeer && this.onpeer(id);
   }
 
-  _setupPeer(peer) {
+  _onClose(id) {
+    this._peers.delete(id);
+    this.onleave && this.onleave(id);
+  }
+
+  _setupPeer(peer, id) {
     peer.on('data', this._ofType('list', bind(this._onList, this)));
+    peer.on('close', bind(this._onClose, this, id));
   }
 
   _onList(msg) {
-    const { timestamp, list } = msg;
-    this.onlist && this.onlist({ timestamp, list });
+    this.onlist && this.onlist(msg);
   }
 
   _ofType(type, cb) {

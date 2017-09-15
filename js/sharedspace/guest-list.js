@@ -6,7 +6,14 @@ class GuestList {
   }
 
   add(guest) {
-    this._list.push(guest);
+    if (this._list.indexOf(guest) < 0) {
+      this._list.push(guest);
+    }
+  }
+
+  remove(guest) {
+    const index =  this._list.indexOf(guest);
+    this._list[guest] = null;
   }
 
   equals(another) {
@@ -17,6 +24,23 @@ class GuestList {
       if (this._list[i] !== another._list[i]) { return false; }
     }
     return true;
+  }
+
+  host() {
+    for (let i = 0, l = this._list.length; i < l; i++) {
+      const guest = this._list[i];
+      if (guest) { return guest; }
+    }
+    return;
+  }
+
+  nextHost() {
+    let hostIndex = this._list.indexOf(this.host());
+    for (let i = hostIndex + 1, l = this._list.length; i < l; i++) {
+      const guest = this._list[i];
+      if (guest) { return guest; }
+    }
+    return;
   }
 }
 
