@@ -6,11 +6,6 @@ const bind = utils.bind;
 const log = utils.debug('sharedspace:log');
 const warn = utils.debug('sharedspace:warn');
 
-function panic(error) {
-  error = (typeof error !== 'string') ? error : new Error(error);
-  throw error;
-}
-
 export default registerComponent('sharedspace', {
   schema: {
     provider: { default: 'localhost:9000' },

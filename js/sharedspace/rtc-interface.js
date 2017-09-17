@@ -48,6 +48,10 @@ class RTCInterface extends EventTarget {
     this._peers.get(destination).send(data);
   }
 
+  isConnected(id) {
+    return this._peers.has(id);
+  }
+
   _onPeer(peer, id) {
     this._peers.set(id, peer);
     this._setupPeer(peer, id);

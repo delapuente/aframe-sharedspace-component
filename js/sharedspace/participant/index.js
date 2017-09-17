@@ -23,7 +23,9 @@ class Participant extends EventTarget {
     return this._rtc.connect()
     .then(() => {
       this._enterTime = Date.now();
-      this._list = new GuestList(this._enterTime, [this.me]);
+      this._list = window.list = new GuestList(this._enterTime, [this.me]);
+      this._waitingList = [];
+      this._emit('connected', { me: this.me });
     });
   }
 
@@ -39,9 +41,8 @@ class Participant extends EventTarget {
     log('enter participant:', id);
     if (this._role !== 'guest') {
       this._list.add(id);
-      const isHost = id === this._list.host();
       this._broadcastList();
-      // TODO: Emit enter participant event
+      this._confirmEnter(id);
     }
   }
 
@@ -49,10 +50,7 @@ class Participant extends EventTarget {
     log('on exit:', id);
     this._takeover(id);
     if (this._role !== 'guest') {
-      this._list.remove(id);
       this._broadcastList();
-      // TODO: Emit exit participant event
-      // TODO: Emit new host event if needed
     }
   }
 
@@ -62,10 +60,13 @@ class Participant extends EventTarget {
   _takeover(leavingGuest) {
     const hostLeft = leavingGuest === this._list.host();
     const meIsNext = this.me === this._list.nextHost();
-    if (hostLeft && meIsNext) {
-      log('taking over');
-      this._role = 'host';
-      // TODO: Emit upgrade event
+    if (hostLeft) {
+      log('host is leaving, be prepared for the takeover');
+      this._list.remove(leavingGuest);
+      if (meIsNext) {
+        log('taking over');
+        this._setRole('host');
+      }
     }
   }
 
@@ -88,15 +89,36 @@ class Participant extends EventTarget {
     let nextList = remoteList;
     if (this._role === 'unknown') {
       nextList = this._selectList(this._list, remoteList);
-      this._role = (nextList === this._list) ? 'host' : 'guest';
-      // TODO: Emit upgrade events
-      // TODO: Emit new host events
+      if (nextList === this._list) {
+        this._setRole('host');
+      }
+      else {
+        this._setRole('guest');
+        this._list.clear();
+      }
 
       log('best list:', nextList);
       log('role:', this._role);
     }
 
     this._updateList(nextList);
+  }
+
+  _setRole(newRole) {
+    if (newRole !== this._role) {
+      this._role = newRole;
+      this._emit('upgrade', { role: newRole });
+      if (newRole === 'host') {
+        this._heartBeatList();
+      }
+    }
+  }
+
+  _heartBeatList() {
+    setTimeout(() => {
+      this._broadcastList();
+      this._heartBeatList();
+    }, 5000 + Math.random(1000));
   }
 
   /**
@@ -106,19 +128,64 @@ class Participant extends EventTarget {
   _selectList(listA, listB) {
     const [ costAB, costBA ] = this._calculateCosts(listA, listB);
     if (costAB === costBA) {
-      error('Equal costs for different lists:', listA, listB);
+      error('equal costs for different lists:', listA, listB);
       panic('Costs for transforming into different lists must be different.');
     }
     return costAB < costBA ? listB : listA;
   }
 
   _calculateCosts(listA, listB) {
+    const transformationCost = bind(GuestList.transformationCost, GuestList);
     return [transformationCost(listA, listB), transformationCost(listB, listA)];
   }
 
   _updateList(newList) {
-    this._list = newList;
-    // TODO: Emit list changes events
+    this._informChanges(newList);
+    this._list = window.list = newList;
+  }
+
+  /*
+   * XXX: Due to the client-server (guest-host) architecture, when a participant
+   * freshly appears in the list, we need to wait for it to be able of
+   * communicate with it but if it's removed, then waiting is not needed.
+   */
+  _informChanges(newList) {
+    const changes = this._list.computeChanges(newList);
+    changes.forEach(({ operation, id, index }) => {
+      const action = operation === 'add' ? 'enter' : 'exit';
+      const role = (newList.host() === id) ? 'host' : 'guest';
+      const position = index + 1;
+      if (action === 'enter') {
+        this._waitFor(id)
+        .then(() => this._emit('enterparticipant', { id, position, role }));
+      }
+      else {
+        this._emit('exitparticipant', { id, position, role });
+      }
+    });
+  }
+
+  _waitFor(id) {
+    if (id === this.me || this._rtc.isConnected(id)) {
+      return Promise.resolve();
+    }
+    log('waiting for:', id);
+    return new Promise(fulfill => {
+      this._waitingList.push([id, fulfill]);
+    });
+  }
+
+  _confirmEnter(targetId) {
+    for (let i = 0, l = this._waitingList.length; i < l; i++) {
+      const [id, fulfill] = this._waitingList.shift();
+      if (id !== targetId) {
+        this._waitingList.push([id, fulfill]);
+      }
+      else {
+        log('no longer waiting for:', id);
+        fulfill();
+      }
+    }
   }
 
   _broadcastList() {
@@ -130,7 +197,8 @@ class Participant extends EventTarget {
   _onMessage(event) {
     const handlerName = `_on${event.detail.type}`;
     if (!this[handlerName]) {
-      warn(`Missing handler for event type ${event.detail.type}`);
+      warn(`missing handler for event type ${event.detail.type}`);
+      return;
     }
     return this[handlerName](event.detail);
   }
@@ -145,10 +213,6 @@ function listMessage(guestList) {
   const message = { type: 'list' };
   Object.assign(message, GuestList.serialize(guestList));
   return message;
-}
-
-function transformationCost(origin, destination) {
-  return (destination.timestamp - origin.timestamp);
 }
 
 export { Participant };

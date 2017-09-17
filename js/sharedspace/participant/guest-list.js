@@ -34,6 +34,36 @@ class GuestList {
     return;
   }
 
+  /*
+   * XXX: Assumes the target list is contained up to the length of the former
+   * one. So it computes removals of participants up to this point and
+   * additions until the end of the target list.
+   */
+  computeChanges(target) {
+    const changes = [];
+    const length = this._list.length;
+    const newLength = target.length;
+    for (let index = 0; index < length; index++) {
+      if (!target[index]) {
+        changes.push({
+          index,
+          operation: 'remove',
+          id: this._list[index]
+        });
+      }
+    }
+    for (let index = length; index < newLength; index++) {
+      if (!this._list[index]) {
+        changes.push({
+          index,
+          operation: 'add',
+          id: target[index]
+        });
+      }
+    }
+    return changes;
+  }
+
   nextHost() {
     let hostIndex = this._list.indexOf(this.host());
     for (let i = hostIndex + 1, l = this._list.length; i < l; i++) {
@@ -43,12 +73,20 @@ class GuestList {
     return;
   }
 
+  clear() {
+    this._list = [];
+  }
+
   static serialize(list) {
     return { timestamp: list.timestamp, list: list._list };
   }
 
   static deserialize(json) {
     return new GuestList(json.timestamp, json.list);
+  }
+
+  static transformationCost(origin, destination) {
+    return (destination.timestamp - origin.timestamp);
   }
 }
 
