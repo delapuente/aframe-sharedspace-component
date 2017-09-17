@@ -73,6 +73,18 @@ class GuestList {
     return;
   }
 
+  indexOf(id) {
+    return this._list.indexOf(id);
+  }
+
+  getRole(id) {
+    return this.isHost(id) ? 'host' : 'guest';
+  }
+
+  isHost(id) {
+    return id === this.host();
+  }
+
   clear() {
     this._list = [];
   }

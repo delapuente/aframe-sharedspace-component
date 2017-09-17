@@ -114,7 +114,7 @@ class Participant extends EventTarget {
    * the next host.
    */
   _takeover(participant) {
-    const isHost = participant === this._list.host();
+    const isHost = this._list.isHost(participant);
     const meIsNext = this.me === this._list.nextHost();
     if (isHost) {
       log('host is leaving, be prepared for the takeover');
@@ -133,7 +133,7 @@ class Participant extends EventTarget {
   _onlist(message) {
     log('on list:', message);
 
-    const notFromHost = this._list.host() !== message.from;
+    const notFromHost = !this._list.isHost(message.from);
     if (this._role !== 'unknown' && notFromHost) {
       log('ignoring list because it\'s not coming from host');
       return;
@@ -209,7 +209,7 @@ class Participant extends EventTarget {
     const changes = this._list.computeChanges(newList);
     changes.forEach(({ operation, id, index }) => {
       const action = operation === 'add' ? 'enter' : 'exit';
-      const role = (newList.host() === id) ? 'host' : 'guest';
+      const role = this._list.getRole(id);
       const position = index + 1;
       if (action === 'enter') {
         this._waitFor(id)
