@@ -42,6 +42,14 @@ class GuestList {
     }
     return;
   }
+
+  static serialize(list) {
+    return { timestamp: list.timestamp, list: list._list };
+  }
+
+  static deserialize(json) {
+    return new GuestList(json.timestamp, json.list);
+  }
 }
 
 export { GuestList };

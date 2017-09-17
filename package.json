@@ -18,9 +18,10 @@
   "keywords": [
     "aframevr",
     "vr",
-    "skeleton",
-    "template",
-    "boilerplate"
+    "networking",
+    "p2p",
+    "chat",
+    "vrspace"
   ],
   "author": "Salvador de la Puente <salva@unoyunodiez.com>",
   "license": "MPL-2.0",
@@ -37,6 +38,7 @@
   "dependencies": {
     "aframe": "^0.6.1",
     "concurrently": "^3.5.0",
+    "event-target-shim": "^2.0.0",
     "signalhub": "^4.8.0",
     "webrtc-swarm": "delapuente/webrtc-swarm#stream-support"
   },
