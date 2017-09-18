@@ -35,7 +35,7 @@ function wait(time) {
  *
  * Here is a risk of creating split networks (i.e. severals hosts) when a lot
  * of peers join simulataneously. To mitigate this effect, connecting is delayed
- * randomly from 1 to 3 seconds.
+ * randomly up to a couple of seconds.
  *
  * The "host" will send the participant list periodically and will ignore
  * any other list. The "guests" will only accept lists coming from the "host",
@@ -67,7 +67,7 @@ class Participant extends EventTarget {
   }
 
   connect() {
-    return wait(1000 + Math.random(2000)) // XXX: see explanation above.
+    return wait(Math.random() * 2000) // XXX: see explanation above.
     .then(() => this._rtc.connect())
     .then(() => {
       this._enterTime = Date.now();
@@ -121,8 +121,8 @@ class Participant extends EventTarget {
   }
 
   /*
-   * Notice that, by the time the list is received. It is possibly that this
-   * "guest" has not connect with all the other guests yet.
+   * Notice that, by the time the list is received. It is possibly that the
+   * local "guest" has not connect with all the other guests yet.
    */
   _onlist(message) {
     log('on list:', message);
@@ -174,7 +174,7 @@ class Participant extends EventTarget {
   /**
    * Select the list of guests that, transforming the other into it, is cheaper.
    * Cost of a transformation is given by the method
-   * GuestList#transformationCost().
+   * GuestList.transformationCost().
    */
   _selectList(listA, listB) {
     const [ costAB, costBA ] = this._calculateCosts(listA, listB);
@@ -196,9 +196,11 @@ class Participant extends EventTarget {
   }
 
   /*
-   * XXX: Due to the client-server (guest-host) architecture, when a participant
-   * freshly appears in the list, we need to wait for it to be able of
-   * communicate with it but if it's removed, then waiting is not needed.
+   * XXX: A new list can come with peers not already connected to this
+   * participant so we need to wait for it to connect before informing the
+   * participant enter. When a participant is no longer in the list, the best
+   * option to keep synchronization with the "host" is to inform it's leaving
+   * immediately.
    */
   _informChanges(newList) {
     const changes = this._list.computeChanges(newList);
