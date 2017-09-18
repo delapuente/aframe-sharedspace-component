@@ -26,10 +26,10 @@ class EntityObserver {
     }
     catch (e) { /* no-op */ }
     if (init.components) {
-      this._componentFilter = init.componentFilter || null;
-      if (!this._observables.has(entity)) {
-        this._recordEntity(entity, init.componentFilter);
-      }
+      const filter = init.componentFilter && init.componentFilter.length ?
+                     init.componentFilter : null;
+      this._observables.delete(entity);
+      this._recordEntity(entity, filter);
     }
   }
 
@@ -46,9 +46,8 @@ class EntityObserver {
     Array.from(this._observables.keys()).forEach(entity => this._collectChanges(entity));
   }
 
-  _recordEntity(entity) {
-    const filter = this._componentFilter;
-    this._observables.set(entity, {});
+  _recordEntity(entity, filter) {
+    this._observables.set(entity, [{}, filter]);
     Object.values(entity.components).forEach(component => {
       if (!filter || filter.indexOf(component.name) >= 0) {
         this._updateComponent(entity, component);
@@ -60,7 +59,7 @@ class EntityObserver {
     const schema = component.schema;
     const data = component.data;
     const lastValue = this._stringify(data, schema);
-    this._observables.get(entity)[component.name] = lastValue;
+    this._observables.get(entity)[0][component.name] = lastValue;
   }
 
   _stringify(data, schema) {
@@ -72,8 +71,8 @@ class EntityObserver {
   }
 
   _collectChanges(entity) {
-    const filter = this._componentFilter;
     const changes = [];
+    const filter = this._observables.get(entity)[1];
     Object.values(entity.components).forEach(component => {
       if (!filter || filter.indexOf(component.name) >= 0) {
         const change = this._getChanges(entity, component)

@@ -163,12 +163,12 @@ export default registerComponent('sharedspace', {
   _setupAvatar(participant) {
     participant.setAttribute('camera', '');
     participant.setAttribute('look-controls', '');
-    if (!participant.hasAttribute('myself')) {
-      participant.setAttribute('myself', 'share: rotation');
+    if (!participant.hasAttribute('onmyself')) {
+      participant.setAttribute('onmyself', 'share: rotation');
     }
     participant.addEventListener('componentinitialized', ({ detail }) => {
       const { name, data } = detail;
-      if (name === 'myself') {
+      if (name === 'onmyself') {
         this._share(participant, data.share);
       }
     });

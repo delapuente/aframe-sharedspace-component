@@ -1,6 +1,6 @@
 import { registerComponent } from 'aframe';
 
-export default registerComponent('myself', {
+export default registerComponent('onmyself', {
   schema: {
     share: { type: 'array', default: [] }
   }
