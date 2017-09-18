@@ -98,8 +98,8 @@ class Participant extends EventTarget {
       nextList.add(id);
       this._updateList(nextList);
       this._broadcastList();
-      this._confirmEnter(id);
     }
+    this._confirmEnter(id);
   }
 
   _onStream({ detail: { stream, id } }) {

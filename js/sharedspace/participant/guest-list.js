@@ -90,7 +90,7 @@ class GuestList {
   }
 
   static serialize(list) {
-    return { timestamp: list.timestamp, list: list._list };
+    return { timestamp: list.timestamp, list: list._list.slice(0) };
   }
 
   static deserialize(json) {

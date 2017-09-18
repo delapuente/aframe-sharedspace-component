@@ -11,7 +11,7 @@ export default registerComponent('sharedspace', {
     provider: { default: 'localhost:9000' },
     room: { default: 'room-101' },
     audio: { default: false },
-    onguest: { type: 'selector', default: '[avatar]' },
+    onparticipant: { type: 'selector', default: '#participant' },
     me: { default: '' }
   },
 
@@ -61,15 +61,17 @@ export default registerComponent('sharedspace', {
   _onEnterParticipant({ detail: { id, position, role } }) {
     log(`on enter: ${id} (${role}) at position ${position}`);
     const participant = this._getParticipantElement(id);
-    if (participant.components['position-around']) {
-      participant.setAttribute('position-around', { position });
-    }
+    requestAnimationFrame(() => {
+      if (participant.hasAttribute('position-around')) {
+        participant.setAttribute('position-around', { position });
+      }
+    });
   },
 
   _getParticipantElement(id) {
     let participant = this.el.querySelector(`[data-sharedspace-id="${id}"]`);
     if (!participant) {
-      const template = document.querySelector('#participant');
+      const template = this.data.onparticipant;
       participant = document.importNode(template.content, true).children[0];
       participant.dataset.sharedspaceId = id;
       this.el.appendChild(participant);
