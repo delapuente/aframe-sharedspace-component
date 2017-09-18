@@ -77,14 +77,6 @@ class RTCInterface extends EventTarget {
     this._emit('exit', { id });
   }
 
-  _isOutOfDate(msg) {
-    return false; // TODO: Implement sync counters by origin and type.
-  }
-
-  _consume(msg) {
-    // TODO: Update sync counters by origin and type.
-  }
-
   _emit(type, detail) {
     const event = new CustomEvent(type, { detail });
     this.dispatchEvent(event);

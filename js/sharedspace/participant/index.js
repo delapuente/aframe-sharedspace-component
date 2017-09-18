@@ -20,15 +20,15 @@ function wait(time) {
  *
  * To that end, the source of trust is centralized into the "host" participant.
  *
- * For choosing the host, a participants starts with "unknown" role. As soon as
+ * For choosing the "host", a participant starts with "unknown" role. As soon as
  * it discovers another participant, it creates a two item participant list
- * with itself and the other participant and broadcast this list along with its
- * enter time.
+ * with itself and the other participant, and broadcast this list along with its
+ * enter-time.
  *
- * Eventually, it will receive another list from the other participant. Then,
- * the list with an older enter time becomes the trusted one. If this list was
- * that coming from the other participant, the role of this participant will be
- * "guest", otherwise it will be "host".
+ * Eventually, it will receive another list from the other participant. The
+ * list with the oldest enter-time is choosen. If this list is the local one,
+ * the participant becomes "host". If the list is the remote one, the
+ * participant becomes "guest".
  *
  * If a participant becomes the "host", it will start broadcasting the list
  * periodically.
@@ -38,27 +38,21 @@ function wait(time) {
  * randomly from 1 to 3 seconds.
  *
  * The "host" will send the participant list periodically and will ignore
- * any other list. The "guests" will only accept lists coming from the "host"
+ * any other list. The "guests" will only accept lists coming from the "host",
  * and the "unknown" participants joining later will choose the "host" list
- * as reference as described before.
+ * as described before.
  *
  * Notice that entering and leaving events also happen along with list updates
  * and it is not guranteed that they happen in any specific order.
  *
  * When some participant leaves, it is not removed from the list but marked
  * as absent (nullified right now). It could be the participant leaving is
- * the current host. Then a takeover happens.
+ * the current "host". Then a takeover happens.
  *
- * If the host is leaving, all the "guests" will remove the host from their
- * lists. Since their lists are the same, the next host (the next non-null
+ * If the host is leaving, all the "guests" will remove the "host" from their
+ * lists. Since their lists are the same, the next "host" (the next non-null
  * participant) must be the same. This participant will also upgrade its role
  * to "host" and will start broadcasting its list periodically.
- *
- * Peer to peer communications are not guaranteed to reach the destination.
- * The same happens with the order of reception of sent messages. This is
- * enough right now but it introduces a high risk of split networks if there is
- * a lot of participants joining simultaneously. **It is recommended to join one
- * by one to avoid the risk of a network split.**
  */
 class Participant extends EventTarget {
   constructor(room, { id, stream, provider }) {
@@ -109,9 +103,9 @@ class Participant extends EventTarget {
   }
 
   /*
-   * Becomes the host if the current host is leaving and it is the next.
-   * It only removes the participant if it is the host, to properly calculate
-   * the next host.
+   * Becomes the "host" if the current "host" is leaving and it is the next.
+   * It only removes the participant if it is the "host", to properly calculate
+   * the next "host".
    */
   _takeover(participant) {
     const isHost = this._list.isHost(participant);
@@ -127,8 +121,8 @@ class Participant extends EventTarget {
   }
 
   /*
-   * Notice that, by the time the list is received. It is possibly that not all
-   * the guests have been detected yet.
+   * Notice that, by the time the list is received. It is possibly that this
+   * "guest" has not connect with all the other guests yet.
    */
   _onlist(message) {
     log('on list:', message);
@@ -179,7 +173,8 @@ class Participant extends EventTarget {
 
   /**
    * Select the list of guests that, transforming the other into it, is cheaper.
-   * Cost of a transformation is given by the function transformationCost().
+   * Cost of a transformation is given by the method
+   * GuestList#transformationCost().
    */
   _selectList(listA, listB) {
     const [ costAB, costBA ] = this._calculateCosts(listA, listB);
