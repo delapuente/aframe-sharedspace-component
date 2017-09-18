@@ -94,7 +94,7 @@ class EntityObserver {
   }
 
   _getChanges(entity, component) {
-    const oldValue = this._observables.get(entity)[component.name];
+    const oldValue = this._observables.get(entity)[0][component.name];
     const newValue = this._stringify(component.data, component.schema);
     if (oldValue !== newValue) {
       this._updateComponent(entity, component);

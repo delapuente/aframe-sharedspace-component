@@ -19,6 +19,7 @@ export default registerComponent('sharedspace', {
 
   init() {
     this._connected = false;
+    // TODO: Isolate all the monitoring, collecting and applying updates.
     this._tree = new SceneTree(this.el);
     this._ongoingUpdates = [];
     this._incomingUpdates = [];
@@ -107,15 +108,42 @@ export default registerComponent('sharedspace', {
   _getParticipantElement(id) {
     let participant = this.el.querySelector(`[data-sharedspace-id="${id}"]`);
     if (!participant) {
+      const isMe = id === this._participation.me;
       const template = this.data.participant;
       participant = document.importNode(template.content, true).children[0];
       participant.dataset.sharedspaceId = id;
-      if (id === this._participation.me) {
+      if (!isMe) {
+        const stream = this._participation.getStreams(id)[0];
+        if (stream) {
+          log(`streaming: ${id}`, stream);
+          const source = this._addStream(id, stream);
+          participant.setAttribute('sound', `src: #${source.id}`);
+        }
+      }
+      if (isMe) {
         this._setupAvatar(participant);
       }
       this.el.appendChild(participant);
     }
     return participant;
+  },
+
+  _addStream(id, stream) {
+    const assets = this._getAssets();
+    const source = new Audio();
+    source.id = `participant-stream-${id}`;
+    source.srcObject = stream;
+    assets.appendChild(source);
+    return source;
+  },
+
+  _getAssets() {
+    let assets = this.el.sceneEl.querySelector('a-assets');
+    if (!assets) {
+      assets = document.createElement('A-ASSETS');
+      this.el.sceneEl.appendChild(assets);
+    }
+    return assets;
   },
 
   _onExitParticipant({ detail: { id, position, role } }) {
