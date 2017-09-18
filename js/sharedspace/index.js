@@ -1,6 +1,8 @@
 import { registerComponent, utils } from 'aframe';
-import { Participant } from './participant';
-import { panic } from './utils';
+import { Participation } from './participation';
+import { SceneTree } from './scene-tree';
+import { EntityObserver } from './entity-observer';
+import { panic } from '../utils';
 
 const bind = utils.bind;
 const log = utils.debug('sharedspace:log');
@@ -11,11 +13,18 @@ export default registerComponent('sharedspace', {
     provider: { default: 'localhost:9000' },
     room: { default: 'room-101' },
     audio: { default: false },
-    onparticipant: { type: 'selector', default: '#participant' },
+    participant: { type: 'selector', default: '#participant' },
     me: { default: '' }
   },
 
   init() {
+    this._connected = false;
+    this._tree = new SceneTree(this.el);
+    this._ongoingUpdates = [];
+    this._incomingUpdates = [];
+    this._collectToSend = bind(this._collectToSend, this);
+    this._observer = new EntityObserver(this._collectToSend);
+
     const { audio } = this.data;
     if (!audio) {
       this._initParticipation(null)
@@ -35,6 +44,22 @@ export default registerComponent('sharedspace', {
     }
   },
 
+  tick(...args) {
+    this._observer.check(...args);
+    if (this._connected) {
+      this._sendUpdates();
+      this._applyUpdates();
+    }
+  },
+
+  send(target, message) {
+    this._participation.send(target, message);
+  },
+
+  _share(el, componentFilter) {
+    this._observer.observe(el, { components: true, componentFilter })
+  },
+
   _getUserMedia(constraints) {
     return navigator.mediaDevices.getUserMedia(constraints)
     .then(stream => {
@@ -45,11 +70,21 @@ export default registerComponent('sharedspace', {
 
   _initParticipation(stream) {
     const { room, id, provider } = this.data;
-    this._participation = new Participant(room, { id, stream, provider });
+    this._participation = new Participation(room, { id, stream, provider });
     this._participation.addEventListener(
       'enterparticipant', bind(this._onEnterParticipant, this)
     );
-    return this._participation.connect();
+    this._participation.addEventListener(
+      'exitparticipant', bind(this._onExitParticipant, this)
+    );
+    this._participation.addEventListener(
+      'participantmessage', bind(this._onParticipantMessage, this)
+    );
+    return this._participation.connect()
+    .then(result => {
+      this._connected = true;
+      return result;
+    });
   },
 
   _configureParticipation() {
@@ -61,7 +96,8 @@ export default registerComponent('sharedspace', {
   _onEnterParticipant({ detail: { id, position, role } }) {
     log(`on enter: ${id} (${role}) at position ${position}`);
     const participant = this._getParticipantElement(id);
-    requestAnimationFrame(() => {
+    participant.addEventListener('loaded', function onLoaded() {
+      participant.removeEventListener('loaded', onLoaded);
       if (participant.hasAttribute('position-around')) {
         participant.setAttribute('position-around', { position });
       }
@@ -71,11 +107,74 @@ export default registerComponent('sharedspace', {
   _getParticipantElement(id) {
     let participant = this.el.querySelector(`[data-sharedspace-id="${id}"]`);
     if (!participant) {
-      const template = this.data.onparticipant;
+      const template = this.data.participant;
       participant = document.importNode(template.content, true).children[0];
       participant.dataset.sharedspaceId = id;
+      if (id === this._participation.me) {
+        this._setupAvatar(participant);
+      }
       this.el.appendChild(participant);
     }
     return participant;
+  },
+
+  _onExitParticipant({ detail: { id, position, role } }) {
+    log(`on enter: ${id} (${role}) at position ${position}`);
+    const participant = this._getParticipantElement(id);
+    participant.parentNode.removeChild(participant);
+  },
+
+  _onParticipantMessage({ detail: { id, message } }) {
+    log(`on message: ${id}`, message);
+    if (message.type === 'participantsupdates') {
+      this._collectToApply(message.updates);
+      return;
+    }
+    this.el.emit('participantmessage', { id, message });
+  },
+
+  _collectToApply(updates) {
+    this._incomingUpdates.push(...updates);
+  },
+
+  _collectToSend(updates) {
+    updates = updates.map(update => {
+      const serializable = Object.assign({}, update);
+      const { sharedspaceId } = update.target.dataset;
+      serializable.target = `[data-sharedspace-id="${sharedspaceId}"]`;
+      return serializable;
+    });
+    this._ongoingUpdates.push(...updates);
+  },
+
+  _sendUpdates() {
+    if (this._ongoingUpdates.length > 0) {
+      const content = participantsUpdatesMessage(this._ongoingUpdates);
+      this._participation.send('*', content);
+      this._ongoingUpdates = [];
+    }
+  },
+
+  _applyUpdates() {
+    this._tree.applyUpdates(this._incomingUpdates);
+    this._incomingUpdates = [];
+  },
+
+  _setupAvatar(participant) {
+    participant.setAttribute('camera', '');
+    participant.setAttribute('look-controls', '');
+    if (!participant.hasAttribute('myself')) {
+      participant.setAttribute('myself', 'share: rotation');
+    }
+    participant.addEventListener('componentinitialized', ({ detail }) => {
+      const { name, data } = detail;
+      if (name === 'myself') {
+        this._share(participant, data.share);
+      }
+    });
   }
 });
+
+function participantsUpdatesMessage(updates) {
+  return { type: 'participantsupdates', updates };
+}

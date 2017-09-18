@@ -12,7 +12,7 @@ function wait(time) {
 }
 
 /**
- * The Participant class represents the participation model.
+ * The Participation class represents the participation model.
  *
  * This model tries to guarantee the entering order for all participants to be
  * the same and so, the problems translates to keeping a list of participants
@@ -54,7 +54,7 @@ function wait(time) {
  * participant) must be the same. This participant will also upgrade its role
  * to "host" and will start broadcasting its list periodically.
  */
-class Participant extends EventTarget {
+class Participation extends EventTarget {
   constructor(room, { id, stream, provider }) {
     super();
 
@@ -89,6 +89,16 @@ class Participant extends EventTarget {
 
   getStreams(id) {
     return this._streams.get(id).slice(0);
+  }
+
+  send(target, content) {
+    const message = contentMessage(content);
+    if (target === '*') {
+      this._rtc.broadcast(message);
+    }
+    else {
+      this._rtc.send(target, message);
+    }
   }
 
   _onEnter({ detail: { id } }) {
@@ -176,6 +186,12 @@ class Participant extends EventTarget {
     this._updateList(nextList);
   }
 
+  _oncontent(message) {
+    log('on content:', message);
+    const { from: id, content } = message;
+    this._emit('participantmessage', { id, message: content });
+  }
+
   _setRole(newRole) {
     if (newRole !== this._role) {
       this._role = newRole;
@@ -225,6 +241,8 @@ class Participant extends EventTarget {
    * immediately.
    */
   _informChanges(newList) {
+    if (this._role === 'unknown') { return; }
+
     const changes = this._list.computeChanges(newList);
     changes.forEach(({ operation, id, index }) => {
       const action = operation === 'add' ? 'enter' : 'exit';
@@ -291,4 +309,8 @@ function listMessage(guestList) {
   return message;
 }
 
-export { Participant };
+function contentMessage(content) {
+  return { type: 'content', content };
+}
+
+export { Participation };

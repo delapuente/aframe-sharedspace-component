@@ -10,11 +10,14 @@
     <a-entity sharedspace="audio: true; provider: https://signaling.eu.ngrok.io">
       <a-sky color="#333"></a-sky>
       <a-plane rotation="-90 0 0" width="15" height="15" color="#777"></a-plane>
-      <a-cylinder class="table" position="0 0.4 0" radius="1.4" height="0.1" color="brown"></a-cylinder>
+      <a-cylinder class="table" position="0 0.8 0" radius="1.4" height="0.1" color="brown"></a-cylinder>
     </a-entity>
   </a-scene>
   <template id="participant">
-    <a-sphere radius="0.1" position-around></a-sphere>
+    <a-entity position-around>
+      <a-cylinder radius="0.1" height="0.05" rotation="90 0 0" segments-radial="5"></a-cylinder>
+      <a-plane depth="0.01" width="0.21" height="0.04" position="0 0.025 -0.026" rotation="180 0 0" color="#000"></a-plane>
+    </a-entity>
   </template>
 </body>
 </html>

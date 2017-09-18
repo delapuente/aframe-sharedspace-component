@@ -12,7 +12,7 @@ import { schema as schemaUtils, utils } from 'aframe';
  *
  * TODO: Optimize by not comparing with the stringifyed version.
  */
-class AFrameEntityObserver {
+class EntityObserver {
 
   constructor(callback) {
     this._observer = new MutationObserver(callback);
@@ -26,8 +26,9 @@ class AFrameEntityObserver {
     }
     catch (e) { /* no-op */ }
     if (init.components) {
+      this._componentFilter = init.componentFilter || null;
       if (!this._observables.has(entity)) {
-        this._recordEntity(entity);
+        this._recordEntity(entity, init.componentFilter);
       }
     }
   }
@@ -46,9 +47,12 @@ class AFrameEntityObserver {
   }
 
   _recordEntity(entity) {
+    const filter = this._componentFilter;
     this._observables.set(entity, {});
     Object.values(entity.components).forEach(component => {
-      this._updateComponent(entity, component);
+      if (!filter || filter.indexOf(component.name) >= 0) {
+        this._updateComponent(entity, component);
+      }
     });
   }
 
@@ -68,18 +72,21 @@ class AFrameEntityObserver {
   }
 
   _collectChanges(entity) {
+    const filter = this._componentFilter;
     const changes = [];
     Object.values(entity.components).forEach(component => {
-      const change = this._getChanges(entity, component)
-      if (change) {
-        const [oldValue, newValue] = change;
-        changes.push({
-          type: 'components',
-          target: entity,
-          componentName: component.name,
-          oldValue,
-          newValue
-        });
+      if (!filter || filter.indexOf(component.name) >= 0) {
+        const change = this._getChanges(entity, component)
+        if (change) {
+          const [oldValue, newValue] = change;
+          changes.push({
+            type: 'components',
+            target: entity,
+            componentName: component.name,
+            oldValue,
+            newValue
+          });
+        }
       }
     });
     if (changes.length) {
@@ -99,4 +106,4 @@ class AFrameEntityObserver {
 
 }
 
-export { AFrameEntityObserver };
+export { EntityObserver };

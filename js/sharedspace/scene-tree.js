@@ -1,11 +1,14 @@
+import { utils } from 'aframe';
+
+const warn = utils.debug('sharedspace:scene-tree:warn');
 
 /**
  * Manages the mutations on the scene tree.
  */
 class SceneTree {
 
-  constructor(scene) {
-    this._scene = scene;
+  constructor(root) {
+    this._root = root;
   }
 
   applyUpdates(updates) {
@@ -27,11 +30,13 @@ class SceneTree {
 
   _applyComponentsUpdate(update) {
     const { target, componentName, newValue } = update;
-    const element = this._scene.querySelector(`[data-nsync-id="${target}"]`);
+    const element = this._root.querySelector(target);
+
     if (!element) {
-      console.error(`Element '${target}' is out of sync`);
+      warn(`element '${target}' is out of sync`);
       return;
     }
+
     element.setAttribute(componentName, newValue);
   }
 
