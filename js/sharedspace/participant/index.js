@@ -60,6 +60,7 @@ class Participant extends EventTarget {
 
     this._rtc = new RTCInterface(room, { id, stream, signaling: provider });
     this._rtc.addEventListener('enter', bind(this._onEnter, this));
+    this._rtc.addEventListener('stream', bind(this._onStream, this));
     this._rtc.addEventListener('exit', bind(this._onExit, this));
     this._rtc.addEventListener('message', bind(this._onMessage, this));
 
@@ -70,6 +71,7 @@ class Participant extends EventTarget {
     return wait(Math.random() * 2000) // XXX: see explanation above.
     .then(() => this._rtc.connect())
     .then(() => {
+      this._streams = new Map();
       this._enterTime = Date.now();
       this._list = window.list = new GuestList(this._enterTime, [this.me]);
       this._waitingList = [];
@@ -85,13 +87,31 @@ class Participant extends EventTarget {
    return this._rtc.me;
   }
 
+  getStreams(id) {
+    return this._streams.get(id).slice(0);
+  }
+
   _onEnter({ detail: { id } }) {
-    log('enter participant:', id);
+    log('on enter:', id);
     if (this._role !== 'guest') {
-      this._list.add(id);
+      const nextList = GuestList.copy(this._list);
+      nextList.add(id);
+      this._updateList(nextList);
       this._broadcastList();
       this._confirmEnter(id);
     }
+  }
+
+  _onStream({ detail: { stream, id } }) {
+    this._addStream(id, stream);
+    this._emit('participantstream', { stream, id });
+  }
+
+  _addStream(id, stream) {
+    if (!this._streams.has(id)) {
+      this._streams.set(id, []);
+    }
+    this._streams.get(id).push(stream);
   }
 
   _onExit({ detail: { id } }) {
@@ -112,7 +132,9 @@ class Participant extends EventTarget {
     const meIsNext = this.me === this._list.nextHost();
     if (isHost) {
       log('host is leaving, be prepared for the takeover');
-      this._list.remove(participant);
+      const nextList = GuestList.copy(this._list);
+      nextList.remove(participant);
+      this._updateList(nextList);
       if (meIsNext) {
         log('taking over');
         this._setRole('host');
@@ -138,14 +160,14 @@ class Participant extends EventTarget {
 
     let nextList = remoteList;
     if (this._role === 'unknown') {
-      nextList = this._selectList(this._list, remoteList);
-      if (nextList === this._list) {
+      nextList = this._selectList(GuestList.copy(this._list), remoteList);
+      if (nextList.equals(this._list)) {
         this._setRole('host');
       }
       else {
         this._setRole('guest');
-        this._list.clear();
       }
+      this._list.clear(); //TODO: Perhaps split into _list and _candidateList
 
       log('best list:', nextList);
       log('role:', this._role);
@@ -206,7 +228,8 @@ class Participant extends EventTarget {
     const changes = this._list.computeChanges(newList);
     changes.forEach(({ operation, id, index }) => {
       const action = operation === 'add' ? 'enter' : 'exit';
-      const role = this._list.getRole(id);
+      // TODO: Perhaps change to GuestLog
+      const role = (action === 'enter' ? newList : this._list).getRole(id);
       const position = index + 1;
       if (action === 'enter') {
         this._waitFor(id)

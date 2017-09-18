@@ -59,8 +59,13 @@ class RTCInterface extends EventTarget {
   }
 
   _setupPeer(peer, id) {
+    peer.on('stream', bind(this._onStream, this, id));
     peer.on('data', bind(this._onData, this));
     peer.on('close', bind(this._onClose, this, id));
+  }
+
+  _onStream(id, stream) {
+    this._emit('stream', { id, stream });
   }
 
   _onData(data) {

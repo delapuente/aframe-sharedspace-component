@@ -42,9 +42,9 @@ class GuestList {
   computeChanges(target) {
     const changes = [];
     const length = this._list.length;
-    const newLength = target.length;
+    const newLength = target._list.length;
     for (let index = 0; index < length; index++) {
-      if (!target[index]) {
+      if (!target._list[index]) {
         changes.push({
           index,
           operation: 'remove',
@@ -57,7 +57,7 @@ class GuestList {
         changes.push({
           index,
           operation: 'add',
-          id: target[index]
+          id: target._list[index]
         });
       }
     }
@@ -99,6 +99,10 @@ class GuestList {
 
   static transformationCost(origin, destination) {
     return (destination.timestamp - origin.timestamp);
+  }
+
+  static copy(list) {
+    return GuestList.deserialize(GuestList.serialize(list));
   }
 }
 

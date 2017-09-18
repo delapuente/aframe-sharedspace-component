@@ -11,6 +11,7 @@ export default registerComponent('sharedspace', {
     provider: { default: 'localhost:9000' },
     room: { default: 'room-101' },
     audio: { default: false },
+    onguest: { type: 'selector', default: '[avatar]' },
     me: { default: '' }
   },
 
@@ -45,6 +46,9 @@ export default registerComponent('sharedspace', {
   _initParticipation(stream) {
     const { room, id, provider } = this.data;
     this._participation = new Participant(room, { id, stream, provider });
+    this._participation.addEventListener(
+      'enterparticipant', bind(this._onEnterParticipant, this)
+    );
     return this._participation.connect();
   },
 
@@ -52,5 +56,24 @@ export default registerComponent('sharedspace', {
     if (!this._participation) { panic('Participation not initialized'); }
     this.data.me = this._participation.me;
     log('Me:', this.data.me);
+  },
+
+  _onEnterParticipant({ detail: { id, position, role } }) {
+    log(`on enter: ${id} (${role}) at position ${position}`);
+    const participant = this._getParticipantElement(id);
+    if (participant.components['position-around']) {
+      participant.setAttribute('position-around', { position });
+    }
+  },
+
+  _getParticipantElement(id) {
+    let participant = this.el.querySelector(`[data-sharedspace-id="${id}"]`);
+    if (!participant) {
+      const template = document.querySelector('#participant');
+      participant = document.importNode(template.content, true).children[0];
+      participant.dataset.sharedspaceId = id;
+      this.el.appendChild(participant);
+    }
+    return participant;
   }
 });

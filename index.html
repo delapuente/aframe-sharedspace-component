@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <title>A-Frame Chat</title>
-  <script defer src="dist/bundle.js"></script>
+  <script src="dist/bundle.js"></script>
 </head>
 <body>
   <a-scene stats>
-    <a-assets>
-    </a-assets>
     <a-entity sharedspace="audio: true; provider: https://signaling.eu.ngrok.io">
-      <a-entity environment></a-entity>
+      <a-sky color="#333"></a-sky>
       <a-plane rotation="-90 0 0" width="15" height="15" color="#777"></a-plane>
-      <a-cylinder class="table" position="0 0.8 0" radius="1.5" height="0.3" color="brown"></a-cylinder>
-      <a-sphere avatar position-around></a-sphere>
+      <a-cylinder class="table" position="0 0.4 0" radius="1.4" height="0.1" color="brown"></a-cylinder>
     </a-entity>
   </a-scene>
+  <template id="participant">
+    <a-sphere radius="0.1"></a-sphere>
+  </template>
 </body>
 </html>
