@@ -63,16 +63,19 @@ Sound.prototype.update = function (oldData) {
   // All sound values set. Load in `src`.
   if (srcChanged) {
     var self = this;
-    var isStream = (data.src.srcObject instanceof MediaStream);
 
-    if (isStream) {
-      var stream = data.src.srcObject;
-      self.pool.children.forEach(function (sound) {
-        sound.setNodeSource(sound.context.createMediaStreamSource(stream));
-      });
-      self.loaded = true;
-      self.el.emit('sound-loaded');
-      return;
+    if (window.MediaStream) {
+      var isStream = (data.src.srcObject instanceof window.MediaStream);
+
+      if (isStream) {
+        var stream = data.src.srcObject;
+        self.pool.children.forEach(function (sound) {
+          sound.setNodeSource(sound.context.createMediaStreamSource(stream));
+        });
+        self.loaded = true;
+        self.el.emit('sound-loaded');
+        return;
+      }
     }
 
     var src = data.src.src;

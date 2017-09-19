@@ -1,8 +1,8 @@
 {
-  "name": "aframe-chat",
-  "version": "1.0.0",
-  "description": "VR chat powered by A-Frame",
-  "main": "index.js",
+  "name": "aframe-sharedspace-component",
+  "version": "0.1.0",
+  "description": "A-Frame VR chatroom component",
+  "main": "dist/aframe-sharedspace-component.js",
   "scripts": {
     "build": "webpack",
     "clean": "shx rm -rf site",
@@ -21,7 +21,9 @@
     "networking",
     "p2p",
     "chat",
-    "vrspace"
+    "vrspace",
+    "virtual",
+    "space"
   ],
   "author": "Salvador de la Puente <salva@unoyunodiez.com>",
   "license": "MPL-2.0",
@@ -33,10 +35,13 @@
     "gh-pages": "^1.0.0",
     "shx": "^0.2.2",
     "webpack": "^2.6.1",
+    "webpack-bundle-analyzer": "^2.9.0",
     "webpack-dev-server": "^2.4.5"
   },
+  "peerDependencies": {
+    "aframe": "^0.6.1"
+  },
   "dependencies": {
-    "aframe": "^0.6.1",
     "concurrently": "^3.5.0",
     "event-target-shim": "^2.0.0",
     "signalhub": "^4.8.0",

@@ -1,4 +1,4 @@
-import { registerComponent, utils } from 'aframe';
+import { registerComponent } from 'aframe';
 
 export default registerComponent('position-around', {
   dependencies: ['position'],
