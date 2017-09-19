@@ -4,20 +4,102 @@
   <meta charset="utf-8" />
   <title>The (Un)Happy Birthday Chamber</title>
   <script src="https://aframe.io/releases/0.6.1/aframe.min.js"></script>
+  <script src="https://rawgit.com/feiss/aframe-environment-component/master/dist/aframe-environment-component.min.js"></script>
   <script src="dist/aframe-sharedspace-component.js"></script>
 </head>
 <body>
   <a-scene stats>
+    <a-assets>
+      <a-asset-item id="cake" src="/assets/cake/scene.gltf"></a-asset-item>
+    </a-assets>
     <a-entity sharedspace="audio: true; provider: https://signaling.eu.ngrok.io">
-      <a-sky color="#333"></a-sky>
-      <a-plane rotation="-90 0 0" width="15" height="15" color="#777"></a-plane>
-      <a-cylinder class="table" position="0 0.8 0" radius="1.4" height="0.1" color="brown"></a-cylinder>
+      <!-- Outside the window -->
+      <a-entity environment="preset: osiris"></a-entity>
+
+      <!-- Room -->
+      <a-entity position="0 0.1 0" geometry="depth:8;height:0.1;width:4" material="color:#fff3d2;fog:false;roughness:0.68" shadow=""></a-entity>
+      <a-entity position="0 2.5 0" geometry="width:4;height:0.1;depth:8" material="color:#ffffff;fog:false"></a-entity>
+      <a-entity position="0 1.3 3.95" rotation="0 0 0.01" geometry="depth:0.1;height:2.5;width:4" material="opacity:0.2;roughness:0.010000000000000009;fog:false;color:#ffffff"></a-entity>
+      <a-entity position="0 1.3 -3.95" rotation="0 0 0.01" geometry="height:2.5;width:4;depth:0.1" material="fog:false;color:#ffffff"></a-entity>
+      <a-entity position="-1.95 1.3 0" geometry="depth:8;height:2.5;width:0.1" material="color:#ffffff;fog:false"></a-entity>
+      <a-entity position="1.95 1.3 0" geometry="depth:8;height:2.5;width:0.1" material="opacity:0.2;roughness:0.010000000000000009;fog:false;color:#ffffff"></a-entity>
+      <a-entity position="0 2.191 0" rotation="-90.01 0 0" light="intensity:0.5;penumbra:0.2;color:#f3fbf8;groundColor:#f9fffe;angle:80;castShadow:true;type:point"></a-entity>
+      <a-entity position="0 2.465 -2.567" rotation="-90.01 0 0" light="intensity:0.5;color:#f3fbf8;groundColor:#f9fffe;angle:80;penumbra:0.05;castShadow:true;type:spot"></a-entity>
+      <a-entity position="-1.831 1.883 0" rotation="10.026761414789405 90.01166961505233 0" geometry="primitive:plane;height:0.6;width:5" material="shader:flat;color:#9dff43" text="align:center;color:#ff00b1;value:CONGRATULATIONS!!!;wrapCount:20"></a-entity>
+
+
+      <!-- Table -->
+      <a-cylinder class="table"
+                  position="0 0.8 0"
+                  height="0.02" color="#8ae0f4"
+                  segments-height="1" segments-radial="6">
+
+        <a-entity class="cake" position="0 0.01 0">
+          <a-cylinder class="dish"
+                      position="0 0.0025 0"
+                      height="0.005" radius="0.16"
+                      segments-height="1" segments-radial="12"
+                      material="shader: flat; color: #e5e3f0">
+          </a-cylinder>
+          <a-cylinder class="cream"
+                      position="0 0.0525 0"
+                      height="0.1" radius="0.15"
+                      segments-height="1" segments-radial="16"
+                      material="roughness:1; side:double; color:#fffde8">
+          </a-cylinder>
+          <a-cylinder class="chocolate"
+                      position="0 0.130 0"
+                      height="0.05" radius="0.08"
+                      segments-height="1" segments-radial="10"
+                      material="roughness:1; side:double; color:#773909">
+          </a-cylinder>
+          <a-cylinder class="candle"
+                      position="0 0.185 0"
+                      height="0.06" radius="0.005"
+                      segments-height="1" segments-radial="3"
+                      material="color:#ffffff;shader:flat">
+
+            <a-sphere class="flame"
+                      position="0 0.04 0"
+                      radius="0.01"
+                      segments-height="2" segments-width="2"
+                      material="
+                        shader:gradientshader;
+                        topColor: #ff6400; bottomColor: #000000;
+                      ">
+              <a-entity class="flame-light"
+                        position="0 1.035 -0.055"
+                        light="
+                          type:point;
+                          intensity:0;color:#fa781f;
+                          decay:2;distance:1;groundColor:#f3ffe2;
+                        ">
+              </a-entity>
+            </a-sphere>
+          </a-cylinder>
+        </a-entity>
+      </a-cylinder>
+
     </a-entity>
   </a-scene>
   <template id="participant">
     <a-entity position-around>
-      <a-cylinder radius="0.1" height="0.05" rotation="90 0 0" segments-radial="5"></a-cylinder>
-      <a-plane depth="0.01" width="0.18" height="0.04" position="0 0.025 -0.026" rotation="180 0 0" color="#000"></a-plane>
+      <!-- Party hat -->
+      <a-cone position="0 0.23 0"
+              radius-bottom="0.075" radius-top="0" height="0.15"
+              segments-height="1" segments-radial="8">
+      </a-cone>
+
+      <!-- Face -->
+      <a-cylinder rotation="90 0 0"
+                  radius="0.15" height="0.075"
+                  segments-height="1" segments-radial="5">
+      </a-cylinder>
+
+      <!-- Cool glasses -->
+      <a-plane position="0 0.038 -0.040" rotation="180 0 0"
+               depth="0.015" width="0.27" height="0.06" color="#000">
+      </a-plane>
     </a-entity>
   </template>
 </body>

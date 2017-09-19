@@ -4,8 +4,8 @@ export default registerComponent('position-around', {
   dependencies: ['position'],
 
   schema: {
-    radius: { default: 1.5 },
-    height: { default: 1 },
+    radius: { default: 1.1 },
+    height: { default: 1.6 },
     position: { default: 1 }
   },
 
