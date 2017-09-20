@@ -45,19 +45,23 @@ class GuestList {
     const newLength = target._list.length;
     for (let index = 0; index < length; index++) {
       if (!target._list[index]) {
+        const id = this._list[index];
         changes.push({
-          index,
-          operation: 'remove',
-          id: this._list[index]
+          id,
+          role: this.getRole(id),
+          position: index + 1,
+          action: 'exit'
         });
       }
     }
     for (let index = length; index < newLength; index++) {
       if (!this._list[index]) {
+        const id = target._list[index];
         changes.push({
-          index,
-          operation: 'add',
-          id: target._list[index]
+          id,
+          role: target.getRole(id),
+          position: index + 1,
+          action: 'enter'
         });
       }
     }
@@ -73,7 +77,7 @@ class GuestList {
     return;
   }
 
-  includes(id) {
+  isPresent(id) {
     return this.indexOf(id) >= 0;
   }
 
