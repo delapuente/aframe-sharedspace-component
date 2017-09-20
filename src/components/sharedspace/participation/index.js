@@ -229,8 +229,11 @@ class Participation extends EventTarget {
   }
 
   _updateList(newList) {
-    this._informChanges(newList);
+    const changes = this._list.computeChanges(newList);
     this._list = window.list = newList;
+    if (this._role !== 'unknown') {
+      this._informChanges(newList);
+    }
   }
 
   /*
@@ -240,21 +243,14 @@ class Participation extends EventTarget {
    * option to keep synchronization with the "host" is to inform it's leaving
    * immediately.
    */
-  _informChanges(newList) {
-    if (this._role === 'unknown') { return; }
-
-    const changes = this._list.computeChanges(newList);
-    changes.forEach(({ operation, id, index }) => {
-      const action = operation === 'add' ? 'enter' : 'exit';
-      // TODO: Perhaps change to GuestLog
-      const role = (action === 'enter' ? newList : this._list).getRole(id);
-      const position = index + 1;
+  _informChanges(changes) {
+    changes.forEach(({ id, role, position, action }) => {
       if (action === 'enter') {
         this._waitFor(id)
-        .then(() => this._emit('enterparticipant', { id, position, role }));
+        .then(() => this._emit('enterparticipant', { id, role, position }));
       }
       else {
-        this._emit('exitparticipant', { id, position, role });
+        this._emit('exitparticipant', { id, role, position });
       }
     });
   }
