@@ -55,7 +55,7 @@ class RTCInterface extends EventTarget {
   _onPeer(peer, id) {
     this._peers.set(id, peer);
     this._setupPeer(peer, id);
-    this._emit('enter', { id });
+    this._emit('connect', { id });
   }
 
   _setupPeer(peer, id) {
@@ -79,7 +79,7 @@ class RTCInterface extends EventTarget {
 
   _onClose(id) {
     this._peers.delete(id);
-    this._emit('exit', { id });
+    this._emit('close', { id });
   }
 
   _emit(type, detail) {

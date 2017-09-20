@@ -59,9 +59,9 @@ class Participation extends EventTarget {
     super();
 
     this._rtc = new RTCInterface(room, { id, stream, signaling: provider });
-    this._rtc.addEventListener('enter', bind(this._onEnter, this));
+    this._rtc.addEventListener('connect', bind(this._onConnect, this));
     this._rtc.addEventListener('stream', bind(this._onStream, this));
-    this._rtc.addEventListener('exit', bind(this._onExit, this));
+    this._rtc.addEventListener('close', bind(this._onClose, this));
     this._rtc.addEventListener('message', bind(this._onMessage, this));
 
     this._role = 'unknown';
@@ -74,7 +74,8 @@ class Participation extends EventTarget {
       this._streams = new Map();
       this._enterTime = Date.now();
       this._list = window.list = new GuestList(this._enterTime, [this.me]);
-      this._waitingList = [];
+      this._connectionWaitingList = [];
+      this._presenceWaitingList = [];
       this._emit('connected', { me: this.me });
     });
   }
@@ -101,20 +102,25 @@ class Participation extends EventTarget {
     }
   }
 
-  _onEnter({ detail: { id } }) {
-    log('on enter:', id);
+  get _negotiating() {
+    return this._role === 'unknown';
+  }
+
+  _onConnect({ detail: { id } }) {
+    log('on connect:', id);
     if (this._role !== 'guest') {
       const nextList = GuestList.copy(this._list);
       nextList.add(id);
       this._updateList(nextList);
       this._broadcastList();
     }
-    this._confirmEnter(id);
+    this._confirmConnection(id);
   }
 
   _onStream({ detail: { stream, id } }) {
     this._addStream(id, stream);
-    this._emit('participantstream', { stream, id });
+    this._waitForPresence(id)
+    .then(() => this._emit('participantstream', { stream, id }));
   }
 
   _addStream(id, stream) {
@@ -124,8 +130,8 @@ class Participation extends EventTarget {
     this._streams.get(id).push(stream);
   }
 
-  _onExit({ detail: { id } }) {
-    log('on exit:', id);
+  _onClose({ detail: { id } }) {
+    log('on close:', id);
     this._takeover(id);
     if (this._role !== 'guest') {
       this._broadcastList();
@@ -160,7 +166,7 @@ class Participation extends EventTarget {
     log('on list:', message);
 
     const notFromHost = !this._list.isHost(message.from);
-    if (this._role !== 'unknown' && notFromHost) {
+    if (!this._negotiating && notFromHost) {
       log('ignoring list because it\'s not coming from host');
       return;
     }
@@ -169,7 +175,7 @@ class Participation extends EventTarget {
     if (this._list.equals(remoteList)) { return; }
 
     let nextList = remoteList;
-    if (this._role === 'unknown') {
+    if (this._negotiating) {
       nextList = this._selectList(GuestList.copy(this._list), remoteList);
       if (nextList.equals(this._list)) {
         this._setRole('host');
@@ -231,8 +237,8 @@ class Participation extends EventTarget {
   _updateList(newList) {
     const changes = this._list.computeChanges(newList);
     this._list = window.list = newList;
-    if (this._role !== 'unknown') {
-      this._informChanges(newList);
+    if (!this._negotiating) {
+      this._informChanges(changes);
     }
   }
 
@@ -246,8 +252,11 @@ class Participation extends EventTarget {
   _informChanges(changes) {
     changes.forEach(({ id, role, position, action }) => {
       if (action === 'enter') {
-        this._waitFor(id)
-        .then(() => this._emit('enterparticipant', { id, role, position }));
+        this._waitForConnection(id)
+        .then(() => {
+          this._emit('enterparticipant', { id, role, position });
+          this._confirmPresence(id);
+        });
       }
       else {
         this._emit('exitparticipant', { id, role, position });
@@ -255,24 +264,47 @@ class Participation extends EventTarget {
     });
   }
 
-  _waitFor(id) {
+  _waitForConnection(id) {
     if (id === this.me || this._rtc.isConnected(id)) {
       return Promise.resolve();
     }
-    log('waiting for:', id);
+    log('waiting for connection:', id);
     return new Promise(fulfill => {
-      this._waitingList.push([id, fulfill]);
+      this._connectionWaitingList.push([id, fulfill]);
     });
   }
 
-  _confirmEnter(targetId) {
-    for (let i = 0, l = this._waitingList.length; i < l; i++) {
-      const [id, fulfill] = this._waitingList.shift();
+  _confirmConnection(targetId) {
+    for (let i = 0, l = this._connectionWaitingList.length; i < l; i++) {
+      const [id, fulfill] = this._connectionWaitingList.shift();
       if (id !== targetId) {
-        this._waitingList.push([id, fulfill]);
+        this._connectionWaitingList.push([id, fulfill]);
       }
       else {
-        log('no longer waiting for:', id);
+        log('no longer waiting for connection:', id);
+        fulfill();
+      }
+    }
+  }
+
+  _waitForPresence(id) {
+    if (id === this.me || (!this._negotiating && this._list.isPresent(id))) {
+      return Promise.resolve();
+    }
+    log('waiting for presence:', id);
+    return new Promise(fulfill => {
+      this._presenceWaitingList.push([id, fulfill]);
+    });
+  }
+
+  _confirmPresence(targetId) {
+    for (let i = 0, l = this._presenceWaitingList.length; i < l; i++) {
+      const [id, fulfill] = this._presenceWaitingList.shift();
+      if (id !== targetId) {
+        this._presenceWaitingList.push([id, fulfill]);
+      }
+      else {
+        log('no longer waiting for presence:', id);
         fulfill();
       }
     }
