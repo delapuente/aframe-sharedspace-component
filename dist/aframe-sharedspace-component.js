@@ -6168,6 +6168,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 var bind = _aframe.utils.bind;
 var log = _aframe.utils.debug('sharedspace:log');
 var warn = _aframe.utils.debug('sharedspace:warn');
+var error = _aframe.utils.debug('sharedspace:error');
 
 exports.default = (0, _aframe.registerComponent)('sharedspace', {
   schema: {
@@ -6235,6 +6236,7 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
     this._participation.addEventListener('enterparticipant', bind(this._onEnterParticipant, this));
     this._participation.addEventListener('exitparticipant', bind(this._onExitParticipant, this));
     this._participation.addEventListener('participantmessage', bind(this._onParticipantMessage, this));
+    this._participation.addEventListener('participantstream', bind(this._onParticipantStream, this));
     return this._participation.connect().then(function (result) {
       _this._connected = true;
       return result;
@@ -6254,7 +6256,9 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
         role = _ref$detail.role;
 
     log('on enter: ' + id + ' (' + role + ') at position ' + position);
-    var participant = this._getParticipantElement(id);
+
+    var participant = this._getParticipant(id) || this._newParticipant(id, position);
+
     participant.addEventListener('loaded', function onLoaded() {
       participant.removeEventListener('loaded', onLoaded);
       if (participant.hasAttribute('position-around')) {
@@ -6262,58 +6266,99 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
       }
     });
   },
-  _getParticipantElement: function _getParticipantElement(id) {
-    var participant = this.el.querySelector('[data-sharedspace-id="' + id + '"]');
+  _getParticipant: function _getParticipant(id) {
+    return this.el.querySelector('[data-sharedspace-id="' + id + '"]');
+  },
+  _newParticipant: function _newParticipant(id, position) {
+    var template = this.data.participant;
+    var participant = document.importNode(template.content, true).children[0];
     if (!participant) {
-      var isMe = id === this._participation.me;
-      var template = this.data.participant;
-      participant = document.importNode(template.content, true).children[0];
-      participant.dataset.sharedspaceId = id;
-      if (!isMe) {
-        var stream = this._participation.getStreams(id)[0];
-        if (stream) {
-          log('streaming: ' + id, stream);
-          var source = this._addStream(id, stream);
-          participant.setAttribute('sound', 'src: #' + source.id);
-        }
-      }
-      if (isMe) {
-        this._setupAvatar(participant);
-      }
-      this.el.appendChild(participant);
+      return warn('Template was empty', template);
     }
+
+    participant.dataset.sharedspaceId = id;
+    participant.dataset.sharedspaceRoomPosition = position;
+
+    var isMe = id === this._participation.me;
+    if (isMe) {
+      this._setupAvatar(participant);
+    }
+
+    this.el.appendChild(participant);
     return participant;
   },
+  _setupAvatar: function _setupAvatar(participant) {
+    var _this2 = this;
+
+    participant.setAttribute('camera', '');
+    participant.setAttribute('look-controls', '');
+    if (!participant.hasAttribute('onmyself')) {
+      participant.setAttribute('onmyself', 'share: rotation');
+    }
+    participant.addEventListener('componentinitialized', function (_ref2) {
+      var detail = _ref2.detail;
+      var name = detail.name,
+          data = detail.data;
+
+      if (name === 'onmyself') {
+        _this2._share(participant, data.share);
+      }
+    });
+  },
+  _onParticipantStream: function _onParticipantStream(_ref3) {
+    var _ref3$detail = _ref3.detail,
+        stream = _ref3$detail.stream,
+        id = _ref3$detail.id;
+
+    var participant = this.el.querySelector('[data-sharedspace-id="' + id + '"]');
+    if (!participant) {
+      error('Participant ' + id + ' avatar is not in the DOM');
+      return;
+    }
+
+    log('streaming: ' + id, stream);
+    this._addStream(id, stream).then(function (source) {
+      participant.setAttribute('sound', 'src: #' + source.id);
+    });
+  },
   _addStream: function _addStream(id, stream) {
-    var assets = this._getAssets();
-    var source = new Audio();
-    source.id = 'participant-stream-' + id;
-    source.srcObject = stream;
-    assets.appendChild(source);
-    return source;
+    return this._getAssets().then(function (assets) {
+      var source = new Audio();
+      source.id = 'participant-stream-' + id;
+      source.srcObject = stream;
+      assets.appendChild(source);
+      return source;
+    });
   },
   _getAssets: function _getAssets() {
     var assets = this.el.sceneEl.querySelector('a-assets');
-    if (!assets) {
+    if (!assets || !assets.hasLoaded) {
       assets = document.createElement('A-ASSETS');
       this.el.sceneEl.appendChild(assets);
+      return new Promise(function (fulfill) {
+        assets.addEventListener('loaded', function () {
+          return fulfill(assets);
+        });
+      });
     }
-    return assets;
+    return Promise.resolve(assets);
   },
-  _onExitParticipant: function _onExitParticipant(_ref2) {
-    var _ref2$detail = _ref2.detail,
-        id = _ref2$detail.id,
-        position = _ref2$detail.position,
-        role = _ref2$detail.role;
+  _onExitParticipant: function _onExitParticipant(_ref4) {
+    var _ref4$detail = _ref4.detail,
+        id = _ref4$detail.id,
+        position = _ref4$detail.position,
+        role = _ref4$detail.role;
 
-    log('on enter: ' + id + ' (' + role + ') at position ' + position);
-    var participant = this._getParticipantElement(id);
-    participant.parentNode.removeChild(participant);
+    log('on exit: ' + id + ' (' + role + ') at position ' + position);
+    var participant = this._getParticipant(id);
+    if (participant) {
+      participant.parentNode.removeChild(participant);
+    }
   },
-  _onParticipantMessage: function _onParticipantMessage(_ref3) {
-    var _ref3$detail = _ref3.detail,
-        id = _ref3$detail.id,
-        message = _ref3$detail.message;
+  _onParticipantMessage: function _onParticipantMessage(_ref5) {
+    var _ref5$detail = _ref5.detail,
+        id = _ref5$detail.id,
+        message = _ref5$detail.message;
 
     log('on message: ' + id, message);
     if (message.type === 'participantsupdates') {
@@ -6349,24 +6394,6 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
   _applyUpdates: function _applyUpdates() {
     this._tree.applyUpdates(this._incomingUpdates);
     this._incomingUpdates = [];
-  },
-  _setupAvatar: function _setupAvatar(participant) {
-    var _this2 = this;
-
-    participant.setAttribute('camera', '');
-    participant.setAttribute('look-controls', '');
-    if (!participant.hasAttribute('onmyself')) {
-      participant.setAttribute('onmyself', 'share: rotation');
-    }
-    participant.addEventListener('componentinitialized', function (_ref4) {
-      var detail = _ref4.detail;
-      var name = detail.name,
-          data = detail.data;
-
-      if (name === 'onmyself') {
-        _this2._share(participant, data.share);
-      }
-    });
   }
 });
 
@@ -6720,19 +6747,23 @@ var GuestList = function () {
       var newLength = target._list.length;
       for (var index = 0; index < length; index++) {
         if (!target._list[index]) {
+          var id = this._list[index];
           changes.push({
-            index: index,
-            operation: 'remove',
-            id: this._list[index]
+            id: id,
+            role: this.getRole(id),
+            position: index + 1,
+            action: 'exit'
           });
         }
       }
       for (var _index = length; _index < newLength; _index++) {
         if (!this._list[_index]) {
+          var _id = target._list[_index];
           changes.push({
-            index: _index,
-            operation: 'add',
-            id: target._list[_index]
+            id: _id,
+            role: target.getRole(_id),
+            position: _index + 1,
+            action: 'enter'
           });
         }
       }
@@ -6749,6 +6780,16 @@ var GuestList = function () {
         }
       }
       return;
+    }
+  }, {
+    key: 'isPresent',
+    value: function isPresent(id) {
+      return this.indexOf(id) >= 0;
+    }
+  }, {
+    key: 'position',
+    value: function position(id) {
+      return this.indexOf(id) + 1;
     }
   }, {
     key: 'indexOf',
@@ -6898,9 +6939,9 @@ var Participation = function (_EventTarget) {
     var _this = _possibleConstructorReturn(this, (Participation.__proto__ || Object.getPrototypeOf(Participation)).call(this));
 
     _this._rtc = new _rtcInterface.RTCInterface(room, { id: id, stream: stream, signaling: provider });
-    _this._rtc.addEventListener('enter', bind(_this._onEnter, _this));
+    _this._rtc.addEventListener('connect', bind(_this._onConnect, _this));
     _this._rtc.addEventListener('stream', bind(_this._onStream, _this));
-    _this._rtc.addEventListener('exit', bind(_this._onExit, _this));
+    _this._rtc.addEventListener('close', bind(_this._onClose, _this));
     _this._rtc.addEventListener('message', bind(_this._onMessage, _this));
 
     _this._role = 'unknown';
@@ -6919,7 +6960,8 @@ var Participation = function (_EventTarget) {
         _this2._streams = new Map();
         _this2._enterTime = Date.now();
         _this2._list = window.list = new _guestList.GuestList(_this2._enterTime, [_this2.me]);
-        _this2._waitingList = [];
+        _this2._connectionWaitingList = [];
+        _this2._presenceWaitingList = [];
         _this2._emit('connected', { me: _this2.me });
       });
     }
@@ -6945,28 +6987,32 @@ var Participation = function (_EventTarget) {
       }
     }
   }, {
-    key: '_onEnter',
-    value: function _onEnter(_ref2) {
+    key: '_onConnect',
+    value: function _onConnect(_ref2) {
       var id = _ref2.detail.id;
 
-      log('on enter:', id);
+      log('on connect:', id);
       if (this._role !== 'guest') {
         var nextList = _guestList.GuestList.copy(this._list);
         nextList.add(id);
         this._updateList(nextList);
         this._broadcastList();
       }
-      this._confirmEnter(id);
+      this._confirmConnection(id);
     }
   }, {
     key: '_onStream',
     value: function _onStream(_ref3) {
+      var _this3 = this;
+
       var _ref3$detail = _ref3.detail,
           stream = _ref3$detail.stream,
           id = _ref3$detail.id;
 
       this._addStream(id, stream);
-      this._emit('participantstream', { stream: stream, id: id });
+      this._waitForPresence(id).then(function () {
+        return _this3._emit('participantstream', { stream: stream, id: id });
+      });
     }
   }, {
     key: '_addStream',
@@ -6977,11 +7023,11 @@ var Participation = function (_EventTarget) {
       this._streams.get(id).push(stream);
     }
   }, {
-    key: '_onExit',
-    value: function _onExit(_ref4) {
+    key: '_onClose',
+    value: function _onClose(_ref4) {
       var id = _ref4.detail.id;
 
-      log('on exit:', id);
+      log('on close:', id);
       this._takeover(id);
       if (this._role !== 'guest') {
         this._broadcastList();
@@ -6999,11 +7045,15 @@ var Participation = function (_EventTarget) {
     value: function _takeover(participant) {
       var isHost = this._list.isHost(participant);
       var meIsNext = this.me === this._list.nextHost();
-      if (isHost) {
-        log('host is leaving, be prepared for the takeover');
+      if (this._role === 'host') {
         var nextList = _guestList.GuestList.copy(this._list);
         nextList.remove(participant);
         this._updateList(nextList);
+      } else if (this._role === 'guest' && isHost) {
+        log('host is leaving, be prepared for the takeover');
+        var _nextList = _guestList.GuestList.copy(this._list);
+        _nextList.remove(participant);
+        this._updateList(_nextList);
         if (meIsNext) {
           log('taking over');
           this._setRole('host');
@@ -7022,7 +7072,7 @@ var Participation = function (_EventTarget) {
       log('on list:', message);
 
       var notFromHost = !this._list.isHost(message.from);
-      if (this._role !== 'unknown' && notFromHost) {
+      if (!this._negotiating && notFromHost) {
         log('ignoring list because it\'s not coming from host');
         return;
       }
@@ -7033,7 +7083,7 @@ var Participation = function (_EventTarget) {
       }
 
       var nextList = remoteList;
-      if (this._role === 'unknown') {
+      if (this._negotiating) {
         nextList = this._selectList(_guestList.GuestList.copy(this._list), remoteList);
         if (nextList.equals(this._list)) {
           this._setRole('host');
@@ -7071,11 +7121,11 @@ var Participation = function (_EventTarget) {
   }, {
     key: '_heartBeatList',
     value: function _heartBeatList() {
-      var _this3 = this;
+      var _this4 = this;
 
       setTimeout(function () {
-        _this3._broadcastList();
-        _this3._heartBeatList();
+        _this4._broadcastList();
+        _this4._heartBeatList();
       }, 3000);
     }
 
@@ -7108,8 +7158,11 @@ var Participation = function (_EventTarget) {
   }, {
     key: '_updateList',
     value: function _updateList(newList) {
-      this._informChanges(newList);
+      var changes = this._list.computeChanges(newList);
       this._list = window.list = newList;
+      if (!this._negotiating) {
+        this._informChanges(changes);
+      }
     }
 
     /*
@@ -7122,58 +7175,81 @@ var Participation = function (_EventTarget) {
 
   }, {
     key: '_informChanges',
-    value: function _informChanges(newList) {
-      var _this4 = this;
+    value: function _informChanges(changes) {
+      var _this5 = this;
 
-      if (this._role === 'unknown') {
-        return;
-      }
-
-      var changes = this._list.computeChanges(newList);
       changes.forEach(function (_ref5) {
-        var operation = _ref5.operation,
-            id = _ref5.id,
-            index = _ref5.index;
+        var id = _ref5.id,
+            role = _ref5.role,
+            position = _ref5.position,
+            action = _ref5.action;
 
-        var action = operation === 'add' ? 'enter' : 'exit';
-        // TODO: Perhaps change to GuestLog
-        var role = (action === 'enter' ? newList : _this4._list).getRole(id);
-        var position = index + 1;
         if (action === 'enter') {
-          _this4._waitFor(id).then(function () {
-            return _this4._emit('enterparticipant', { id: id, position: position, role: role });
+          _this5._waitForConnection(id).then(function () {
+            _this5._emit('enterparticipant', { id: id, role: role, position: position });
+            _this5._confirmPresence(id);
           });
         } else {
-          _this4._emit('exitparticipant', { id: id, position: position, role: role });
+          _this5._emit('exitparticipant', { id: id, role: role, position: position });
         }
       });
     }
   }, {
-    key: '_waitFor',
-    value: function _waitFor(id) {
-      var _this5 = this;
+    key: '_waitForConnection',
+    value: function _waitForConnection(id) {
+      var _this6 = this;
 
       if (id === this.me || this._rtc.isConnected(id)) {
         return Promise.resolve();
       }
-      log('waiting for:', id);
+      log('waiting for connection:', id);
       return new Promise(function (fulfill) {
-        _this5._waitingList.push([id, fulfill]);
+        _this6._connectionWaitingList.push([id, fulfill]);
       });
     }
   }, {
-    key: '_confirmEnter',
-    value: function _confirmEnter(targetId) {
-      for (var i = 0, l = this._waitingList.length; i < l; i++) {
-        var _waitingList$shift = this._waitingList.shift(),
-            _waitingList$shift2 = _slicedToArray(_waitingList$shift, 2),
-            id = _waitingList$shift2[0],
-            fulfill = _waitingList$shift2[1];
+    key: '_confirmConnection',
+    value: function _confirmConnection(targetId) {
+      for (var i = 0, l = this._connectionWaitingList.length; i < l; i++) {
+        var _connectionWaitingLis = this._connectionWaitingList.shift(),
+            _connectionWaitingLis2 = _slicedToArray(_connectionWaitingLis, 2),
+            id = _connectionWaitingLis2[0],
+            fulfill = _connectionWaitingLis2[1];
 
         if (id !== targetId) {
-          this._waitingList.push([id, fulfill]);
+          this._connectionWaitingList.push([id, fulfill]);
         } else {
-          log('no longer waiting for:', id);
+          log('no longer waiting for connection:', id);
+          fulfill();
+        }
+      }
+    }
+  }, {
+    key: '_waitForPresence',
+    value: function _waitForPresence(id) {
+      var _this7 = this;
+
+      if (id === this.me || !this._negotiating && this._list.isPresent(id)) {
+        return Promise.resolve();
+      }
+      log('waiting for presence:', id);
+      return new Promise(function (fulfill) {
+        _this7._presenceWaitingList.push([id, fulfill]);
+      });
+    }
+  }, {
+    key: '_confirmPresence',
+    value: function _confirmPresence(targetId) {
+      for (var i = 0, l = this._presenceWaitingList.length; i < l; i++) {
+        var _presenceWaitingList$ = this._presenceWaitingList.shift(),
+            _presenceWaitingList$2 = _slicedToArray(_presenceWaitingList$, 2),
+            id = _presenceWaitingList$2[0],
+            fulfill = _presenceWaitingList$2[1];
+
+        if (id !== targetId) {
+          this._presenceWaitingList.push([id, fulfill]);
+        } else {
+          log('no longer waiting for presence:', id);
           fulfill();
         }
       }
@@ -7205,6 +7281,11 @@ var Participation = function (_EventTarget) {
     key: 'me',
     get: function get() {
       return this._rtc.me;
+    }
+  }, {
+    key: '_negotiating',
+    get: function get() {
+      return this._role === 'unknown';
     }
   }]);
 
@@ -7335,7 +7416,7 @@ var RTCInterface = function (_EventTarget) {
     value: function _onPeer(peer, id) {
       this._peers.set(id, peer);
       this._setupPeer(peer, id);
-      this._emit('enter', { id: id });
+      this._emit('connect', { id: id });
     }
   }, {
     key: '_setupPeer',
@@ -7363,7 +7444,7 @@ var RTCInterface = function (_EventTarget) {
     key: '_onClose',
     value: function _onClose(id) {
       this._peers.delete(id);
-      this._emit('exit', { id: id });
+      this._emit('close', { id: id });
     }
   }, {
     key: '_emit',
@@ -7477,6 +7558,8 @@ __webpack_require__(30);
 __webpack_require__(28);
 
 __webpack_require__(29);
+
+localStorage.debug = 'sharedspace:*';
 
 /***/ }),
 /* 38 */

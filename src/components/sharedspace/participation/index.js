@@ -146,7 +146,12 @@ class Participation extends EventTarget {
   _takeover(participant) {
     const isHost = this._list.isHost(participant);
     const meIsNext = this.me === this._list.nextHost();
-    if (isHost) {
+    if (this._role === 'host') {
+      const nextList = GuestList.copy(this._list);
+      nextList.remove(participant);
+      this._updateList(nextList);
+    }
+    else if (this._role === 'guest' && isHost) {
       log('host is leaving, be prepared for the takeover');
       const nextList = GuestList.copy(this._list);
       nextList.remove(participant);
