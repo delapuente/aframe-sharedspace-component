@@ -102,7 +102,7 @@ export default registerComponent('sharedspace', {
     log(`on enter: ${id} (${role}) at position ${position}`);
 
     const participant =
-      this._getParticipant(id) || this._newParticipant(id, positions);
+      this._getParticipant(id) || this._newParticipant(id, position);
 
     participant.addEventListener('loaded', function onLoaded() {
       participant.removeEventListener('loaded', onLoaded);
@@ -118,7 +118,7 @@ export default registerComponent('sharedspace', {
 
   _newParticipant(id, position) {
     const template = this.data.participant;
-    participant = document.importNode(template.content, true).children[0];
+    const participant = document.importNode(template.content, true).children[0];
     if (!participant) { return warn('Template was empty', template); }
 
     participant.dataset.sharedspaceId = id;
@@ -146,7 +146,7 @@ export default registerComponent('sharedspace', {
   },
 
   _onParticipantStream({ detail: { stream, id} }) {
-    let participant = this.el.querySelector(`[data-sharedspace-id="${id}"]`);
+    const participant = this.el.querySelector(`[data-sharedspace-id="${id}"]`);
     if (!participant) {
       error(`Participant ${id} avatar is not in the DOM`);
       return;
@@ -176,8 +176,8 @@ export default registerComponent('sharedspace', {
   },
 
   _onExitParticipant({ detail: { id, position, role } }) {
-    log(`on enter: ${id} (${role}) at position ${position}`);
-    const participant = this._getParticipantElement(id);
+    log(`on exit: ${id} (${role}) at position ${position}`);
+    const participant = this._getParticipant(id);
     participant.parentNode.removeChild(participant);
   },
 
