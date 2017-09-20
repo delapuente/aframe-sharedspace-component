@@ -153,32 +153,41 @@ export default registerComponent('sharedspace', {
     }
 
     log(`streaming: ${id}`, stream);
-    const source = this._addStream(id, stream);
-    participant.setAttribute('sound', `src: #${source.id}`);
+    this._addStream(id, stream)
+    .then(source => {
+      participant.setAttribute('sound', `src: #${source.id}`);
+    });
   },
 
   _addStream(id, stream) {
-    const assets = this._getAssets();
-    const source = new Audio();
-    source.id = `participant-stream-${id}`;
-    source.srcObject = stream;
-    assets.appendChild(source);
-    return source;
+    return this._getAssets()
+    .then(assets => {
+      const source = new Audio();
+      source.id = `participant-stream-${id}`;
+      source.srcObject = stream;
+      assets.appendChild(source);
+      return source;
+    });
   },
 
   _getAssets() {
     let assets = this.el.sceneEl.querySelector('a-assets');
-    if (!assets) {
+    if (!assets || !assets.hasLoaded) {
       assets = document.createElement('A-ASSETS');
       this.el.sceneEl.appendChild(assets);
+      return new Promise(fulfill => {
+        assets.addEventListener('loaded', () => fulfill(assets));
+      });
     }
-    return assets;
+    return Promise.resolve(assets);
   },
 
   _onExitParticipant({ detail: { id, position, role } }) {
     log(`on exit: ${id} (${role}) at position ${position}`);
     const participant = this._getParticipant(id);
-    participant.parentNode.removeChild(participant);
+    if (participant) {
+      participant.parentNode.removeChild(participant);
+    }
   },
 
   _onParticipantMessage({ detail: { id, message } }) {
