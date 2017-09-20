@@ -7,6 +7,7 @@ import { panic } from '../utils';
 const bind = utils.bind;
 const log = utils.debug('sharedspace:log');
 const warn = utils.debug('sharedspace:warn');
+const error = utils.debug('sharedspace:error');
 
 export default registerComponent('sharedspace', {
   schema: {
@@ -81,6 +82,9 @@ export default registerComponent('sharedspace', {
     this._participation.addEventListener(
       'participantmessage', bind(this._onParticipantMessage, this)
     );
+    this._participation.addEventListener(
+      'participantstream', bind(this._onParticipantStream, this)
+    );
     return this._participation.connect()
     .then(result => {
       this._connected = true;
@@ -96,7 +100,10 @@ export default registerComponent('sharedspace', {
 
   _onEnterParticipant({ detail: { id, position, role } }) {
     log(`on enter: ${id} (${role}) at position ${position}`);
-    const participant = this._getParticipantElement(id);
+
+    const participant =
+      this._getParticipant(id) || this._newParticipant(id, positions);
+
     participant.addEventListener('loaded', function onLoaded() {
       participant.removeEventListener('loaded', onLoaded);
       if (participant.hasAttribute('position-around')) {
@@ -105,27 +112,49 @@ export default registerComponent('sharedspace', {
     });
   },
 
-  _getParticipantElement(id) {
+  _getParticipant(id) {
+    return this.el.querySelector(`[data-sharedspace-id="${id}"]`);
+  },
+
+  _newParticipant(id, position) {
+    const template = this.data.participant;
+    participant = document.importNode(template.content, true).children[0];
+    if (!participant) { return warn('Template was empty', template); }
+
+    participant.dataset.sharedspaceId = id;
+    participant.dataset.sharedspaceRoomPosition = position;
+
+    const isMe = id === this._participation.me;
+    if (isMe) { this._setupAvatar(participant); }
+
+    this.el.appendChild(participant);
+    return participant;
+  },
+
+  _setupAvatar(participant) {
+    participant.setAttribute('camera', '');
+    participant.setAttribute('look-controls', '');
+    if (!participant.hasAttribute('onmyself')) {
+      participant.setAttribute('onmyself', 'share: rotation');
+    }
+    participant.addEventListener('componentinitialized', ({ detail }) => {
+      const { name, data } = detail;
+      if (name === 'onmyself') {
+        this._share(participant, data.share);
+      }
+    });
+  },
+
+  _onParticipantStream({ detail: { stream, id} }) {
     let participant = this.el.querySelector(`[data-sharedspace-id="${id}"]`);
     if (!participant) {
-      const isMe = id === this._participation.me;
-      const template = this.data.participant;
-      participant = document.importNode(template.content, true).children[0];
-      participant.dataset.sharedspaceId = id;
-      if (!isMe) {
-        const stream = this._participation.getStreams(id)[0];
-        if (stream) {
-          log(`streaming: ${id}`, stream);
-          const source = this._addStream(id, stream);
-          participant.setAttribute('sound', `src: #${source.id}`);
-        }
-      }
-      if (isMe) {
-        this._setupAvatar(participant);
-      }
-      this.el.appendChild(participant);
+      error(`Participant ${id} avatar is not in the DOM`);
+      return;
     }
-    return participant;
+
+    log(`streaming: ${id}`, stream);
+    const source = this._addStream(id, stream);
+    participant.setAttribute('sound', `src: #${source.id}`);
   },
 
   _addStream(id, stream) {
@@ -186,20 +215,6 @@ export default registerComponent('sharedspace', {
   _applyUpdates() {
     this._tree.applyUpdates(this._incomingUpdates);
     this._incomingUpdates = [];
-  },
-
-  _setupAvatar(participant) {
-    participant.setAttribute('camera', '');
-    participant.setAttribute('look-controls', '');
-    if (!participant.hasAttribute('onmyself')) {
-      participant.setAttribute('onmyself', 'share: rotation');
-    }
-    participant.addEventListener('componentinitialized', ({ detail }) => {
-      const { name, data } = detail;
-      if (name === 'onmyself') {
-        this._share(participant, data.share);
-      }
-    });
   }
 });
 

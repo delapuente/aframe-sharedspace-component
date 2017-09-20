@@ -73,6 +73,14 @@ class GuestList {
     return;
   }
 
+  includes(id) {
+    return this.indexOf(id) >= 0;
+  }
+
+  position(id) {
+    return this.indexOf(id) + 1;
+  }
+
   indexOf(id) {
     return this._list.indexOf(id);
   }
