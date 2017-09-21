@@ -24,6 +24,7 @@ export default registerComponent('sharedspace', {
 
   init() {
     this._connected = false;
+    this._initializing = false;
 
     // Delay connection until all the scene is complete so other dependant
     // components can set their event handlers up. See `participants` component
@@ -45,11 +46,11 @@ export default registerComponent('sharedspace', {
   },
 
   _start() {
-    this._initializing = true;
-    if (this.data.hold || this._connected) {
-      this._initializing = false;
+    if (this.data.hold || this._connected || this._initializing) {
       return;
     }
+
+    this._initializing = true;
 
     const { audio } = this.data;
     if (!audio) {
