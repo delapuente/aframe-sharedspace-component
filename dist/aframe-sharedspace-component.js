@@ -6431,6 +6431,7 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
   },
   init: function init() {
     this._connected = false;
+    this._initializing = false;
 
     // Delay connection until all the scene is complete so other dependant
     // components can set their event handlers up. See `participants` component
@@ -6448,11 +6449,11 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
     return this._connected;
   },
   _start: function _start() {
-    this._initializing = true;
-    if (this.data.hold || this._connected) {
-      this._initializing = false;
+    if (this.data.hold || this._connected || this._initializing) {
       return;
     }
+
+    this._initializing = true;
 
     var audio = this.data.audio;
 
