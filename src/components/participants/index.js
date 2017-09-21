@@ -138,8 +138,11 @@ export default registerComponent('participants', {
   },
 
   _setupMyself(participant) {
+    // HACK: Move this inside the conditional when camera can be used in mixins.
+    // If you want to remove the camera right now, use participantsetup event
+    // and remove from detail.participant element.
+    participant.setAttribute('camera', '');
     if (this.data.onmyself === 'auto') {
-      participant.setAttribute('camera', '');
       participant.setAttribute('look-controls', '');
       participant.setAttribute('share', 'rotation');
     }
@@ -147,7 +150,7 @@ export default registerComponent('participants', {
       const mixinList = participant.hasAttribute('mixin') ?
                         participant.getAttribute('mixin').split(/\s+/) : [];
 
-      mixingList.push(this.data.myself);
+      mixinList.push(this.data.onmyself);
       participant.setAttribute('mixin', mixinList.join(' '));
     }
 

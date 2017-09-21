@@ -9,35 +9,30 @@ const error = utils.debug('sharedspace:error');
 
 export default registerComponent('sharedspace', {
   schema: {
-    provider: { default: 'localhost:9000' },
+    hold: { default: false },
+    provider: { default: 'https://salvadelapuente.com:9000' },
     room: { default: 'room-101' },
     audio: { default: false },
     me: { default: '' }
   },
 
+  update() {
+    if (!this._initializing && !this._connected && !this.data.hold) {
+      this._start();
+    }
+  },
+
   init() {
     this._connected = false;
 
-    this.el.sceneEl.addEventListener('loaded', () => {
-
-      const { audio } = this.data;
-      if (!audio) {
-        this._initParticipation(null)
-        .then(bind(this._getIdentity, this));
-        return;
-      }
-
-      this._getUserMedia({ audio })
-      .then(bind(this._initParticipation, this))
-      .catch(bind(informAndInit, this))
-      .then(bind(this._getIdentity, this));
-
-    });
-
-    function informAndInit(reason) {
-      warn('getUserMedia() failed. There will be no stream.');
-      this.el.emit('getusermediafailed', reason, false);
-      return this._initParticipation(null);
+    // Delay connection until all the scene is complete so other dependant
+    // components can set their event handlers up. See `participants` component
+    // for an example.
+    if (this.el.sceneEl.hasLoaded) {
+      this._start();
+    }
+    else {
+      this.el.sceneEl.addEventListener('loaded', bind(this._start, this));
     }
   },
 
@@ -47,6 +42,32 @@ export default registerComponent('sharedspace', {
 
   isConnected() {
     return this._connected;
+  },
+
+  _start() {
+    this._initializing = true;
+    if (this.data.hold || this._connected) {
+      this._initializing = false;
+      return;
+    }
+
+    const { audio } = this.data;
+    if (!audio) {
+      this._initParticipation(null)
+      .then(bind(this._getIdentity, this));
+      return;
+    }
+
+    this._getUserMedia({ audio })
+    .then(bind(this._initParticipation, this))
+    .catch(bind(informAndInit, this))
+    .then(bind(this._getIdentity, this));
+
+    function informAndInit(reason) {
+      warn('getUserMedia() failed. There will be no stream.');
+      this.el.emit('getusermediafailed', reason, false);
+      return this._initParticipation(null);
+    }
   },
 
   _getUserMedia(constraints) {
@@ -64,6 +85,7 @@ export default registerComponent('sharedspace', {
     return this._participation.connect()
     .then(result => {
       this._connected = true;
+      this._initializing = false;
       return result;
     });
   },

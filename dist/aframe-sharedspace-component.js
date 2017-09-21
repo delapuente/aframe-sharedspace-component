@@ -6229,14 +6229,17 @@ exports.default = (0, _aframe.registerComponent)('participants', {
   _setupMyself: function _setupMyself(participant) {
     var _this = this;
 
+    // HACK: Move this inside the conditional when camera can be used in mixins.
+    // If you want to remove the camera right now, use participantsetup event
+    // and remove from detail.participant element.
+    participant.setAttribute('camera', '');
     if (this.data.onmyself === 'auto') {
-      participant.setAttribute('camera', '');
       participant.setAttribute('look-controls', '');
       participant.setAttribute('share', 'rotation');
     } else if (this.data.myself !== 'none') {
       var mixinList = participant.hasAttribute('mixin') ? participant.getAttribute('mixin').split(/\s+/) : [];
 
-      mixingList.push(this.data.myself);
+      mixinList.push(this.data.onmyself);
       participant.setAttribute('mixin', mixinList.join(' '));
     }
 
@@ -6331,6 +6334,7 @@ exports.default = (0, _aframe.registerComponent)('position-around', {
   dependencies: ['position'],
 
   schema: {
+    center: { type: 'vec3' },
     radius: { default: 1.1 },
     height: { default: 1.6 },
     position: { default: 1 }
@@ -6358,9 +6362,9 @@ exports.default = (0, _aframe.registerComponent)('position-around', {
     var positionInLayer = roomPosition - previousCapacity;
     var positionAroundTable = 2 * Math.PI / capacity * positionInLayer;
     return {
-      x: Math.cos(positionAroundTable) * radius,
-      y: height,
-      z: Math.sin(positionAroundTable) * radius
+      x: Math.cos(positionAroundTable) * radius + this.data.center.x,
+      y: height + this.data.center.y,
+      z: Math.sin(positionAroundTable) * radius + this.data.center.z
     };
   },
   _inFrontOf: function _inFrontOf(_ref) {
@@ -6413,32 +6417,28 @@ var error = _aframe.utils.debug('sharedspace:error');
 
 exports.default = (0, _aframe.registerComponent)('sharedspace', {
   schema: {
-    provider: { default: 'localhost:9000' },
+    hold: { default: false },
+    provider: { default: 'https://salvadelapuente.com:9000' },
     room: { default: 'room-101' },
     audio: { default: false },
     me: { default: '' }
   },
 
+  update: function update() {
+    if (!this._initializing && !this._connected && !this.data.hold) {
+      this._start();
+    }
+  },
   init: function init() {
-    var _this = this;
-
     this._connected = false;
 
-    this.el.sceneEl.addEventListener('loaded', function () {
-      var audio = _this.data.audio;
-
-      if (!audio) {
-        _this._initParticipation(null).then(bind(_this._getIdentity, _this));
-        return;
-      }
-
-      _this._getUserMedia({ audio: audio }).then(bind(_this._initParticipation, _this)).catch(bind(informAndInit, _this)).then(bind(_this._getIdentity, _this));
-    });
-
-    function informAndInit(reason) {
-      warn('getUserMedia() failed. There will be no stream.');
-      this.el.emit('getusermediafailed', reason, false);
-      return this._initParticipation(null);
+    // Delay connection until all the scene is complete so other dependant
+    // components can set their event handlers up. See `participants` component
+    // for an example.
+    if (this.el.sceneEl.hasLoaded) {
+      this._start();
+    } else {
+      this.el.sceneEl.addEventListener('loaded', bind(this._start, this));
     }
   },
   send: function send(target, message) {
@@ -6447,6 +6447,28 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
   isConnected: function isConnected() {
     return this._connected;
   },
+  _start: function _start() {
+    this._initializing = true;
+    if (this.data.hold || this._connected) {
+      this._initializing = false;
+      return;
+    }
+
+    var audio = this.data.audio;
+
+    if (!audio) {
+      this._initParticipation(null).then(bind(this._getIdentity, this));
+      return;
+    }
+
+    this._getUserMedia({ audio: audio }).then(bind(this._initParticipation, this)).catch(bind(informAndInit, this)).then(bind(this._getIdentity, this));
+
+    function informAndInit(reason) {
+      warn('getUserMedia() failed. There will be no stream.');
+      this.el.emit('getusermediafailed', reason, false);
+      return this._initParticipation(null);
+    }
+  },
   _getUserMedia: function _getUserMedia(constraints) {
     return navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
       log('My stream:', stream);
@@ -6454,7 +6476,7 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
     });
   },
   _initParticipation: function _initParticipation(stream) {
-    var _this2 = this;
+    var _this = this;
 
     var _data = this.data,
         room = _data.room,
@@ -6464,7 +6486,8 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
     this._participation = new _participation.Participation(room, { id: id, stream: stream, provider: provider });
     this._configureParticipation();
     return this._participation.connect().then(function (result) {
-      _this2._connected = true;
+      _this._connected = true;
+      _this._initializing = false;
       return result;
     });
   },
@@ -6472,12 +6495,12 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
     this._passEventsThrough(['enterparticipant', 'exitparticipant', 'participantstream', 'participantmessage']);
   },
   _passEventsThrough: function _passEventsThrough(events) {
-    var _this3 = this;
+    var _this2 = this;
 
     events.forEach(function (eventType) {
-      _this3._participation.addEventListener(eventType, function (event) {
+      _this2._participation.addEventListener(eventType, function (event) {
         log('on ' + eventType + ':', event.detail);
-        _this3.el.emit(eventType, event.detail);
+        _this2.el.emit(eventType, event.detail);
       });
     });
   },
@@ -7648,8 +7671,6 @@ __webpack_require__(28);
 __webpack_require__(30);
 
 __webpack_require__(29);
-
-localStorage.debug = 'sharedspace:*';
 
 /***/ }),
 /* 39 */

@@ -4,6 +4,7 @@ export default registerComponent('position-around', {
   dependencies: ['position'],
 
   schema: {
+    center: { type: 'vec3' },
     radius: { default: 1.1 },
     height: { default: 1.6 },
     position: { default: 1 }
@@ -30,9 +31,9 @@ export default registerComponent('position-around', {
     const positionInLayer = roomPosition - previousCapacity;
     const positionAroundTable = 2 * Math.PI / capacity * positionInLayer;
     return {
-      x: Math.cos(positionAroundTable) * radius,
-      y: height,
-      z: Math.sin(positionAroundTable) * radius
+      x: Math.cos(positionAroundTable) * radius + this.data.center.x,
+      y: height + this.data.center.y,
+      z: Math.sin(positionAroundTable) * radius + this.data.center.z
     };
   },
 

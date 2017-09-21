@@ -1,5 +1,3 @@
-localStorage.debug = 'sharedspace:*';
-
 import './positional-audio-patch';
 
 import './components/sharedspace';
