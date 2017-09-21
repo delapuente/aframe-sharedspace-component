@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack",
     "clean": "shx rm -rf site",
-    "copy": "shx cp -r index.html vendor assets dist site/",
+    "copy": "shx cp -r index.html style.css assets dist site/",
     "deploy": "npm run build && npm run copy && gh-pages -d site",
     "postdeploy": "npm run clean",
     "predeploy": "npm run clean && shx mkdir -p site",
