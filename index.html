@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>A-Frame Sharedspace Component</title>
+  <script src="https://aframe.io/releases/0.7.0/aframe.min.js"></script>
+  <script src="./dist/aframe-sharedspace-component.js"></script>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <section>
+    <h1>A-Frame Sharedspace Component</h1>
+    <p>
+      Grant this site permission to access your microphone and share the following link  with your friends (or open it in another browser).
+    </p>
+    <p>
+      <span class="link"></span><span class="move"><a href="./">Click here to move to another room.</a></span>
+    </p>
+  </section>
+  <a-scene embedded>
+    <a-entity sharedspace="audio: true; hold: true" participants>
+
+      <!-- Room -->
+      <a-sky color="#333"></a-sky>
+      <a-plane rotation="-90 0 0" width="15" height="15" color="#777"></a-plane>
+
+      <!-- Table -->
+      <a-cylinder class="table"
+                  position="0 0.8 0"
+                  height="0.02" color="#8ae0f4"
+                  segments-height="1" segments-radial="6">
+      </a-cylinder>
+
+    </a-entity>
+  </a-scene>
+  <template>
+    <a-entity position-around>
+      <a-entity obj-model="obj: url(./assets/face.obj)" rotation="0 180 0" scale="0.01 0.01 0.01" position="0 -0.1 0.15"></a-entity>
+      <!--
+      Anime Face Model Stocking(https://sketchfab.com/models/d049b6a85d204057b170ef9dbc851200) by stocking(https://sketchfab.com/stocking) is licensed under CC Attribution(http://creativecommons.org/licenses/by/4.0/)
+      -->
+    </a-entity>
+  </template>
+  <script>
+    var scene = document.querySelector('a-scene');
+    var room = document.querySelector('[sharedspace]');
+    var table = document.querySelector('.table');
+
+    // Make the participant to look at the center of the table.
+    room.addEventListener('participantadded', function (evt) {
+      var participant = evt.detail.participant;
+      participant.addEventListener('loaded', function (evt) {
+        var tablePosition = table.getAttribute('position');
+        var participantY = participant.getAttribute('position').y;
+        participant.object3D.lookAt(new THREE.Vector3(
+          tablePosition.x, participantY, tablePosition.z
+        ));
+
+        // It is not enough to modify the underlaying Three object. It is
+        // neccessary to use the A-Frame API for the sharedspace component to
+        // be able of serialize the rotation correctly.
+        var radToDeg = THREE.Math.radToDeg;
+        var rotation = participant.object3D.rotation;
+        rotation.y += Math.PI;
+        participant.setAttribute('rotation', {
+          x: radToDeg(rotation.x),
+          y: radToDeg(rotation.y),
+          z: radToDeg(rotation.z)
+        });
+      });
+    });
+
+    // Create a new room or join one.
+    let roomName = window.location.search.substr(1);
+    if (!roomName) {
+      roomName = Date.now() + '';
+      history.pushState({}, '', window.location + `?${roomName}`);
+    }
+    connect();
+
+    function connect() {
+      if (scene.hasLoaded) {
+        room.setAttribute('sharedspace', { room: roomName, hold: false });
+      }
+      else {
+        scene.addEventListener('loaded', connect);
+      }
+    }
+
+    // Select link on click.
+    var link = document.querySelector('.link');
+    link.textContent = window.location.href;
+    link.onclick = function () {
+      var range = document.createRange();
+      range.selectNode(link);
+      var selection = document.getSelection();
+      selection.empty();
+      selection.addRange(range);
+    };
+
+  </script>
+</body>
+</html>
