@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "dist";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 37);
+/******/ 	return __webpack_require__(__webpack_require__.s = 38);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -397,10 +397,16 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3).Buffer))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4).Buffer))
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports) {
+
+module.exports = AFRAME;
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -414,8 +420,8 @@ function objectToString(o) {
 
 
 
-var base64 = __webpack_require__(38)
-var ieee754 = __webpack_require__(48)
+var base64 = __webpack_require__(39)
+var ieee754 = __webpack_require__(49)
 var isArray = __webpack_require__(21)
 
 exports.Buffer = Buffer
@@ -2197,12 +2203,6 @@ function isnan (val) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-module.exports = AFRAME;
-
-/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2643,7 +2643,7 @@ module.exports = g;
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var Buffer = __webpack_require__(3).Buffer;
+var Buffer = __webpack_require__(4).Buffer;
 
 var isBufferEncoding = Buffer.isEncoding
   || function(encoding) {
@@ -2855,7 +2855,7 @@ exports.Readable = exports;
 exports.Writable = __webpack_require__(13);
 exports.Duplex = __webpack_require__(5);
 exports.Transform = __webpack_require__(23);
-exports.PassThrough = __webpack_require__(56);
+exports.PassThrough = __webpack_require__(57);
 
 
 /***/ }),
@@ -2962,7 +2962,7 @@ module.exports.newNode = function newNode(listener, kind, options) {
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var wrappy = __webpack_require__(76)
+var wrappy = __webpack_require__(77)
 module.exports = wrappy(once)
 module.exports.strict = wrappy(onceStrict)
 
@@ -3091,7 +3091,7 @@ util.inherits = __webpack_require__(1);
 
 /*<replacement>*/
 var internalUtil = {
-  deprecate: __webpack_require__(71)
+  deprecate: __webpack_require__(72)
 };
 /*</replacement>*/
 
@@ -3605,13 +3605,13 @@ function CorkedRequest(state) {
     }
   };
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(69).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(70).setImmediate))
 
 /***/ }),
 /* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(3)
+module.exports = __webpack_require__(4)
 
 
 /***/ }),
@@ -3646,10 +3646,10 @@ var inherits = __webpack_require__(1);
 
 inherits(Stream, EE);
 Stream.Readable = __webpack_require__(9);
-Stream.Writable = __webpack_require__(59);
-Stream.Duplex = __webpack_require__(55);
+Stream.Writable = __webpack_require__(60);
+Stream.Duplex = __webpack_require__(56);
 Stream.Transform = __webpack_require__(25);
-Stream.PassThrough = __webpack_require__(58);
+Stream.PassThrough = __webpack_require__(59);
 
 // Backwards-compat with node 0.4.x
 Stream.Stream = Stream;
@@ -3799,7 +3799,7 @@ exports.panic = panic;
  * Expose `debug()` as the module.
  */
 
-exports = module.exports = __webpack_require__(40);
+exports = module.exports = __webpack_require__(41);
 exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
@@ -4000,8 +4000,8 @@ function localstorage() {
 /*globals window */
 
 var Commons = __webpack_require__(10)
-var CustomEventTarget = __webpack_require__(43)
-var EventWrapper = __webpack_require__(44)
+var CustomEventTarget = __webpack_require__(44)
+var EventWrapper = __webpack_require__(45)
 var isObject = Commons.isObject
 var LISTENERS = Commons.LISTENERS
 var CAPTURE = Commons.CAPTURE
@@ -4278,7 +4278,7 @@ util.inherits = __webpack_require__(1);
 /*</replacement>*/
 
 /*<replacement>*/
-var debugUtil = __webpack_require__(79);
+var debugUtil = __webpack_require__(80);
 var debug = void 0;
 if (debugUtil && debugUtil.debuglog) {
   debug = debugUtil.debuglog('stream');
@@ -4287,7 +4287,7 @@ if (debugUtil && debugUtil.debuglog) {
 }
 /*</replacement>*/
 
-var BufferList = __webpack_require__(57);
+var BufferList = __webpack_require__(58);
 var StringDecoder;
 
 util.inherits(Readable, Stream);
@@ -5422,8 +5422,8 @@ var util = __webpack_require__(2);
 util.inherits = __webpack_require__(1);
 /*</replacement>*/
 
-var Readable = __webpack_require__(64);
-var Writable = __webpack_require__(66);
+var Readable = __webpack_require__(65);
+var Writable = __webpack_require__(67);
 
 util.inherits(Duplex, Readable);
 
@@ -6001,7 +6001,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(73);
+exports.isBuffer = __webpack_require__(74);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -6045,7 +6045,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(72);
+exports.inherits = __webpack_require__(73);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -6076,13 +6076,243 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _aframe = __webpack_require__(4);
+var _aframe = __webpack_require__(3);
 
-exports.default = (0, _aframe.registerComponent)('onmyself', {
+var _sceneTree = __webpack_require__(34);
+
+var _entityObserver = __webpack_require__(33);
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var bind = _aframe.utils.bind;
+var log = _aframe.utils.debug('sharedspace:participants:log');
+var warn = _aframe.utils.debug('sharedspace:participants:warn');
+var error = _aframe.utils.debug('sharedspace:participants:error');
+
+exports.default = (0, _aframe.registerComponent)('participants', {
+
+  dependendies: ['sharedspace'],
+
   schema: {
-    share: { type: 'array', default: [] }
+    template: { type: 'selector', default: 'template' },
+    placement: { type: 'string', default: 'position-around' },
+    onmyself: { type: 'string', default: 'auto' },
+    audio: { default: true },
+    autoremove: { default: true }
+  },
+
+  init: function init() {
+    this._tree = new _sceneTree.SceneTree(this.el);
+    this._ongoingUpdates = [];
+    this._incomingUpdates = [];
+    this._collectToSend = bind(this._collectToSend, this);
+    this._observer = new _entityObserver.EntityObserver(this._collectToSend);
+    this._sharedspace = this.el.components.sharedspace;
+
+    this.el.addEventListener('enterparticipant', bind(this._onEnter, this));
+    this.el.addEventListener('participantstream', bind(this._onStream, this));
+    this.el.addEventListener('participantmessage', bind(this._onMessage, this));
+    this.el.addEventListener('exitparticipant', bind(this._onExit, this));
+  },
+  tick: function tick() {
+    var _observer;
+
+    (_observer = this._observer).check.apply(_observer, arguments);
+    if (this._sharedspace.isConnected()) {
+      this._sendUpdates();
+      this._applyUpdates();
+    }
+  },
+  _onEnter: function _onEnter(_ref) {
+    var _ref$detail = _ref.detail,
+        id = _ref$detail.id,
+        position = _ref$detail.position;
+
+    if (this.data.template !== 'none' && !this._getParticipant(id)) {
+      this._addParticipant(id, position);
+    }
+  },
+  _onStream: function _onStream(_ref2) {
+    var _ref2$detail = _ref2.detail,
+        id = _ref2$detail.id,
+        stream = _ref2$detail.stream;
+
+    if (!this.data.audio) {
+      return;
+    }
+
+    var participant = this._getParticipant(id);
+    if (!participant) {
+      warn('Participant ' + id + ' avatar is not in the DOM');
+      return;
+    }
+
+    this._addStream(id, stream).then(function (source) {
+      log('streaming: ' + id, stream);
+      participant.setAttribute('sound', 'src: #' + source.id);
+    });
+  },
+  _onExit: function _onExit(_ref3) {
+    var id = _ref3.detail.id;
+
+    var isMe = id === this._sharedspace.data.me;
+    var participant = this._getParticipant(id);
+    if (participant) {
+      this.el.emit('participantelement', { participant: participant, isMe: isMe, action: 'exit' });
+      if (this.data.autoremove) {
+        participant.parentNode.removeChild(participant);
+      }
+    }
+  },
+  _onMessage: function _onMessage(_ref4) {
+    var _ref4$detail = _ref4.detail,
+        id = _ref4$detail.id,
+        message = _ref4$detail.message;
+
+    if (message.type === 'participantsupdates') {
+      this._collectToApply(message.updates);
+      return;
+    }
+  },
+  _getParticipant: function _getParticipant(id) {
+    return this.el.querySelector('[data-sharedspace-id="' + id + '"]');
+  },
+  _addParticipant: function _addParticipant(id, position) {
+    var isMe = id === this._sharedspace.data.me;
+    var participant = this._newParticipant();
+    this.el.emit('participantelement', { participant: participant, isMe: isMe, action: 'enter' });
+
+    this._setupParticipant(participant, id, position);
+    if (isMe) {
+      this._setupMyself(participant);
+    }
+    this.el.emit('participantsetup', { participant: participant, isMe: isMe });
+
+    this.el.appendChild(participant);
+    this.el.emit('participantadded', { participant: participant, isMe: isMe });
+
+    return participant;
+  },
+  _newParticipant: function _newParticipant() {
+    var empty = document.createElement('A-ENTITY');
+
+    var template = this.data.template;
+    if (!template) {
+      warn('Template not found. Using an empty entity.');
+      return empty;
+    }
+
+    var instance = document.importNode(template.content, true).children[0];
+    if (!instance) {
+      warn('Template was empty. Using an empty entity.');
+      return empty;
+    }
+
+    return instance;
+  },
+  _setupParticipant: function _setupParticipant(participant, id, position) {
+    var isMe = id === this._sharedspace.data.me;
+    participant.dataset.sharedspaceId = id;
+    participant.dataset.sharedspaceRoomPosition = position;
+    participant.dataset.isMe = isMe;
+
+    var placement = this.data.placement;
+    if (placement !== 'none') {
+      participant.addEventListener('loaded', function onLoaded() {
+        participant.removeEventListener('loaded', onLoaded);
+        participant.setAttribute(placement, { position: position });
+      });
+    }
+
+    return participant;
+  },
+  _setupMyself: function _setupMyself(participant) {
+    var _this = this;
+
+    if (this.data.onmyself === 'auto') {
+      participant.setAttribute('camera', '');
+      participant.setAttribute('look-controls', '');
+      participant.setAttribute('share', 'rotation');
+    } else if (this.data.myself !== 'none') {
+      var mixinList = participant.hasAttribute('mixin') ? participant.getAttribute('mixin').split(/\s+/) : [];
+
+      mixingList.push(this.data.myself);
+      participant.setAttribute('mixin', mixinList.join(' '));
+    }
+
+    participant.addEventListener('componentinitialized', function (_ref5) {
+      var detail = _ref5.detail;
+      var name = detail.name;
+
+      if (name === 'share') {
+        var share = participant.components.share;
+        var filter = share.data.split(',').map(function (str) {
+          return str.trim();
+        });
+        log('sharing:', filter);
+        _this._share(participant, filter.length > 0 ? filter : null);
+      }
+    });
+  },
+  _share: function _share(el, componentFilter) {
+    this._observer.observe(el, { components: true, componentFilter: componentFilter });
+  },
+  _addStream: function _addStream(id, stream) {
+    return this._getAssets().then(function (assets) {
+      var source = new Audio();
+      source.id = 'participant-stream-' + id;
+      source.srcObject = stream;
+      assets.appendChild(source);
+      return source;
+    });
+  },
+  _getAssets: function _getAssets() {
+    var assets = this.el.sceneEl.querySelector('a-assets');
+    if (!assets || !assets.hasLoaded) {
+      assets = document.createElement('A-ASSETS');
+      this.el.sceneEl.appendChild(assets);
+      return new Promise(function (fulfill) {
+        assets.addEventListener('loaded', function () {
+          return fulfill(assets);
+        });
+      });
+    }
+    return Promise.resolve(assets);
+  },
+  _collectToApply: function _collectToApply(updates) {
+    var _incomingUpdates;
+
+    (_incomingUpdates = this._incomingUpdates).push.apply(_incomingUpdates, _toConsumableArray(updates));
+  },
+  _collectToSend: function _collectToSend(updates) {
+    var _ongoingUpdates;
+
+    updates = updates.map(function (update) {
+      var serializable = Object.assign({}, update);
+      var sharedspaceId = update.target.dataset.sharedspaceId;
+
+      serializable.target = '[data-sharedspace-id="' + sharedspaceId + '"]';
+      return serializable;
+    });
+    (_ongoingUpdates = this._ongoingUpdates).push.apply(_ongoingUpdates, _toConsumableArray(updates));
+  },
+  _sendUpdates: function _sendUpdates() {
+    if (this._ongoingUpdates.length > 0) {
+      var content = participantsUpdatesMessage(this._ongoingUpdates);
+      this._sharedspace.send('*', content);
+      this._ongoingUpdates = [];
+    }
+  },
+  _applyUpdates: function _applyUpdates() {
+    this._tree.applyUpdates(this._incomingUpdates);
+    this._incomingUpdates = [];
   }
 });
+
+
+function participantsUpdatesMessage(updates) {
+  return { type: 'participantsupdates', updates: updates };
+}
 
 /***/ }),
 /* 29 */
@@ -6095,7 +6325,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _aframe = __webpack_require__(4);
+var _aframe = __webpack_require__(3);
 
 exports.default = (0, _aframe.registerComponent)('position-around', {
   dependencies: ['position'],
@@ -6153,17 +6383,28 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _aframe = __webpack_require__(4);
+var _aframe = __webpack_require__(3);
 
-var _participation = __webpack_require__(34);
+exports.default = (0, _aframe.registerComponent)('share', {
+  schema: { type: 'string', default: '' }
+});
 
-var _sceneTree = __webpack_require__(36);
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
 
-var _entityObserver = __webpack_require__(32);
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _aframe = __webpack_require__(3);
+
+var _participation = __webpack_require__(36);
 
 var _utils = __webpack_require__(17);
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var bind = _aframe.utils.bind;
 var log = _aframe.utils.debug('sharedspace:log');
@@ -6175,27 +6416,24 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
     provider: { default: 'localhost:9000' },
     room: { default: 'room-101' },
     audio: { default: false },
-    participant: { type: 'selector', default: '#participant' },
     me: { default: '' }
   },
 
   init: function init() {
+    var _this = this;
+
     this._connected = false;
-    // TODO: Isolate all the monitoring, collecting and applying updates.
-    this._tree = new _sceneTree.SceneTree(this.el);
-    this._ongoingUpdates = [];
-    this._incomingUpdates = [];
-    this._collectToSend = bind(this._collectToSend, this);
-    this._observer = new _entityObserver.EntityObserver(this._collectToSend);
 
-    var audio = this.data.audio;
+    this.el.sceneEl.addEventListener('loaded', function () {
+      var audio = _this.data.audio;
 
-    if (!audio) {
-      this._initParticipation(null).then(bind(this._configureParticipation, this));
-      return;
-    }
+      if (!audio) {
+        _this._initParticipation(null).then(bind(_this._getIdentity, _this));
+        return;
+      }
 
-    this._getUserMedia({ audio: audio }).then(bind(this._initParticipation, this)).catch(bind(informAndInit, this)).then(bind(this._configureParticipation, this));
+      _this._getUserMedia({ audio: audio }).then(bind(_this._initParticipation, _this)).catch(bind(informAndInit, _this)).then(bind(_this._getIdentity, _this));
+    });
 
     function informAndInit(reason) {
       warn('getUserMedia() failed. There will be no stream.');
@@ -6203,20 +6441,11 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
       return this._initParticipation(null);
     }
   },
-  tick: function tick() {
-    var _observer;
-
-    (_observer = this._observer).check.apply(_observer, arguments);
-    if (this._connected) {
-      this._sendUpdates();
-      this._applyUpdates();
-    }
-  },
   send: function send(target, message) {
     this._participation.send(target, message);
   },
-  _share: function _share(el, componentFilter) {
-    this._observer.observe(el, { components: true, componentFilter: componentFilter });
+  isConnected: function isConnected() {
+    return this._connected;
   },
   _getUserMedia: function _getUserMedia(constraints) {
     return navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
@@ -6225,7 +6454,7 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
     });
   },
   _initParticipation: function _initParticipation(stream) {
-    var _this = this;
+    var _this2 = this;
 
     var _data = this.data,
         room = _data.room,
@@ -6233,183 +6462,42 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
         provider = _data.provider;
 
     this._participation = new _participation.Participation(room, { id: id, stream: stream, provider: provider });
-    this._participation.addEventListener('enterparticipant', bind(this._onEnterParticipant, this));
-    this._participation.addEventListener('exitparticipant', bind(this._onExitParticipant, this));
-    this._participation.addEventListener('participantmessage', bind(this._onParticipantMessage, this));
-    this._participation.addEventListener('participantstream', bind(this._onParticipantStream, this));
+    this._configureParticipation();
     return this._participation.connect().then(function (result) {
-      _this._connected = true;
+      _this2._connected = true;
       return result;
     });
   },
   _configureParticipation: function _configureParticipation() {
+    this._passEventsThrough(['enterparticipant', 'exitparticipant', 'participantstream', 'participantmessage']);
+  },
+  _passEventsThrough: function _passEventsThrough(events) {
+    var _this3 = this;
+
+    events.forEach(function (eventType) {
+      _this3._participation.addEventListener(eventType, function (event) {
+        log('on ' + eventType + ':', event.detail);
+        _this3.el.emit(eventType, event.detail);
+      });
+    });
+  },
+  _getIdentity: function _getIdentity() {
     if (!this._participation) {
       (0, _utils.panic)('Participation not initialized');
     }
     this.data.me = this._participation.me;
     log('Me:', this.data.me);
-  },
-  _onEnterParticipant: function _onEnterParticipant(_ref) {
-    var _ref$detail = _ref.detail,
-        id = _ref$detail.id,
-        position = _ref$detail.position,
-        role = _ref$detail.role;
-
-    log('on enter: ' + id + ' (' + role + ') at position ' + position);
-
-    var participant = this._getParticipant(id) || this._newParticipant(id, position);
-
-    participant.addEventListener('loaded', function onLoaded() {
-      participant.removeEventListener('loaded', onLoaded);
-      if (participant.hasAttribute('position-around')) {
-        participant.setAttribute('position-around', { position: position });
-      }
-    });
-  },
-  _getParticipant: function _getParticipant(id) {
-    return this.el.querySelector('[data-sharedspace-id="' + id + '"]');
-  },
-  _newParticipant: function _newParticipant(id, position) {
-    var template = this.data.participant;
-    var participant = document.importNode(template.content, true).children[0];
-    if (!participant) {
-      return warn('Template was empty', template);
-    }
-
-    participant.dataset.sharedspaceId = id;
-    participant.dataset.sharedspaceRoomPosition = position;
-
-    var isMe = id === this._participation.me;
-    if (isMe) {
-      this._setupAvatar(participant);
-    }
-
-    this.el.appendChild(participant);
-    return participant;
-  },
-  _setupAvatar: function _setupAvatar(participant) {
-    var _this2 = this;
-
-    participant.setAttribute('camera', '');
-    participant.setAttribute('look-controls', '');
-    if (!participant.hasAttribute('onmyself')) {
-      participant.setAttribute('onmyself', 'share: rotation');
-    }
-    participant.addEventListener('componentinitialized', function (_ref2) {
-      var detail = _ref2.detail;
-      var name = detail.name,
-          data = detail.data;
-
-      if (name === 'onmyself') {
-        _this2._share(participant, data.share);
-      }
-    });
-  },
-  _onParticipantStream: function _onParticipantStream(_ref3) {
-    var _ref3$detail = _ref3.detail,
-        stream = _ref3$detail.stream,
-        id = _ref3$detail.id;
-
-    var participant = this.el.querySelector('[data-sharedspace-id="' + id + '"]');
-    if (!participant) {
-      error('Participant ' + id + ' avatar is not in the DOM');
-      return;
-    }
-
-    log('streaming: ' + id, stream);
-    this._addStream(id, stream).then(function (source) {
-      participant.setAttribute('sound', 'src: #' + source.id);
-    });
-  },
-  _addStream: function _addStream(id, stream) {
-    return this._getAssets().then(function (assets) {
-      var source = new Audio();
-      source.id = 'participant-stream-' + id;
-      source.srcObject = stream;
-      assets.appendChild(source);
-      return source;
-    });
-  },
-  _getAssets: function _getAssets() {
-    var assets = this.el.sceneEl.querySelector('a-assets');
-    if (!assets || !assets.hasLoaded) {
-      assets = document.createElement('A-ASSETS');
-      this.el.sceneEl.appendChild(assets);
-      return new Promise(function (fulfill) {
-        assets.addEventListener('loaded', function () {
-          return fulfill(assets);
-        });
-      });
-    }
-    return Promise.resolve(assets);
-  },
-  _onExitParticipant: function _onExitParticipant(_ref4) {
-    var _ref4$detail = _ref4.detail,
-        id = _ref4$detail.id,
-        position = _ref4$detail.position,
-        role = _ref4$detail.role;
-
-    log('on exit: ' + id + ' (' + role + ') at position ' + position);
-    var participant = this._getParticipant(id);
-    if (participant) {
-      participant.parentNode.removeChild(participant);
-    }
-  },
-  _onParticipantMessage: function _onParticipantMessage(_ref5) {
-    var _ref5$detail = _ref5.detail,
-        id = _ref5$detail.id,
-        message = _ref5$detail.message;
-
-    log('on message: ' + id, message);
-    if (message.type === 'participantsupdates') {
-      this._collectToApply(message.updates);
-      return;
-    }
-    this.el.emit('participantmessage', { id: id, message: message });
-  },
-  _collectToApply: function _collectToApply(updates) {
-    var _incomingUpdates;
-
-    (_incomingUpdates = this._incomingUpdates).push.apply(_incomingUpdates, _toConsumableArray(updates));
-  },
-  _collectToSend: function _collectToSend(updates) {
-    var _ongoingUpdates;
-
-    updates = updates.map(function (update) {
-      var serializable = Object.assign({}, update);
-      var sharedspaceId = update.target.dataset.sharedspaceId;
-
-      serializable.target = '[data-sharedspace-id="' + sharedspaceId + '"]';
-      return serializable;
-    });
-    (_ongoingUpdates = this._ongoingUpdates).push.apply(_ongoingUpdates, _toConsumableArray(updates));
-  },
-  _sendUpdates: function _sendUpdates() {
-    if (this._ongoingUpdates.length > 0) {
-      var content = participantsUpdatesMessage(this._ongoingUpdates);
-      this._participation.send('*', content);
-      this._ongoingUpdates = [];
-    }
-  },
-  _applyUpdates: function _applyUpdates() {
-    this._tree.applyUpdates(this._incomingUpdates);
-    this._incomingUpdates = [];
   }
 });
 
-
-function participantsUpdatesMessage(updates) {
-  return { type: 'participantsupdates', updates: updates };
-}
-
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _aframe = __webpack_require__(4);
+var _aframe = __webpack_require__(3);
 
 var AFRAME = _interopRequireWildcard(_aframe);
 
@@ -6516,7 +6604,7 @@ Sound.prototype.update = function (oldData) {
 };
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6531,7 +6619,7 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _aframe = __webpack_require__(4);
+var _aframe = __webpack_require__(3);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -6563,7 +6651,7 @@ var EntityObserver = function () {
         this._observer.observe(entity, init);
       } catch (e) {/* no-op */}
       if (init.components) {
-        var filter = init.componentFilter && init.componentFilter.length ? init.componentFilter : null;
+        var filter = init.componentFilter;
         this._observables.delete(entity);
         this._recordEntity(entity, filter);
       }
@@ -6665,7 +6753,87 @@ var EntityObserver = function () {
 exports.EntityObserver = EntityObserver;
 
 /***/ }),
-/* 33 */
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SceneTree = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _aframe = __webpack_require__(3);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var warn = _aframe.utils.debug('sharedspace:scene-tree:warn');
+
+/**
+ * Manages the mutations on the scene tree.
+ */
+
+var SceneTree = function () {
+  function SceneTree(root) {
+    _classCallCheck(this, SceneTree);
+
+    this._root = root;
+  }
+
+  _createClass(SceneTree, [{
+    key: 'applyUpdates',
+    value: function applyUpdates(updates) {
+      var _this = this;
+
+      if (!Array.isArray(updates)) {
+        updates = [updates];
+      }
+      updates.forEach(function (update) {
+        return _this._applyUpdate(update);
+      });
+    }
+  }, {
+    key: '_applyUpdate',
+    value: function _applyUpdate(update) {
+      var methodName = '_apply' + capitalize(update.type) + 'Update';
+      var method = this[methodName];
+      if (!method) {
+        throw new Error('Unknown update \'' + update.type + '\'. Looking for a\n\'' + methodName + '\' implementation.');
+      }
+      this[methodName](update);
+    }
+  }, {
+    key: '_applyComponentsUpdate',
+    value: function _applyComponentsUpdate(update) {
+      var target = update.target,
+          componentName = update.componentName,
+          newValue = update.newValue;
+
+      var element = this._root.querySelector(target);
+
+      if (!element) {
+        warn('element \'' + target + '\' is out of sync');
+        return;
+      }
+
+      element.setAttribute(componentName, newValue);
+    }
+  }]);
+
+  return SceneTree;
+}();
+
+function capitalize(str) {
+  return '' + str[0].toUpperCase() + str.substr(1);
+}
+
+exports.SceneTree = SceneTree;
+
+/***/ }),
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6839,7 +7007,7 @@ var GuestList = function () {
 exports.GuestList = GuestList;
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6854,15 +7022,15 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _aframe = __webpack_require__(4);
+var _aframe = __webpack_require__(3);
 
 var _eventTargetShim = __webpack_require__(19);
 
 var _eventTargetShim2 = _interopRequireDefault(_eventTargetShim);
 
-var _guestList = __webpack_require__(33);
+var _guestList = __webpack_require__(35);
 
-var _rtcInterface = __webpack_require__(35);
+var _rtcInterface = __webpack_require__(37);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7305,7 +7473,7 @@ function contentMessage(content) {
 exports.Participation = Participation;
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7320,13 +7488,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _aframe = __webpack_require__(4);
+var _aframe = __webpack_require__(3);
 
-var _signalhub = __webpack_require__(61);
+var _signalhub = __webpack_require__(62);
 
 var _signalhub2 = _interopRequireDefault(_signalhub);
 
-var _webrtcSwarm = __webpack_require__(74);
+var _webrtcSwarm = __webpack_require__(75);
 
 var _webrtcSwarm2 = _interopRequireDefault(_webrtcSwarm);
 
@@ -7465,104 +7633,26 @@ var RTCInterface = function (_EventTarget) {
 exports.RTCInterface = RTCInterface;
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.SceneTree = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _aframe = __webpack_require__(4);
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var warn = _aframe.utils.debug('sharedspace:scene-tree:warn');
-
-/**
- * Manages the mutations on the scene tree.
- */
-
-var SceneTree = function () {
-  function SceneTree(root) {
-    _classCallCheck(this, SceneTree);
-
-    this._root = root;
-  }
-
-  _createClass(SceneTree, [{
-    key: 'applyUpdates',
-    value: function applyUpdates(updates) {
-      var _this = this;
-
-      if (!Array.isArray(updates)) {
-        updates = [updates];
-      }
-      updates.forEach(function (update) {
-        return _this._applyUpdate(update);
-      });
-    }
-  }, {
-    key: '_applyUpdate',
-    value: function _applyUpdate(update) {
-      var methodName = '_apply' + capitalize(update.type) + 'Update';
-      var method = this[methodName];
-      if (!method) {
-        throw new Error('Unknown update \'' + update.type + '\'. Looking for a\n\'' + methodName + '\' implementation.');
-      }
-      this[methodName](update);
-    }
-  }, {
-    key: '_applyComponentsUpdate',
-    value: function _applyComponentsUpdate(update) {
-      var target = update.target,
-          componentName = update.componentName,
-          newValue = update.newValue;
-
-      var element = this._root.querySelector(target);
-
-      if (!element) {
-        warn('element \'' + target + '\' is out of sync');
-        return;
-      }
-
-      element.setAttribute(componentName, newValue);
-    }
-  }]);
-
-  return SceneTree;
-}();
-
-function capitalize(str) {
-  return '' + str[0].toUpperCase() + str.substr(1);
-}
-
-exports.SceneTree = SceneTree;
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
+__webpack_require__(32);
 
 __webpack_require__(31);
 
-__webpack_require__(30);
-
 __webpack_require__(28);
+
+__webpack_require__(30);
 
 __webpack_require__(29);
 
 localStorage.debug = 'sharedspace:*';
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7683,7 +7773,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -7799,7 +7889,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -7815,7 +7905,7 @@ exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
 exports.enabled = enabled;
-exports.humanize = __webpack_require__(49);
+exports.humanize = __webpack_require__(50);
 
 /**
  * The currently active debug mode names, and names to skip.
@@ -8007,7 +8097,7 @@ function coerce(val) {
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var once = __webpack_require__(11);
@@ -8096,7 +8186,7 @@ module.exports = eos;
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var stream = __webpack_require__(15)
@@ -8143,7 +8233,7 @@ module.exports = function(url, opts) {
 }
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8276,7 +8366,7 @@ module.exports.defineCustomEventTarget = function(EventTargetBase, types) {
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8438,7 +8528,7 @@ module.exports.createEventWrapper = function createEventWrapper(event, eventTarg
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var isFunction = __webpack_require__(20)
@@ -8490,7 +8580,7 @@ function forEachObject(object, iterator, context) {
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports) {
 
 // originally pulled out of simple-peer
@@ -8511,7 +8601,7 @@ module.exports = function getBrowserRTC () {
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var win;
@@ -8531,7 +8621,7 @@ module.exports = win;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -8621,7 +8711,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports) {
 
 /**
@@ -8779,10 +8869,10 @@ function plural(ms, n, name) {
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(process, Buffer) {var req = __webpack_require__(77)
+/* WEBPACK VAR INJECTION */(function(process, Buffer) {var req = __webpack_require__(78)
 
 module.exports = Nets
 
@@ -8807,14 +8897,14 @@ function Nets (opts, cb) {
   return req(opts, cb)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(3).Buffer))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(4).Buffer))
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var trim = __webpack_require__(70)
-  , forEach = __webpack_require__(45)
+var trim = __webpack_require__(71)
+  , forEach = __webpack_require__(46)
   , isArray = function(arg) {
       return Object.prototype.toString.call(arg) === '[object Array]';
     }
@@ -8846,12 +8936,12 @@ module.exports = function (headers) {
 }
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var once = __webpack_require__(11)
-var eos = __webpack_require__(41)
-var fs = __webpack_require__(78) // we only need fs to get the ReadStream and WriteStream prototypes
+var eos = __webpack_require__(42)
+var fs = __webpack_require__(79) // we only need fs to get the ReadStream and WriteStream prototypes
 
 var noop = function () {}
 
@@ -8932,7 +9022,7 @@ module.exports = pump
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8942,7 +9032,7 @@ function oldBrowser () {
   throw new Error('secure random number generation not supported by this browser\nuse chrome, FireFox or Internet Explorer 11')
 }
 
-var Buffer = __webpack_require__(54).Buffer
+var Buffer = __webpack_require__(55).Buffer
 var crypto = global.crypto || global.msCrypto
 
 if (crypto && crypto.getRandomValues) {
@@ -8978,11 +9068,11 @@ function randomBytes (size, cb) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(0)))
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-disable node/no-deprecated-api */
-var buffer = __webpack_require__(3)
+var buffer = __webpack_require__(4)
 var Buffer = buffer.Buffer
 
 if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
@@ -9044,14 +9134,14 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(5);
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9083,7 +9173,7 @@ PassThrough.prototype._transform = function (chunk, encoding, cb) {
 };
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9153,21 +9243,21 @@ BufferList.prototype.concat = function (n) {
 };
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(9).PassThrough
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(13);
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -9360,14 +9450,14 @@ module.exports = __webpack_require__(13);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7), __webpack_require__(0)))
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {var events = __webpack_require__(6)
-var ess = __webpack_require__(42)
-var nets = __webpack_require__(50)
-var pump = __webpack_require__(52)
-var through = __webpack_require__(68)
+var ess = __webpack_require__(43)
+var nets = __webpack_require__(51)
+var pump = __webpack_require__(53)
+var through = __webpack_require__(69)
 var inherits = __webpack_require__(1)
 
 module.exports = SignalHub
@@ -9485,15 +9575,15 @@ function noop () {}
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {module.exports = Peer
 
 var debug = __webpack_require__(18)('simple-peer')
-var getBrowserRTC = __webpack_require__(46)
+var getBrowserRTC = __webpack_require__(47)
 var inherits = __webpack_require__(1)
-var randombytes = __webpack_require__(53)
+var randombytes = __webpack_require__(54)
 var stream = __webpack_require__(9)
 
 var MAX_BUFFERED_AMOUNT = 64 * 1024
@@ -10239,10 +10329,10 @@ Peer.prototype._transformConstraints = function (constraints) {
 
 function noop () {}
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3).Buffer))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4).Buffer))
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports) {
 
 module.exports = Array.isArray || function (arr) {
@@ -10251,7 +10341,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -10278,12 +10368,12 @@ module.exports = Array.isArray || function (arr) {
 module.exports = Readable;
 
 /*<replacement>*/
-var isArray = __webpack_require__(63);
+var isArray = __webpack_require__(64);
 /*</replacement>*/
 
 
 /*<replacement>*/
-var Buffer = __webpack_require__(3).Buffer;
+var Buffer = __webpack_require__(4).Buffer;
 /*</replacement>*/
 
 Readable.ReadableState = ReadableState;
@@ -11240,7 +11330,7 @@ function indexOf (xs, x) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -11456,7 +11546,7 @@ function done(stream, er) {
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -11487,7 +11577,7 @@ function done(stream, er) {
 module.exports = Writable;
 
 /*<replacement>*/
-var Buffer = __webpack_require__(3).Buffer;
+var Buffer = __webpack_require__(4).Buffer;
 /*</replacement>*/
 
 Writable.WritableState = WritableState;
@@ -11849,17 +11939,17 @@ function endWritable(stream, state, cb) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 67 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(65)
-
-
-/***/ }),
 /* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(process) {var Transform = __webpack_require__(67)
+module.exports = __webpack_require__(66)
+
+
+/***/ }),
+/* 69 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process) {var Transform = __webpack_require__(68)
   , inherits  = __webpack_require__(27).inherits
   , xtend     = __webpack_require__(16)
 
@@ -11959,7 +12049,7 @@ module.exports.obj = through2(function (options, transform, flush) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var apply = Function.prototype.apply;
@@ -12012,13 +12102,13 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(60);
+__webpack_require__(61);
 exports.setImmediate = setImmediate;
 exports.clearImmediate = clearImmediate;
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports) {
 
 
@@ -12038,7 +12128,7 @@ exports.right = function(str){
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {
@@ -12112,7 +12202,7 @@ function config (name) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -12141,7 +12231,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -12152,14 +12242,14 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(process) {var SimplePeer = __webpack_require__(62)
+/* WEBPACK VAR INJECTION */(function(process) {var SimplePeer = __webpack_require__(63)
 var inherits = __webpack_require__(1)
 var events = __webpack_require__(6)
-var through = __webpack_require__(75)
-var cuid = __webpack_require__(39)
+var through = __webpack_require__(76)
+var cuid = __webpack_require__(40)
 var once = __webpack_require__(11)
 var debug = __webpack_require__(18)('webrtc-swarm')
 
@@ -12357,7 +12447,7 @@ function connect (swarm, hub) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {var Transform = __webpack_require__(25)
@@ -12460,7 +12550,7 @@ module.exports.obj = through2(function (options, transform, flush) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports) {
 
 // Returns a wrapper function that returns a wrapped callback
@@ -12499,14 +12589,14 @@ function wrappy (fn, cb) {
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var window = __webpack_require__(47)
+var window = __webpack_require__(48)
 var isFunction = __webpack_require__(20)
-var parseHeaders = __webpack_require__(51)
+var parseHeaders = __webpack_require__(52)
 var xtend = __webpack_require__(16)
 
 module.exports = createXHR
@@ -12747,13 +12837,13 @@ function noop() {}
 
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, exports) {
 
 /* (ignored) */

@@ -1,5 +1,8 @@
+localStorage.debug = 'sharedspace:*';
+
 import './positional-audio-patch';
 
 import './components/sharedspace';
-import './components/onmyself';
+import './components/participants';
+import './components/share';
 import './components/position-around';

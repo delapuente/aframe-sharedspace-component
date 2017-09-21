@@ -26,8 +26,7 @@ class EntityObserver {
     }
     catch (e) { /* no-op */ }
     if (init.components) {
-      const filter = init.componentFilter && init.componentFilter.length ?
-                     init.componentFilter : null;
+      const filter = init.componentFilter;
       this._observables.delete(entity);
       this._recordEntity(entity, filter);
     }

@@ -9,7 +9,7 @@
 </head>
 <body>
   <a-scene stats>
-    <a-entity sharedspace="audio: true; provider: https://signaling.eu.ngrok.io">
+    <a-entity sharedspace="audio: true; provider: https://signaling.eu.ngrok.io" participants>
       <!-- Outside the window -->
       <a-entity environment="preset: osiris"></a-entity>
 
@@ -79,7 +79,7 @@
 
     </a-entity>
   </a-scene>
-  <template id="participant">
+  <template>
     <a-entity position-around>
       <!-- Party hat -->
       <a-cone position="0 0.23 0"

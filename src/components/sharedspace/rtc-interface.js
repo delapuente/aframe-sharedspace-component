@@ -2,7 +2,7 @@ import { utils } from 'aframe';
 import signalhub from 'signalhub';
 import WebRtcSwarm from 'webrtc-swarm';
 import EventTarget from 'event-target-shim';
-import { panic } from '../utils';
+import { panic } from '../../utils';
 
 const bind = utils.bind;
 const log = utils.debug('sharedspace:rtc-interface:log');
