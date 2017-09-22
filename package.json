@@ -1,10 +1,12 @@
 {
   "name": "aframe-sharedspace-component",
-  "version": "0.2.0",
-  "description": "A-Frame VR component to create multi-user experiences",
+  "version": "0.3.0",
+  "description": "A-Frame VR component to create multi-user experiences with WebRTC",
   "main": "dist/aframe-sharedspace-component.js",
   "scripts": {
-    "build": "webpack",
+    "build": "concurrently \"npm run build:dev\" \"npm run build:prod\"",
+    "build:dev": "webpack",
+    "build:prod": "webpack --config webpack.prod.js",
     "clean": "shx rm -rf site",
     "copy": "shx cp -r index.html assets dist site/",
     "deploy": "npm run build && npm run copy && gh-pages -d site",
@@ -34,9 +36,11 @@
     "file-loader": "^0.11.2",
     "gh-pages": "^1.0.0",
     "shx": "^0.2.2",
+    "uglifyjs-webpack-plugin": "^0.4.6",
     "webpack": "^2.6.1",
     "webpack-bundle-analyzer": "^2.9.0",
-    "webpack-dev-server": "^2.4.5"
+    "webpack-dev-server": "^2.4.5",
+    "webpack-merge": "^4.1.0"
   },
   "peerDependencies": {
     "aframe": "^0.6.1"

@@ -1,5 +1,6 @@
-var path = require('path');
-var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const path = require('path');
+const BundleAnalyzerPlugin =
+  require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 var plugins = [];
 process.env.SIZE_ANALYSIS && plugins.push(new BundleAnalyzerPlugin());
