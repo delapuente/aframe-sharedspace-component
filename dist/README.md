@@ -219,7 +219,7 @@ If you prefer to provide your own components and to control which of them are sh
 
 It is important for the participants in multi-user experiences to not overlap with each other and keep some free space around. The `placement` property accepts the name of an arbitrary component or `none`. If set to `none`, placement is disabled. But if set to a registered component, instantiation process will set the `position` property of the component to the participant's position in the room.
 
-The [`position-around`](#position-around) component, included with `sharedspace` will arrange the participants around a particular point but other arrangements are possible. Room positions starts in 1. The following code will [register a component](https://aframe.io/docs/0.6.0/core/component.html#register-a-component) that arranges entities in a queue extending to -Z axis.
+The [`position-around`](#position-around) component, included with `sharedspace` will arrange the participants around a particular point but other arrangements are possible. Room positions starts in 1. The following code will [register a component](https://aframe.io/docs/0.7.0/core/component.html#register-a-component) that arranges entities in a queue extending to -Z axis.
 
 ```html
 <script>
@@ -391,7 +391,7 @@ For instance, the following code will change the color of some nested element:
 
 This component modifies the `position` component of an A-Frame entity to make it appear in a virtual circle. The position 1 is at the right of the circle; the position 2 is in front of 1. The position 3 is on the top of the circle; the position 4 is in front of 3. The position 5 is in the middle of 1 and 3; the position 6 is in front of 5 and so on...
 
-
+![Entities are positioned according to circle around a center with and offset height. Positions tend to occupy the farthest space to previous positions.](https://cdn.rawgit.com/delapuente/aframe-sharedspace-component/master/img/position-around.svg)
 
 
 ### Properties

@@ -3,6 +3,10 @@
 
 Try the [Minimal Chatroom](https://minimal-chatroom.glitch.me) on-line!
 
+The `sharedspace` component provides a simple participation model in which participants join or leave a named room, send messages to other peers and publish audio streams. It runs on the top of WebRTC, with minimal signaling infrastructure relaying on peer-to-peer session management.
+
+The `sharedspace` component covers an specific usecase. If you are looking for a more general solution to network-synchronized A-Frame scenes, take a look at [`networked-aframe`](https://github.com/haydenjameslee/networked-aframe) by [Hayden Lee](http://haydenlee.io/).
+
 ## HTTPS
 WebRTC works with secure origins only, so your site must be served from `localhost` or HTTPS for the component to work. If you need to access your application from the Internet, use [ngrok](https://ngrok.com/) or build it completely on [glitch](https://glitch.com/). Both options work great.
 
@@ -29,7 +33,7 @@ Once A-Frame and the `sharedspace` component are [installed](#install), this is 
   </a-entity>
 </a-scene>
 <template>
-  <a-sphere radius="0.1" position-around><a-sphere>
+  <a-sphere radius="0.1"><a-sphere>
 </template>
 ```
 
@@ -48,14 +52,20 @@ When installing `sharedspace`, four components are registered with A-Frame:
 
 Take a look at the [Component Overview](https://github.com/delapuente/aframe-sharedspace-component/tree/master/dist#component-overview) document while preparing a more _webby_ version of the docs.
 
-## Develop
-Issuing the following command will run a local server with live-reload listening at port `8080` and a local WebRTC signaling server at port `9000`:
+## Contributing
+If you want to contribute to the project, clone the repository and install the dependencies:
+
+```bash
+$ npm install
+```
+
+Issue the following command to run a local server with live-reload listening at port `8080` and a local WebRTC signaling server at port `9000`:
 
 ```bash
 $ npm start
 ```
 
-You need to point the `sharedspace` component to the developer server. Use the `provider` property to that end:
+To make the `sharedspace` component to use the local signaling server, use the `provider` property:
 
 ```html
 <a-entity sharedspace="provider: http://localhost:9000">
@@ -78,8 +88,12 @@ $ SIZE_ANALYSIS=1 npm run build
 ```
 
 ## Deploy
-Finally, if you want to publish "The (Un)Happy Birthday Chamber" demo on GitHub Pages, run:
+To deploy the demo coming with the library on GitHub Pages, use the following command. Remeber to change the `origin` remote to point to your own repository.
 
 ```bash
 $ npm run deploy
 ```
+
+## Credits
+
+[Anime Face Model Stocking](https://sketchfab.com/models/d049b6a85d204057b170ef9dbc851200) by [stocking](https://sketchfab.com/stocking) is licensed under [CC Attribution](http://creativecommons.org/licenses/by/4.0/)
