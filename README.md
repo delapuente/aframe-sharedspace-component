@@ -1,7 +1,7 @@
 # aframe-sharedspace-component
 > A-Frame VR component to create multi-user experiences with WebRTC
 
-Try the
+Try the [Minimal Chatroom](https://minimal-chatroom.glitch.me) on-line!
 
 ## HTTPS
 WebRTC works with secure origins only, so your site must be served from `localhost` or HTTPS for the component to work. If you need to access your application from the Internet, use [ngrok](https://ngrok.com/) or build it completely on [glitch](https://glitch.com/). Both options work great.
@@ -33,7 +33,7 @@ Once A-Frame and the `sharedspace` component are [installed](#install), this is 
 </template>
 ```
 
-Unfortunately, the chatroom lacks from decoration and participants will be spheres, which is not the best way of representing a human head. Instead, take a look at the [Minimal Chatroom application on Glitch](glitch.com/edit/#!/minimal-chatroom) for a **functional** minimal setup.
+Unfortunately, the chatroom lacks from decoration and participants will be spheres, which is not the best way of representing a human head. Instead, take a look at the [Minimal Chatroom application on Glitch](https://glitch.com/edit/#!/minimal-chatroom) for a **functional** minimal setup.
 
 ## Documentation
 
