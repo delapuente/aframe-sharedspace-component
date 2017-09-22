@@ -195,7 +195,7 @@ By default, `onmyself` is set to `auto` which means adding the following compone
  * `camera` for the avatar to become the active camera.
  * `look-controls` to rotate the avatar by dragging on the screen.
  * `share="rotation"` to keep own rotation synchronized with the other peers.
-  
+
 If you prefer to provide your own components and to control which of them are shared, set `onmyself` to the id of an [A-Frame mixin](https://aframe.io/docs/0.7.0/core/mixins.html). The following configuration adds `wasd-controls` to move the avatar around with the `w`, `a`, `s` and `d` keys and shares position for the peers to see how the local participant moves:
 
 ```html
@@ -213,7 +213,7 @@ If you prefer to provide your own components and to control which of them are sh
 
 > **NOTE**: Due to a bug in A-Frame, it is impossible to set a `camera` component in a mixin. Since the camera in the local participant is a vey common case, it is always added. Use the `participantsetup` event to customize the participant element and remove the `camera` component if you don't want it.
 
-[Try it yourself by remixing the Minimal Chatroom](https://glitch.com/edit/#!/minimal-chatroom) project on Glitch.
+[Try it yourself by remixing the VR Chat project](https://glitch.com/edit/#!/vr-chat) on Glitch.
 
 #### Placing the participants
 
@@ -269,7 +269,7 @@ room.addEventListener('participantadded', function onParticipant(evt) {
     participant.addEventListener('loaded', onParticipant.bind(null, evt));
     return;
   }
-  
+
   var center = { x: 0, z: 0 };
   var participantY = participant.getAttribute('position').y;
   participant.object3D.lookAt(new THREE.Vector3(
@@ -402,4 +402,3 @@ This component modifies the `position` component of an A-Frame entity to make it
 | `radius`   | Entity's distance to the center.                 | 1.1       |
 | `height`   | Displacement in +Y above the final position.     | 1.6       |
 | `position` | Position aroung the central point.               | 1         |
-

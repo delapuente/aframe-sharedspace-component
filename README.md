@@ -1,7 +1,7 @@
 # aframe-sharedspace-component
 > A-Frame VR component to create multi-user experiences with WebRTC
 
-Try the [Minimal Chatroom](https://minimal-chatroom.glitch.me) on-line!
+Try the [VR Chat](https://vr-chat.glitch.me/) on-line!
 
 The `sharedspace` component provides a simple participation model in which participants join or leave a named room, send messages to other peers and publish audio streams. It runs on the top of WebRTC, with minimal signaling infrastructure relaying on peer-to-peer session management.
 
@@ -37,7 +37,7 @@ Once A-Frame and the `sharedspace` component are [installed](#install), this is 
 </template>
 ```
 
-Unfortunately, the chatroom lacks from decoration and participants will be spheres, which is not the best way of representing a human head. Instead, take a look at the [Minimal Chatroom application on Glitch](https://glitch.com/edit/#!/minimal-chatroom) for a **functional** minimal setup.
+Unfortunately, the chatroom lacks from decoration and participants will be spheres, which is not the best way of representing a human head. Instead, take a look at the [VR Chat application on Glitch](https://glitch.com/edit/#!/vr-chat) for a **functional** minimal setup.
 
 ## Documentation
 
