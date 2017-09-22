@@ -102,21 +102,61 @@ room.addEventListener('enterparticipant', function (evt) {
 
 #### Detail
 
-| Name                 | Detail     | Description                           |
-|----------------------|----------------------------------------------------|
-| `enterparticipant`   | `id`       | Participant unique id.                |
-|                      | `position` | Order in the room.                    |
-|                      | `isMe`     | `true` if it's the local participant. |
-
-| `exitparticipant`    | `id`       | Participant unique id.                |
-|                      | `position` | Order in the room.                    |
-|                      | `isMe`     | `true` if it's the local participant. |
-
-| `participantstream`  | `id`       | Participant unique id.                |
-|                      | `stream`   | [MediaStream](https://developer.mozilla.org/en-US/docs/Web/API/MediaStream) object                    |
-
-| `participantmessage` | `id`       | Participant unique id.                |
-|                      | `message`  | Message                    |
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Detail</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><code>enterparticipant</code></td>
+      <td><code>id</code></td>
+      <td>Participant unique id.</td>
+    </tr>
+    <tr>
+      <td><code>position</code></td>
+      <td>Order in the room.</td>
+    </tr>
+    <tr>
+      <td><code>isMe</code></td>
+      <td><code>true</code> if it’s the local participant.</td>
+    </tr>
+    <tr rowspan="3">
+      <td><code>exitparticipant</code></td>
+      <td><code>id</code></td>
+      <td>Participant unique id.</td>
+    </tr>
+    <tr>
+      <td><code>position</code></td>
+      <td>Order in the room.</td>
+    </tr>
+    <tr>
+      <td><code>isMe</code></td>
+      <td><code>true</code> if it’s the local participant.</td>
+    </tr>
+    <tr rowspan="2">
+      <td><code>participantstream</code></td>
+      <td><code>id</code></td>
+      <td>Participant unique id.</td>
+    </tr>
+    <tr>
+      <td><code>stream</code></td>
+      <td><a href="https://developer.mozilla.org/en-US/docs/Web/API/MediaStream">MediaStream</a> object</td>
+    </tr>
+    <tr>
+      <td rowspan="3"><code>participantmessage</code></td>
+      <td><code>id</code></td>
+      <td>Participant unique id.</td>
+    </tr>
+    <tr>
+      <td><code>message</code></td>
+      <td>Message</td>
+    </tr>
+  </tbody>
+</table>
 
 ## participants
 

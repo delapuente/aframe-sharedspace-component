@@ -37,7 +37,16 @@ Unfortunately, the chatroom lacks from decoration and participants will be spher
 
 ## Documentation
 
-Take a look at the [Component Overview]() document while I prepare the proper documentations.
+When installing `sharedspace`, four components are registered with A-Frame:
+
+| Component         | Description                                          |
+|-------------------|------------------------------------------------------|
+| `sharedspace`     | Provides the participation model.                    |
+| `participants`    | Represent participants as A-Frame entities.          |
+| `share`           | Controls the state of the participant to share.      |
+| `position-around` | Helper to position an entity around a central point. |
+
+Take a look at the [Component Overview](https://github.com/delapuente/aframe-sharedspace-component/tree/master/dist#component-overview) document while preparing a more _webby_ version of the docs.
 
 ## Develop
 Issuing the following command will run a local server with live-reload listening at port `8080` and a local WebRTC signaling server at port `9000`:
