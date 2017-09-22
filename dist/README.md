@@ -124,8 +124,8 @@ room.addEventListener('enterparticipant', function (evt) {
       <td><code>isMe</code></td>
       <td><code>true</code> if it’s the local participant.</td>
     </tr>
-    <tr rowspan="3">
-      <td><code>exitparticipant</code></td>
+    <tr>
+      <td rowspan="3"><code>exitparticipant</code></td>
       <td><code>id</code></td>
       <td>Participant unique id.</td>
     </tr>
@@ -137,8 +137,8 @@ room.addEventListener('enterparticipant', function (evt) {
       <td><code>isMe</code></td>
       <td><code>true</code> if it’s the local participant.</td>
     </tr>
-    <tr rowspan="2">
-      <td><code>participantstream</code></td>
+    <tr>
+      <td rowspan="2"><code>participantstream</code></td>
       <td><code>id</code></td>
       <td>Participant unique id.</td>
     </tr>
@@ -147,7 +147,7 @@ room.addEventListener('enterparticipant', function (evt) {
       <td><a href="https://developer.mozilla.org/en-US/docs/Web/API/MediaStream">MediaStream</a> object</td>
     </tr>
     <tr>
-      <td rowspan="3"><code>participantmessage</code></td>
+      <td rowspan="2"><code>participantmessage</code></td>
       <td><code>id</code></td>
       <td>Participant unique id.</td>
     </tr>
