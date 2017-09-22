@@ -6424,18 +6424,16 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
     me: { default: '' }
   },
 
-  update: function update() {
-    if (!this._initializing && !this._connected && !this.data.hold) {
-      this._start();
-    }
-  },
   init: function init() {
     this._connected = false;
     this._initializing = false;
+  },
 
-    // Delay connection until all the scene is complete so other dependant
-    // components can set their event handlers up. See `participants` component
-    // for an example.
+
+  // Delay connection until all the scene is complete so other dependant
+  // components can set their event handlers up. See `participants` component
+  // for an example.
+  update: function update() {
     if (this.el.sceneEl.hasLoaded) {
       this._start();
     } else {
