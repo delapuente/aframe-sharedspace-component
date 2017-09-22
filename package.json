@@ -1,7 +1,7 @@
 {
   "name": "aframe-sharedspace-component",
-  "version": "0.1.0",
-  "description": "A-Frame VR chatroom component",
+  "version": "0.2.0",
+  "description": "A-Frame VR component to create multi-user experiences",
   "main": "dist/aframe-sharedspace-component.js",
   "scripts": {
     "build": "webpack",
