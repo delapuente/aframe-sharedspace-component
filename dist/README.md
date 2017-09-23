@@ -5,7 +5,7 @@ When installing `sharedspace`, four components are registered with A-Frame:
 | Component                             | Description                                          |
 |---------------------------------------|------------------------------------------------------|
 | [`sharedspace`](#sharedspace)         | Provides the participation model.                    |
-| [`participants`](#participants)       | Represent participants as A-Frame entities.          |
+| [`avatars`](#avatars)       | Manage participants' avatars.          |
 | [`share`](#share)                     | Controls the state of the participant to share.      |
 | [`position-around`](#position-around) | Helper to position an entity around a central point. |
 
@@ -158,28 +158,28 @@ room.addEventListener('enterparticipant', function (evt) {
   </tbody>
 </table>
 
-## participants
+## avatars
 
-The `sharedspace` component is useless in isolation, but provides the necessary hooks for creating multi-user experiences. To use `sharedspace` in an effective way, your application should listen to the aforementioned events and translate them into changes in the A-Frame scene. The `participants` component does this in a configurable and powerful way.
+The `sharedspace` component is useless in isolation, but provides the necessary hooks for creating multi-user experiences. To use `sharedspace` in an effective way, your application should listen to the aforementioned events and translate them into changes in the A-Frame scene. The `avatars` component does this in a configurable and powerful way.
 
-The `participants` component use an HTML5 template to instantiate new participants. It gives them an id and position in the form of [`data-*`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*) attributes and attaches participant audio streams as A-Frame positional audio. When instantiating the _local participant_, special customization is possible.
+The `avatars` component use an HTML5 template to instantiate new avatars. It gives them an id and position in the form of [`data-*`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*) attributes and attaches participants audio streams to the avatars in the form of A-Frame positional audio. When instantiating the avatar of the _local participant_, special customization is possible.
 
 ### Properties
 
 | Property     | Description                                                         | Default           |
 |--------------|---------------------------------------------------------------------|-------------------|
-| `template`   | CSS selector of the participant `template` tag or `none`.           | `template`        |
-| `placement`  | Component to position the participant instance or `none`.           | `position-around` |
-| `onmyself`   | A-Frame mixin id or `auto` or `none`. It controls the configuration of the local participant instance.  | `auto` |
+| `template`   | CSS selector of the avatar `template` tag or `none`.           | `template`        |
+| `placement`  | Component to position the avatar instance or `none`.           | `position-around` |
+| `onmyself`   | A-Frame mixin id or `auto` or `none`. It controls the configuration of the local participant avatar.  | `auto` |
 | `audio`      | If set, will convert media streams into positional audio.           | `true`            |
-| `autoremove` | If set, removes the participant from the DOM if it exits.           | `true`            |
+| `autoremove` | If set, removes the avatar from the DOM if it exits.           | `true`            |
 
-#### Disabling participant instantiation
+#### Disabling avatar instantiation
 
-Setting `template` to `none` will disable instantiation of new participants. It will be your reponsibility to create an avatar for your peers and yourself. To keep the interoperability with other features such as `audio` or `autoremove`, set the `data-sharedspace-id` attribute of the custom avatar to the `sharedspace` id of the participant:
+Setting `template` to `none` will disable instantiation of new avatars. It will be your responsibility to create an avatar for your peers and yourself. To keep the interoperability with other features such as `audio` or `autoremove`, set the `data-sharedspace-id` attribute of the custom avatar to the `sharedspace` id of the participant:
 
 ```js
-// <a-entity sharedspace="audio: true" participants="template: none"></a-entity>
+// <a-entity sharedspace="audio: true" avatars="template: none"></a-entity>
 var room = document.querySelector('[sharedspace]');
 room.addEventListener('enterparticipant', function (evt) {
   var avatar = getCustomAvatar();
@@ -188,22 +188,22 @@ room.addEventListener('enterparticipant', function (evt) {
 );
 ```
 
-#### Customizing the local participant
+#### Customizing the local participant avatar
 
-By default, `onmyself` is set to `auto` which means adding the following components, when instantiating the template for the local participant:
+By default, `onmyself` is set to `auto` which means adding the following components, when instantiating the avatar of the local participant:
 
  * `camera` for the avatar to become the active camera.
  * `look-controls` to rotate the avatar by dragging on the screen.
- * `share="rotation"` to keep own rotation synchronized with the other peers.
+ * `share="rotation"` to keep own rotation synchronized with other peers.
 
-If you prefer to provide your own components and to control which of them are shared, set `onmyself` to the id of an [A-Frame mixin](https://aframe.io/docs/0.7.0/core/mixins.html). The following configuration adds `wasd-controls` to move the avatar around with the `w`, `a`, `s` and `d` keys and shares position for the peers to see how the local participant moves:
+If you prefer to provide your own components and to control which of them are shared, set `onmyself` to the id of an [A-Frame mixin](https://aframe.io/docs/0.7.0/core/mixins.html). The following configuration adds `wasd-controls` to move the avatar around with the `w`, `a`, `s` and `d` keys and shares position for the peers to see how the local participant avatar moves:
 
 ```html
 <a-scene>
   <a-assets>
     <a-mixin id="me" look-controls wasd-controls share="position, rotation"></a-mixin>
   </a-assets>
-  <a-entity sharedspace="audio: true" participants="onmyself: me">
+  <a-entity sharedspace="audio: true" avatars="onmyself: me">
   </a-entity>
 </a-scene>
 <template>
@@ -211,15 +211,15 @@ If you prefer to provide your own components and to control which of them are sh
 </template>
 ```
 
-> **NOTE**: Due to a bug in A-Frame, it is impossible to set a `camera` component in a mixin. Since the camera in the local participant is a vey common case, it is always added. Use the `participantsetup` event to customize the participant element and remove the `camera` component if you don't want it.
+> **NOTE**: Due to a bug in A-Frame, it is impossible to set a `camera` component in a mixin. Since the camera in the avatar of the local participant is a vey common case, it is always added. Use the `avatarsetup` event to customize the avatar element and remove the `camera` component if you don't want it.
 
 [Try it yourself by remixing the VR Chat project](https://glitch.com/edit/#!/vr-chat) on Glitch.
 
-#### Placing the participants
+#### Placing the avatars
 
-It is important for the participants in multi-user experiences to not overlap with each other and keep some free space around. The `placement` property accepts the name of an arbitrary component or `none`. If set to `none`, placement is disabled. But if set to a registered component, instantiation process will set the `position` property of the component to the participant's position in the room.
+It is important for the users in a multi-user experience to not overlap with each other and keep some free space around. The `placement` property accepts the name of an arbitrary component or `none`. If set to `none`, automatic placement is disabled. But if set to a registered component, instantiation process will set the `position` property of the component to the participant's position in the room.
 
-The [`position-around`](#position-around) component, included with `sharedspace` will arrange the participants around a particular point but other arrangements are possible. Room positions starts in 1. The following code will [register a component](https://aframe.io/docs/0.7.0/core/component.html#register-a-component) that arranges entities in a queue extending to -Z axis.
+The [`position-around`](#position-around) component, included with `sharedspace` will arrange the avatars around a particular point but other arrangements are possible. Room positions starts in 1. The following code will [register a component](https://aframe.io/docs/0.7.0/core/component.html#register-a-component) that arranges entities in a queue extending to -Z axis.
 
 ```html
 <script>
@@ -239,7 +239,7 @@ The [`position-around`](#position-around) component, included with `sharedspace`
   });
 </script>
 <a-scene>
-  <a-entity sharedspace="audio: true" participants="placement: queue">
+  <a-entity sharedspace="audio: true" avatars="placement: queue">
   </a-entity>
 </a-scene>
 <template>
@@ -247,39 +247,39 @@ The [`position-around`](#position-around) component, included with `sharedspace`
 </template>
 ```
 
-Notice that `placement` does not deal with orientation. By default, cameras are created looking to -Z axis. You will need to customize the participant element to modify the initial orientation. Read more about how to customize the participant elements in the next section.
+Notice that `placement` does not deal with orientation. By default, cameras are created looking to -Z axis. You will need to customize the avatar element to modify the initial orientation. Read more about how to customize the avatars in the next section.
 
 ### Events
 
 | Name                 | Description                                                                         |
 |----------------------|-------------------------------------------------------------------------------------|
-| `participantelement` | There is going to be some operation with the participant element.                   |
-| `participantsetup`   | The participant element is configured, including local participant customizations . |
-| `participantadded`   | The participant element has been added to the room.                                 |
+| `avatarelement` | There is going to be some operation with the avatar.                   |
+| `avatarsetup`   | The avatar is configured, including local participant customizations . |
+| `avataradded`   | The avatar element has been added to the room.                                 |
 
-Events `participantsetup` and `participantadded` only happen while adding a new participant. The `participantelement` event can happen while adding or removing.
+Events `avatarsetup` and `avataradded` only happen while adding a new avatar. The `avatarelement` event can happen while adding or removing.
 
-The following snippet will make the participant element set the orieantation once the new participant is added:
+The following snippet will make the avatar element set the orientation once the new avatar is added:
 
 ```js
-// <a-entity sharedspace></a-entity>
-room.addEventListener('participantadded', function onParticipant(evt) {
-  var participant = evt.detail.participant;
-  if (!participant.hasLoaded) {
-    participant.addEventListener('loaded', onParticipant.bind(null, evt));
+// <a-entity sharedspace avatars></a-entity>
+room.addEventListener('avataradded', function onAdded(evt) {
+  var avatar = evt.detail.avatar;
+  if (!avatar.hasLoaded) {
+    avatar.addEventListener('loaded', onAdded.bind(null, evt));
     return;
   }
 
   var center = { x: 0, z: 0 };
-  var participantY = participant.getAttribute('position').y;
-  participant.object3D.lookAt(new THREE.Vector3(
-    center.x, participantY, center.z
+  var avatarY = avatar.getAttribute('position').y;
+  avatar.object3D.lookAt(new THREE.Vector3(
+    center.x, avatarY, center.z
   ));
 
   var radToDeg = THREE.Math.radToDeg;
-  var rotation = participant.object3D.rotation;
+  var rotation = avatar.object3D.rotation;
   rotation.y += Math.PI;
-  participant.setAttribute('rotation', {
+  avatar.setAttribute('rotation', {
     x: radToDeg(rotation.x),
     y: radToDeg(rotation.y),
     z: radToDeg(rotation.z)
@@ -299,9 +299,9 @@ room.addEventListener('participantadded', function onParticipant(evt) {
   </thead>
   <tbody>
     <tr>
-      <td rowspan="3"><code>participantelement</code></td>
-      <td><code>participant</code></td>
-      <td>Participant HTML element.</td>
+      <td rowspan="3"><code>avatarelement</code></td>
+      <td><code>avatar</code></td>
+      <td>Avatar HTML element.</td>
     </tr>
     <tr>
       <td><code>action</code></td>
@@ -309,32 +309,32 @@ room.addEventListener('participantadded', function onParticipant(evt) {
     </tr>
     <tr>
       <td><code>isMe</code></td>
-      <td><code>true</code> if it’s the local participant.</td>
+      <td><code>true</code> if it’s the avatar of the local participant.</td>
     </tr>
     <tr>
-      <td rowspan="2"><code>participantsetup</code></td>
-      <td><code>participant</code></td>
-      <td>Participant HTML element.</td>
+      <td rowspan="2"><code>avatarsetup</code></td>
+      <td><code>avatar</code></td>
+      <td>Avatar HTML element.</td>
     </tr>
     <tr>
       <td><code>isMe</code></td>
-      <td><code>true</code> if it’s the local participant.</td>
+      <td><code>true</code> if it’s the avatar of the local participant.</td>
     </tr>
     <tr>
       <td rowspan="2"><code>participantadded</code></td>
       <td><code>participant</code></td>
-      <td>Participant HTML element.</td>
+      <td>Avatar HTML element.</td>
     </tr>
         <tr>
       <td><code>isMe</code></td>
-      <td><code>true</code> if it’s the local participant.</td>
+      <td><code>true</code> if it’s the avatar of the local participant.</td>
     </tr>
   </tbody>
 </table>
 
 ## share
 
-The `share` component is a companion of the `particpants` component. It controls what components of the local participant element will be shared among all the participants. The `share` component can be included in the [A-Frame mixin](https://aframe.io/docs/0.7.0/core/mixins.html) used for [customizing the local participant](#customizing-the-loca-participant) or during the `participantelement` event (in a synchronous way). It defaults in the empty list which means all the components will be shared. Be careful since "all the components" includes the `camera` component.
+The `share` component is a companion of the `avatars` component. It controls what components of the local participant avatar will be shared among all the participants. The `share` component can be included in the [A-Frame mixin](https://aframe.io/docs/0.7.0/core/mixins.html) used for [customizing the local participant avatar](#customizing-the-loca-participant-avatar) or during the `avatarelement` event (in a synchronous way). It defaults in the empty list which means all the components will be shared. Be careful since "all the components" includes the `camera` component.
 
 ### Sharing nested elements' state
 
@@ -360,7 +360,7 @@ For instance, the following code will change the color of some nested element:
   <a-assets>
     <a-mixin id="me" look-controls share="rotation, theme"></a-mixin>
   </a-assets>
-  <a-entity sharedspace="audio: true" participants="placement: queue">
+  <a-entity sharedspace="audio: true" avatars="placement: queue">
   </a-entity>
 </a-scene>
 <template>
@@ -401,4 +401,4 @@ This component modifies the `position` component of an A-Frame entity to make it
 | `center`   | Point around which, the entities will be placed. | `0, 0, 0` |
 | `radius`   | Entity's distance to the center.                 | 1.1       |
 | `height`   | Displacement in +Y above the final position.     | 1.6       |
-| `position` | Position aroung the central point.               | 1         |
+| `position` | Position around the central point.               | 1         |

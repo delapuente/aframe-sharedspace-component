@@ -29,7 +29,7 @@ Once A-Frame and the `sharedspace` component are [installed](#install), this is 
 
 ```html
 <a-scene>
-  <a-entity sharedspace="audio: true" participants>
+  <a-entity sharedspace="audio: true" avatars>
   </a-entity>
 </a-scene>
 <template>
@@ -37,7 +37,7 @@ Once A-Frame and the `sharedspace` component are [installed](#install), this is 
 </template>
 ```
 
-Unfortunately, the chatroom lacks from decoration and participants will be spheres, which is not the best way of representing a human head. Instead, take a look at the [VR Chat application on Glitch](https://glitch.com/edit/#!/vr-chat) for a **functional** minimal setup.
+Unfortunately, the chatroom lacks from decoration and avatars will be spheres, which is not the best way of representing a human head. Instead, take a look at the [VR Chat application on Glitch](https://glitch.com/edit/#!/vr-chat) for a **functional** minimal setup.
 
 ## Documentation
 
@@ -46,7 +46,7 @@ When installing `sharedspace`, four components are registered with A-Frame:
 | Component         | Description                                          |
 |-------------------|------------------------------------------------------|
 | `sharedspace`     | Provides the participation model.                    |
-| `participants`    | Represent participants as A-Frame entities.          |
+| `avatars`         | Manage participants' avatars.                        |
 | `share`           | Controls the state of the participant to share.      |
 | `position-around` | Helper to position an entity around a central point. |
 

@@ -7,7 +7,7 @@ const log = utils.debug('sharedspace:participants:log');
 const warn = utils.debug('sharedspace:participants:warn');
 const error = utils.debug('sharedspace:participants:error');
 
-export default registerComponent('participants', {
+export default registerComponent('avatars', {
 
   dependendies: ['sharedspace'],
 
@@ -67,7 +67,7 @@ export default registerComponent('participants', {
     const isMe = id === this._sharedspace.data.me;
     const participant = this._getParticipant(id);
     if (participant) {
-      this.el.emit('participantelement', { participant, isMe, action: 'exit' });
+      this.el.emit('avatarelement', { avatar, isMe, action: 'exit' });
       if (this.data.autoremove) {
         participant.parentNode.removeChild(participant);
       }
@@ -88,16 +88,16 @@ export default registerComponent('participants', {
   _addParticipant(id, position) {
     const isMe = id === this._sharedspace.data.me;
     const participant = this._newParticipant();
-    this.el.emit('participantelement', { participant, isMe, action: 'enter' });
+    this.el.emit('avatarelement', { avatar, isMe, action: 'enter' });
 
     this._setupParticipant(participant, id, position);
     if (isMe) {
       this._setupMyself(participant);
     }
-    this.el.emit('participantsetup', { participant, isMe });
+    this.el.emit('avatarsetup', { avatar, isMe });
 
     this.el.appendChild(participant);
-    this.el.emit('participantadded', { participant, isMe });
+    this.el.emit('avataradded', { avatar, isMe });
 
     return participant;
   },
