@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8" />
   <title>A-Frame Sharedspace Component</title>
   <script src="https://aframe.io/releases/0.7.0/aframe.min.js"></script>
@@ -16,21 +17,39 @@
     font-family: sans-serif;;
   }
 
-  h1 {
-    margin-top: 1rem;
+  .hide {
+    color: black;
+    margin: 0;
+    padding: 1rem;
+    float: right;
+    text-align: right;
+    position: relative;
+    z-index: 110;
+    background-color: white;
+    font-size: 1rem;
   }
 
   section {
     box-sizing: border-box;
-    padding: 1rem;
+    padding: 0.5rem;
     position: relative;
     z-index: 100;
     background-color: white;
+    transform: translateY(0);
+    transition: transform 500ms;
+  }
+
+  section.hidden {
+    transform: translateY(-100%);
   }
 
   p {
     margin-top: 0.75rem;
     margin-bottom: 0.3rem;
+  }
+
+  .options {
+    display: flex;
   }
 
   a-scene {
@@ -40,40 +59,43 @@
 
   .link,
   .move {
-    display: inline-block;
+    display: block;
     border-radius: 5px;
     border: 2px dashed grey;
     padding: 0.4rem;
+    margin-top: 1rem;
   }
 
   .move {
     background-color: #61B8EC;
     border: 2px solid #61B8EC;
-    margin-left: 1rem;
   }
 
-  .move a {
+  a.move {
     color: white;
     font-weight: strong;
+    text-decoration: none;
   }
   </style>
 </head>
 <body>
-  <section>
+  <a class="hide" href="#">Hide</a>
+  <section class="instructions">
     <h1>A-Frame Sharedspace Component</h1>
     <p>
-      Grant this site permission to access your microphone and share the following link  with your friends (or open it in another browser).
+      Grant this site permission to access your microphone and share the following link  with your friends (or open it in another browser). Wait for a friend to start chatting.
     </p>
-    <p>
-      <span class="link"></span><span class="move"><a href="./">Click here to move to another room.</a></span>
-    </p>
+    <span class="link"></span>
+    <a class="move" href="./">Move to another room.</a>
   </section>
   <a-scene embedded>
     <a-entity sharedspace="audio: true; hold: true" avatars>
 
       <!-- Room -->
       <a-sky color="#333"></a-sky>
-      <a-plane rotation="-90 0 0" width="15" height="15" color="#777"></a-plane>
+      <a-plane rotation="-90 0 0"
+               width="15" height="15" color="#777">
+      </a-plane>
 
       <!-- Table -->
       <a-cylinder class="table"
@@ -86,40 +108,47 @@
   </a-scene>
   <template>
     <a-entity position-around>
-      <a-entity obj-model="obj: url(./assets/face.obj)" rotation="0 180 0" scale="0.01 0.01 0.01" position="0 -0.1 0.15"></a-entity>
+      <a-entity obj-model="obj: url(https://cdn.glitch.com/4e53a88a-96d2-46e5-ab4b-f8f1b9c2d486%2Fface.obj?1506059732633)" rotation="0 180 0" scale="0.01 0.01 0.01" position="0 -0.1 0.15"></a-entity>
       <!--
       Anime Face Model Stocking(https://sketchfab.com/models/d049b6a85d204057b170ef9dbc851200) by stocking(https://sketchfab.com/stocking) is licensed under CC Attribution(http://creativecommons.org/licenses/by/4.0/)
       -->
     </a-entity>
   </template>
   <script>
+    var instructions = document.querySelector('.instructions');
+    document.querySelector('.hide').onclick = function (evt) {
+      instructions.classList.toggle('hidden');
+      this.textContent = instructions.classList.contains('hidden') ? 'Show': 'Hide';
+      return false;
+    };
+
     var scene = document.querySelector('a-scene');
     var room = document.querySelector('[sharedspace]');
     var table = document.querySelector('.table');
 
-    // Make the avatar to look at the center of the table.
+    // Make the participant to look at the center of the table.
     room.addEventListener('avataradded', function onAdded(evt) {
 
-      var avatar = evt.detail.avatar;
-      if (!avatar.hasLoaded) {
-        avatar.addEventListener('loaded', onAdded.bind(null, evt));
+      var participant = evt.detail.avatar;
+      if (!participant.hasLoaded) {
+        participant.addEventListener('loaded', onAdded.bind(null, evt));
         return;
       }
 
       var tablePosition = table.getAttribute('position');
-      var avatarY = avatar.getAttribute('position').y;
-      avatar.object3D.lookAt(new THREE.Vector3(
-        tablePosition.x, avatarY, tablePosition.z
+      var participantY = participant.getAttribute('position').y;
+      participant.object3D.lookAt(new THREE.Vector3(
+        tablePosition.x, participantY, tablePosition.z
       ));
 
       // It is not enough to modify the underlaying Three object. It is
       // neccessary to use the A-Frame API for the sharedspace component to
       // be able of serialize the rotation correctly.
       var radToDeg = THREE.Math.radToDeg;
-      var rotation = avatar.object3D.rotation;
+      var rotation = participant.object3D.rotation;
       rotation.y += Math.PI;
 
-      avatar.setAttribute('rotation', {
+      participant.setAttribute('rotation', {
         x: radToDeg(rotation.x),
         y: radToDeg(rotation.y),
         z: radToDeg(rotation.z)
@@ -130,7 +159,7 @@
     // Create a new room or join one.
     let roomName = window.location.search.substr(1);
     if (!roomName) {
-      roomName = 'room-' + Date.now();
+      roomName = 'demo-' + Date.now();
       history.pushState({}, '', window.location + `?${roomName}`);
     }
     connect();
@@ -153,6 +182,7 @@
       selection.empty();
       selection.addRange(range);
     };
+
   </script>
 </body>
 </html>
