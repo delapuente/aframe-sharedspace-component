@@ -6089,7 +6089,7 @@ var log = _aframe.utils.debug('sharedspace:participants:log');
 var warn = _aframe.utils.debug('sharedspace:participants:warn');
 var error = _aframe.utils.debug('sharedspace:participants:error');
 
-exports.default = (0, _aframe.registerComponent)('participants', {
+exports.default = (0, _aframe.registerComponent)('avatars', {
 
   dependendies: ['sharedspace'],
 
@@ -6158,7 +6158,7 @@ exports.default = (0, _aframe.registerComponent)('participants', {
     var isMe = id === this._sharedspace.data.me;
     var participant = this._getParticipant(id);
     if (participant) {
-      this.el.emit('participantelement', { participant: participant, isMe: isMe, action: 'exit' });
+      this.el.emit('avatarelement', { avatar: avatar, isMe: isMe, action: 'exit' });
       if (this.data.autoremove) {
         participant.parentNode.removeChild(participant);
       }
@@ -6180,16 +6180,16 @@ exports.default = (0, _aframe.registerComponent)('participants', {
   _addParticipant: function _addParticipant(id, position) {
     var isMe = id === this._sharedspace.data.me;
     var participant = this._newParticipant();
-    this.el.emit('participantelement', { participant: participant, isMe: isMe, action: 'enter' });
+    this.el.emit('avatarelement', { avatar: avatar, isMe: isMe, action: 'enter' });
 
     this._setupParticipant(participant, id, position);
     if (isMe) {
       this._setupMyself(participant);
     }
-    this.el.emit('participantsetup', { participant: participant, isMe: isMe });
+    this.el.emit('avatarsetup', { avatar: avatar, isMe: isMe });
 
     this.el.appendChild(participant);
-    this.el.emit('participantadded', { participant: participant, isMe: isMe });
+    this.el.emit('avataradded', { avatar: avatar, isMe: isMe });
 
     return participant;
   },
@@ -6424,16 +6424,18 @@ exports.default = (0, _aframe.registerComponent)('sharedspace', {
     me: { default: '' }
   },
 
+  update: function update() {
+    if (!this._initializing && !this._connected && !this.data.hold) {
+      this._start();
+    }
+  },
   init: function init() {
     this._connected = false;
     this._initializing = false;
-  },
 
-
-  // Delay connection until all the scene is complete so other dependant
-  // components can set their event handlers up. See `participants` component
-  // for an example.
-  update: function update() {
+    // Delay connection until all the scene is complete so other dependant
+    // components can set their event handlers up. See `participants` component
+    // for an example.
     if (this.el.sceneEl.hasLoaded) {
       this._start();
     } else {

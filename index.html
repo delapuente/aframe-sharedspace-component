@@ -69,7 +69,7 @@
     </p>
   </section>
   <a-scene embedded>
-    <a-entity sharedspace="audio: true; hold: true" participants>
+    <a-entity sharedspace="audio: true; hold: true" avatars>
 
       <!-- Room -->
       <a-sky color="#333"></a-sky>
@@ -97,45 +97,50 @@
     var room = document.querySelector('[sharedspace]');
     var table = document.querySelector('.table');
 
-    // Make the participant to look at the center of the table.
-    room.addEventListener('participantadded', function (evt) {
-      var participant = evt.detail.participant;
-      participant.addEventListener('loaded', function (evt) {
-        var tablePosition = table.getAttribute('position');
-        var participantY = participant.getAttribute('position').y;
-        participant.object3D.lookAt(new THREE.Vector3(
-          tablePosition.x, participantY, tablePosition.z
-        ));
+    // Make the avatar to look at the center of the table.
+    room.addEventListener('avataradded', function onAdded(evt) {
 
-        // It is not enough to modify the underlaying Three object. It is
-        // neccessary to use the A-Frame API for the sharedspace component to
-        // be able of serialize the rotation correctly.
-        var radToDeg = THREE.Math.radToDeg;
-        var rotation = participant.object3D.rotation;
-        rotation.y += Math.PI;
-        participant.setAttribute('rotation', {
-          x: radToDeg(rotation.x),
-          y: radToDeg(rotation.y),
-          z: radToDeg(rotation.z)
-        });
+      var avatar = evt.detail.avatar;
+      if (!avatar.hasLoaded) {
+        avatar.addEventListener('loaded', onAdded.bind(null, evt));
+        return;
+      }
+
+      var tablePosition = table.getAttribute('position');
+      var avatarY = avatar.getAttribute('position').y;
+      avatar.object3D.lookAt(new THREE.Vector3(
+        tablePosition.x, avatarY, tablePosition.z
+      ));
+
+      // It is not enough to modify the underlaying Three object. It is
+      // neccessary to use the A-Frame API for the sharedspace component to
+      // be able of serialize the rotation correctly.
+      var radToDeg = THREE.Math.radToDeg;
+      var rotation = avatar.object3D.rotation;
+      rotation.y += Math.PI;
+
+      avatar.setAttribute('rotation', {
+        x: radToDeg(rotation.x),
+        y: radToDeg(rotation.y),
+        z: radToDeg(rotation.z)
       });
+
     });
 
     // Create a new room or join one.
     let roomName = window.location.search.substr(1);
     if (!roomName) {
-      roomName = Date.now() + '';
+      roomName = 'room-' + Date.now();
       history.pushState({}, '', window.location + `?${roomName}`);
     }
     connect();
 
     function connect() {
-      if (scene.hasLoaded) {
-        room.setAttribute('sharedspace', { room: roomName, hold: false });
-      }
-      else {
+      if (!scene.hasLoaded) {
         scene.addEventListener('loaded', connect);
+        return;
       }
+      room.setAttribute('sharedspace', { room: roomName, hold: false });
     }
 
     // Select link on click.
@@ -148,7 +153,6 @@
       selection.empty();
       selection.addRange(range);
     };
-
   </script>
 </body>
 </html>
