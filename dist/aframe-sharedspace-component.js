@@ -6085,9 +6085,9 @@ var _entityObserver = __webpack_require__(33);
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var bind = _aframe.utils.bind;
-var log = _aframe.utils.debug('sharedspace:participants:log');
-var warn = _aframe.utils.debug('sharedspace:participants:warn');
-var error = _aframe.utils.debug('sharedspace:participants:error');
+var log = _aframe.utils.debug('sharedspace:avatars:log');
+var warn = _aframe.utils.debug('sharedspace:avatars:warn');
+var error = _aframe.utils.debug('sharedspace:avatars:error');
 
 exports.default = (0, _aframe.registerComponent)('avatars', {
 
@@ -6128,8 +6128,8 @@ exports.default = (0, _aframe.registerComponent)('avatars', {
         id = _ref$detail.id,
         position = _ref$detail.position;
 
-    if (this.data.template !== 'none' && !this._getParticipant(id)) {
-      this._addParticipant(id, position);
+    if (this.data.template !== 'none' && !this._getAvatar(id)) {
+      this._addAvatar(id, position);
     }
   },
   _onStream: function _onStream(_ref2) {
@@ -6141,26 +6141,26 @@ exports.default = (0, _aframe.registerComponent)('avatars', {
       return;
     }
 
-    var participant = this._getParticipant(id);
-    if (!participant) {
-      warn('Participant ' + id + ' avatar is not in the DOM');
+    var avatar = this._getAvatar(id);
+    if (!avatar) {
+      warn('Avatar ' + id + ' avatar is not in the DOM');
       return;
     }
 
     this._addStream(id, stream).then(function (source) {
       log('streaming: ' + id, stream);
-      participant.setAttribute('sound', 'src: #' + source.id);
+      avatar.setAttribute('sound', 'src: #' + source.id);
     });
   },
   _onExit: function _onExit(_ref3) {
     var id = _ref3.detail.id;
 
     var isMe = id === this._sharedspace.data.me;
-    var participant = this._getParticipant(id);
-    if (participant) {
+    var avatar = this._getAvatar(id);
+    if (avatar) {
       this.el.emit('avatarelement', { avatar: avatar, isMe: isMe, action: 'exit' });
       if (this.data.autoremove) {
-        participant.parentNode.removeChild(participant);
+        avatar.parentNode.removeChild(avatar);
       }
     }
   },
@@ -6169,31 +6169,31 @@ exports.default = (0, _aframe.registerComponent)('avatars', {
         id = _ref4$detail.id,
         message = _ref4$detail.message;
 
-    if (message.type === 'participantsupdates') {
+    if (message.type === 'avatarsupdates') {
       this._collectToApply(message.updates);
       return;
     }
   },
-  _getParticipant: function _getParticipant(id) {
+  _getAvatar: function _getAvatar(id) {
     return this.el.querySelector('[data-sharedspace-id="' + id + '"]');
   },
-  _addParticipant: function _addParticipant(id, position) {
+  _addAvatar: function _addAvatar(id, position) {
     var isMe = id === this._sharedspace.data.me;
-    var participant = this._newParticipant();
+    var avatar = this._newAvatar();
     this.el.emit('avatarelement', { avatar: avatar, isMe: isMe, action: 'enter' });
 
-    this._setupParticipant(participant, id, position);
+    this._setupAvatar(avatar, id, position);
     if (isMe) {
-      this._setupMyself(participant);
+      this._setupLocalAvatar(avatar);
     }
     this.el.emit('avatarsetup', { avatar: avatar, isMe: isMe });
 
-    this.el.appendChild(participant);
+    this.el.appendChild(avatar);
     this.el.emit('avataradded', { avatar: avatar, isMe: isMe });
 
-    return participant;
+    return avatar;
   },
-  _newParticipant: function _newParticipant() {
+  _newAvatar: function _newAvatar() {
     var empty = document.createElement('A-ENTITY');
 
     var template = this.data.template;
@@ -6210,50 +6210,50 @@ exports.default = (0, _aframe.registerComponent)('avatars', {
 
     return instance;
   },
-  _setupParticipant: function _setupParticipant(participant, id, position) {
+  _setupAvatar: function _setupAvatar(avatar, id, position) {
     var isMe = id === this._sharedspace.data.me;
-    participant.dataset.sharedspaceId = id;
-    participant.dataset.sharedspaceRoomPosition = position;
-    participant.dataset.isMe = isMe;
+    avatar.dataset.sharedspaceId = id;
+    avatar.dataset.sharedspaceRoomPosition = position;
+    avatar.dataset.isMe = isMe;
 
     var placement = this.data.placement;
     if (placement !== 'none') {
-      participant.addEventListener('loaded', function onLoaded() {
-        participant.removeEventListener('loaded', onLoaded);
-        participant.setAttribute(placement, { position: position });
+      avatar.addEventListener('loaded', function onLoaded() {
+        avatar.removeEventListener('loaded', onLoaded);
+        avatar.setAttribute(placement, { position: position });
       });
     }
 
-    return participant;
+    return avatar;
   },
-  _setupMyself: function _setupMyself(participant) {
+  _setupLocalAvatar: function _setupLocalAvatar(avatar) {
     var _this = this;
 
     // HACK: Move this inside the conditional when camera can be used in mixins.
-    // If you want to remove the camera right now, use participantsetup event
-    // and remove from detail.participant element.
-    participant.setAttribute('camera', '');
+    // If you want to remove the camera right now, use avatarsetup event
+    // and remove from detail.avatar element.
+    avatar.setAttribute('camera', '');
     if (this.data.onmyself === 'auto') {
-      participant.setAttribute('look-controls', '');
-      participant.setAttribute('share', 'rotation');
+      avatar.setAttribute('look-controls', '');
+      avatar.setAttribute('share', 'rotation');
     } else if (this.data.myself !== 'none') {
-      var mixinList = participant.hasAttribute('mixin') ? participant.getAttribute('mixin').split(/\s+/) : [];
+      var mixinList = avatar.hasAttribute('mixin') ? avatar.getAttribute('mixin').split(/\s+/) : [];
 
       mixinList.push(this.data.onmyself);
-      participant.setAttribute('mixin', mixinList.join(' '));
+      avatar.setAttribute('mixin', mixinList.join(' '));
     }
 
-    participant.addEventListener('componentinitialized', function (_ref5) {
+    avatar.addEventListener('componentinitialized', function (_ref5) {
       var detail = _ref5.detail;
       var name = detail.name;
 
       if (name === 'share') {
-        var share = participant.components.share;
+        var share = avatar.components.share;
         var filter = share.data.split(',').map(function (str) {
           return str.trim();
         });
         log('sharing:', filter);
-        _this._share(participant, filter.length > 0 ? filter : null);
+        _this._share(avatar, filter.length > 0 ? filter : null);
       }
     });
   },
@@ -6263,7 +6263,7 @@ exports.default = (0, _aframe.registerComponent)('avatars', {
   _addStream: function _addStream(id, stream) {
     return this._getAssets().then(function (assets) {
       var source = new Audio();
-      source.id = 'participant-stream-' + id;
+      source.id = 'avatar-stream-' + id;
       source.srcObject = stream;
       assets.appendChild(source);
       return source;
@@ -6301,7 +6301,7 @@ exports.default = (0, _aframe.registerComponent)('avatars', {
   },
   _sendUpdates: function _sendUpdates() {
     if (this._ongoingUpdates.length > 0) {
-      var content = participantsUpdatesMessage(this._ongoingUpdates);
+      var content = avatarsUpdatesMessage(this._ongoingUpdates);
       this._sharedspace.send('*', content);
       this._ongoingUpdates = [];
     }
@@ -6313,8 +6313,8 @@ exports.default = (0, _aframe.registerComponent)('avatars', {
 });
 
 
-function participantsUpdatesMessage(updates) {
-  return { type: 'participantsupdates', updates: updates };
+function avatarsUpdatesMessage(updates) {
+  return { type: 'avatarsupdates', updates: updates };
 }
 
 /***/ }),
