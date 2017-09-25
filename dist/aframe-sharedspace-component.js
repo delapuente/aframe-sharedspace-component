@@ -6235,6 +6235,7 @@ exports.default = (0, _aframe.registerComponent)('avatars', {
     avatar.setAttribute('camera', '');
     if (this.data.onmyself === 'auto') {
       avatar.setAttribute('look-controls', '');
+      avatar.setAttribute('visible', 'false');
       avatar.setAttribute('share', 'rotation');
     } else if (this.data.myself !== 'none') {
       var mixinList = avatar.hasAttribute('mixin') ? avatar.getAttribute('mixin').split(/\s+/) : [];
@@ -6666,6 +6667,8 @@ var EntityObserver = function () {
     this._observer = new MutationObserver(callback);
     this._callback = callback;
     this._observables = new Map();
+    this._checkCount = 0;
+    this._keyThreshold = 60;
   }
 
   _createClass(EntityObserver, [{
@@ -6697,8 +6700,18 @@ var EntityObserver = function () {
       var _this = this;
 
       Array.from(this._observables.keys()).forEach(function (entity) {
-        return _this._collectChanges(entity);
+        return _this._collectChanges(entity, _this._isKey());
       });
+    }
+  }, {
+    key: '_isKey',
+    value: function _isKey() {
+      var count = this._checkCount++;
+      if (count === this._keyThreshold) {
+        this._checkCount = 0;
+        return true;
+      }
+      return false;
     }
   }, {
     key: '_recordEntity',
@@ -6731,20 +6744,23 @@ var EntityObserver = function () {
     }
   }, {
     key: '_collectChanges',
-    value: function _collectChanges(entity) {
+    value: function _collectChanges(entity, isKey) {
       var _this3 = this;
 
       var changes = [];
       var filter = this._observables.get(entity)[1];
       Object.values(entity.components).forEach(function (component) {
         if (!filter || filter.indexOf(component.name) >= 0) {
-          var change = _this3._getChanges(entity, component);
+          // TODO: Refactor this mess
+          var change = isKey ? _this3._getCurrentValue(entity, component) : _this3._getChanges(entity, component);
           if (change) {
-            var _change = _slicedToArray(change, 2),
-                oldValue = _change[0],
-                newValue = _change[1];
+            var _ref = !isKey ? change : [change, change],
+                _ref2 = _slicedToArray(_ref, 2),
+                oldValue = _ref2[0],
+                newValue = _ref2[1];
 
             changes.push({
+              isKey: isKey,
               type: 'components',
               target: entity,
               componentName: component.name,
@@ -6761,13 +6777,18 @@ var EntityObserver = function () {
   }, {
     key: '_getChanges',
     value: function _getChanges(entity, component) {
-      var oldValue = this._observables.get(entity)[0][component.name];
+      var oldValue = this._getCurrentValue(entity, component);
       var newValue = this._stringify(component.data, component.schema);
       if (oldValue !== newValue) {
         this._updateComponent(entity, component);
         return [oldValue, newValue];
       }
       return null;
+    }
+  }, {
+    key: '_getCurrentValue',
+    value: function _getCurrentValue(entity, component) {
+      return this._observables.get(entity)[0][component.name];
     }
   }]);
 

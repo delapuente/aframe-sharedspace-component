@@ -129,26 +129,26 @@
     // Make the participant to look at the center of the table.
     room.addEventListener('avataradded', function onAdded(evt) {
 
-      var participant = evt.detail.avatar;
-      if (!participant.hasLoaded) {
-        participant.addEventListener('loaded', onAdded.bind(null, evt));
+      var avatar = evt.detail.avatar;
+      if (!avatar.hasLoaded) {
+        avatar.addEventListener('loaded', onAdded.bind(null, evt));
         return;
       }
 
       var tablePosition = table.getAttribute('position');
-      var participantY = participant.getAttribute('position').y;
-      participant.object3D.lookAt(new THREE.Vector3(
-        tablePosition.x, participantY, tablePosition.z
+      var avatarY = avatar.getAttribute('position').y;
+      avatar.object3D.lookAt(new THREE.Vector3(
+        tablePosition.x, avatarY, tablePosition.z
       ));
 
       // It is not enough to modify the underlaying Three object. It is
       // neccessary to use the A-Frame API for the sharedspace component to
       // be able of serialize the rotation correctly.
       var radToDeg = THREE.Math.radToDeg;
-      var rotation = participant.object3D.rotation;
+      var rotation = avatar.object3D.rotation;
       rotation.y += Math.PI;
 
-      participant.setAttribute('rotation', {
+      avatar.setAttribute('rotation', {
         x: radToDeg(rotation.x),
         y: radToDeg(rotation.y),
         z: radToDeg(rotation.z)

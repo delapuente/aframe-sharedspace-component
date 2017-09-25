@@ -18,6 +18,8 @@ class EntityObserver {
     this._observer = new MutationObserver(callback);
     this._callback = callback;
     this._observables = new Map();
+    this._checkCount = 0;
+    this._keyThreshold = 60;
   }
 
   observe(entity, init) {
@@ -42,7 +44,17 @@ class EntityObserver {
   }
 
   check() {
-    Array.from(this._observables.keys()).forEach(entity => this._collectChanges(entity));
+    Array.from(this._observables.keys())
+    .forEach(entity => this._collectChanges(entity, this._isKey()));
+  }
+
+  _isKey() {
+    const count = this._checkCount++;
+    if (count === this._keyThreshold) {
+      this._checkCount = 0;
+      return true;
+    }
+    return false;
   }
 
   _recordEntity(entity, filter) {
@@ -69,15 +81,19 @@ class EntityObserver {
     return utils.styleParser.stringify(stringifiedData);
   }
 
-  _collectChanges(entity) {
+  _collectChanges(entity, isKey) {
     const changes = [];
     const filter = this._observables.get(entity)[1];
     Object.values(entity.components).forEach(component => {
       if (!filter || filter.indexOf(component.name) >= 0) {
-        const change = this._getChanges(entity, component)
+        // TODO: Refactor this mess
+        const change = isKey ?
+                       this._getCurrentValue(entity, component) :
+                       this._getChanges(entity, component)
         if (change) {
-          const [oldValue, newValue] = change;
+          const [oldValue, newValue] = !isKey ? change : [change, change];
           changes.push({
+            isKey,
             type: 'components',
             target: entity,
             componentName: component.name,
@@ -93,13 +109,17 @@ class EntityObserver {
   }
 
   _getChanges(entity, component) {
-    const oldValue = this._observables.get(entity)[0][component.name];
+    const oldValue = this._getCurrentValue(entity, component);
     const newValue = this._stringify(component.data, component.schema);
     if (oldValue !== newValue) {
       this._updateComponent(entity, component);
       return [oldValue, newValue];
     }
     return null;
+  }
+
+  _getCurrentValue(entity, component) {
+    return this._observables.get(entity)[0][component.name];
   }
 
 }

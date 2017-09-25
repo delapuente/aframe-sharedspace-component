@@ -195,6 +195,7 @@ By default, `onmyself` is set to `auto` which means adding the following compone
  * `camera` for the avatar to become the active camera.
  * `look-controls` to rotate the avatar by dragging on the screen.
  * `share="rotation"` to keep own rotation synchronized with other peers.
+ * `visible="false"` to hide the local participant avatar.
 
 If you prefer to provide your own components and to control which of them are shared, set `onmyself` to the id of an [A-Frame mixin](https://aframe.io/docs/0.7.0/core/mixins.html). The following configuration adds `wasd-controls` to move the avatar around with the `w`, `a`, `s` and `d` keys and shares position for the peers to see how the local participant avatar moves:
 

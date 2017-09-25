@@ -144,6 +144,7 @@ export default registerComponent('avatars', {
     avatar.setAttribute('camera', '');
     if (this.data.onmyself === 'auto') {
       avatar.setAttribute('look-controls', '');
+      avatar.setAttribute('visible', 'false');
       avatar.setAttribute('share', 'rotation');
     }
     else if (this.data.myself !== 'none') {
