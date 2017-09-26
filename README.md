@@ -33,7 +33,7 @@ Once A-Frame and the `sharedspace` component are [installed](#install), this is 
   </a-entity>
 </a-scene>
 <template>
-  <a-sphere radius="0.1"><a-sphere>
+  <a-sphere radius="0.1"></a-sphere>
 </template>
 ```
 
