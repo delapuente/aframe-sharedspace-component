@@ -14,12 +14,12 @@ import { schema as schemaUtils, utils } from 'aframe';
  */
 class EntityObserver {
 
-  constructor(callback) {
+  constructor(callback, { keyEach=60 }={}) {
     this._observer = new MutationObserver(callback);
     this._callback = callback;
     this._observables = new Map();
     this._checkCount = 0;
-    this._keyThreshold = 60;
+    this._keyThreshold = keyEach;
   }
 
   observe(entity, init) {
@@ -49,7 +49,7 @@ class EntityObserver {
   }
 
   _isKey() {
-    const count = this._checkCount++;
+    const count = ++this._checkCount;
     if (count === this._keyThreshold) {
       this._checkCount = 0;
       return true;
