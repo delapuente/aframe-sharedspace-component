@@ -403,7 +403,7 @@ function objectToString(o) {
 /* 3 */
 /***/ (function(module, exports) {
 
-module.exports = AFRAME;
+module.exports = undefined;
 
 /***/ }),
 /* 4 */
@@ -6662,13 +6662,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  */
 var EntityObserver = function () {
   function EntityObserver(callback) {
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$keyEach = _ref.keyEach,
+        keyEach = _ref$keyEach === undefined ? 60 : _ref$keyEach;
+
     _classCallCheck(this, EntityObserver);
 
     this._observer = new MutationObserver(callback);
     this._callback = callback;
     this._observables = new Map();
     this._checkCount = 0;
-    this._keyThreshold = 60;
+    this._keyThreshold = keyEach;
   }
 
   _createClass(EntityObserver, [{
@@ -6706,7 +6710,7 @@ var EntityObserver = function () {
   }, {
     key: '_isKey',
     value: function _isKey() {
-      var count = this._checkCount++;
+      var count = ++this._checkCount;
       if (count === this._keyThreshold) {
         this._checkCount = 0;
         return true;
@@ -6754,10 +6758,10 @@ var EntityObserver = function () {
           // TODO: Refactor this mess
           var change = isKey ? _this3._getCurrentValue(entity, component) : _this3._getChanges(entity, component);
           if (change) {
-            var _ref = !isKey ? change : [change, change],
-                _ref2 = _slicedToArray(_ref, 2),
-                oldValue = _ref2[0],
-                newValue = _ref2[1];
+            var _ref2 = !isKey ? change : [change, change],
+                _ref3 = _slicedToArray(_ref2, 2),
+                oldValue = _ref3[0],
+                newValue = _ref3[1];
 
             changes.push({
               isKey: isKey,
