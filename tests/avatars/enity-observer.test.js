@@ -3,11 +3,11 @@ const helpers = require('../helpers');
 
 suite('EnitityObserver', () => {
   const noCall = [];
-  function defaultSequence() {
+  function* defaultSequence() {
     let count = 0;
-    return { next: () => ({
-      value: (count++ === 0) ? 'init' : `delta-${count}`
-    })};
+    while (true) {
+      yield (count++ === 0) ? 'init' : `delta-${count}`;
+    }
   };
 
   let inject;
@@ -105,7 +105,9 @@ suite('EnitityObserver', () => {
     const keyEach = 2;
     const repetitions = 3;
     const max = keyEach * repetitions;
-    sequence = { next: () => ({ value: 'const' }) };
+    sequence = (function* () {
+      while (true) { yield 'const'; }
+    }());
 
     return testObserverCheck({ keyEach }, observer => {
       observer.observe(entity, {
@@ -122,5 +124,4 @@ suite('EnitityObserver', () => {
       });
     });
   });
-
 });

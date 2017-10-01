@@ -6,7 +6,7 @@ var plugins = [];
 process.env.SIZE_ANALYSIS && plugins.push(new BundleAnalyzerPlugin());
 
 module.exports = {
-  entry: './src/index.js',
+  entry: ['./src/index.js'],
   output: {
     filename: 'aframe-sharedspace-component.js',
     path: path.resolve(__dirname, 'dist'),

@@ -1,10 +1,11 @@
-const webpackConfig = require('../webpack.config.js');
+const webpackConfig = require('../webpack.test.js');
 
 module.exports = function (config) {
   config.set({
     basePath: '../',
     frameworks: ['mocha', 'sinon-chai', 'chai-shallow-deep-equal'],
     files: [
+      { pattern: 'tests/index.test.js', watched: false },
       { pattern: 'tests/**/*.js', watched: false }
     ],
     preprocessors: {
