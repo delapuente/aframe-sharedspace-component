@@ -51,7 +51,7 @@ suite('EnitityObserver', () => {
     init(observer);
     for (let i = 0; i < callCount; i++) {
       observer.check();
-      // If the check did not cause a callback call, add an empty set.
+      // If the check did not cause a callback call, add the centinel.
       if (allUpdates.length === i) {
         allUpdates.push(noCall);
       }

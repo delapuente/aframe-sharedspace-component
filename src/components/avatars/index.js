@@ -12,6 +12,7 @@ export default registerComponent('avatars', {
   dependendies: ['sharedspace'],
 
   schema: {
+    // Should it be a custom type to parse none as null?
     template: { type: 'selector', default: 'template' },
     placement: { type: 'string', default: 'position-around' },
     onmyself: { type: 'string', default: 'auto' },
@@ -27,10 +28,22 @@ export default registerComponent('avatars', {
     this._observer = new EntityObserver(this._collectToSend);
     this._sharedspace = this.el.components.sharedspace;
 
-    this.el.addEventListener('enterparticipant', bind(this._onEnter, this));
-    this.el.addEventListener('participantstream', bind(this._onStream, this));
-    this.el.addEventListener('participantmessage', bind(this._onMessage, this));
-    this.el.addEventListener('exitparticipant', bind(this._onExit, this));
+    this._onEnter = bind(this._onEnter, this);
+    this._onStream = bind(this._onStream, this);
+    this._onMessage = bind(this._onMessage, this);
+    this._onExit = bind(this._onExit, this);
+
+    this.el.addEventListener('enterparticipant', this._onEnter);
+    this.el.addEventListener('participantstream', this._onStream);
+    this.el.addEventListener('participantmessage', this._onMessage);
+    this.el.addEventListener('exitparticipant', this._onExit);
+  },
+
+  remove() {
+    this.el.removeEventListener('enterparticipant', this._onEnter);
+    this.el.removeEventListener('participantstream', this._onStream);
+    this.el.removeEventListener('participantmessage', this._onMessage);
+    this.el.removeEventListener('exitparticipant', this._onExit);
   },
 
   tick(...args) {
@@ -42,7 +55,7 @@ export default registerComponent('avatars', {
   },
 
   _onEnter({ detail: { id, position }}) {
-    if(this.data.template !== 'none' && !this._getAvatar(id)) {
+    if(this.data.template && !this._getAvatar(id)) {
       this._addAvatar(id, position);
     }
   },
@@ -138,16 +151,17 @@ export default registerComponent('avatars', {
   },
 
   _setupLocalAvatar(avatar) {
-    // HACK: Move this inside the conditional when camera can be used in mixins.
-    // If you want to remove the camera right now, use avatarsetup event
-    // and remove from detail.avatar element.
-    avatar.setAttribute('camera', '');
     if (this.data.onmyself === 'auto') {
+      avatar.setAttribute('camera', '');
       avatar.setAttribute('look-controls', '');
       avatar.setAttribute('visible', 'false');
       avatar.setAttribute('share', 'rotation');
     }
-    else if (this.data.myself !== 'none') {
+    else if (this.data.onmyself !== 'none') {
+      // HACK: Remove this when camera can be used inside a mixin.
+      // If you want to remove the camera right now, use avatarsetup event
+      // and remove it from detail.avatar element.
+      avatar.setAttribute('camera', '');
       const mixinList = avatar.hasAttribute('mixin') ?
                         avatar.getAttribute('mixin').split(/\s+/) : [];
 
