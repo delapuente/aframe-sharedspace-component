@@ -1,3 +1,5 @@
+const SceneTree =
+  require('../../src/components/avatars/scene-tree').SceneTree;
 const registerComponent = require('aframe').registerComponent;
 const helpers = require('../helpers');
 
@@ -35,10 +37,13 @@ suite('avatars component', () => {
     room.components.sharedspace = fakeSharedSpace;
     room.removeAttribute('avatars');
     room.setAttribute('avatars', '');
-    room.innerHTML = '';
   });
 
   suite('on enterparticipant', () => {
+
+    setup(() => {
+      room.innerHTML = '';
+    });
 
     test('if template is disabled, does nothing', () => {
       room.setAttribute('avatars', { template: 'none' });
@@ -207,6 +212,103 @@ suite('avatars component', () => {
 
         assert.isTrue(onAdded.calledAfter(onSetup));
         assert.isTrue(onSetup.calledAfter(onElement));
+      });
+    });
+
+  });
+
+  suite('on exitparticipant', () => {
+
+    setup(() => {
+      room.innerHTML = `<a-entity data-sharedspace-id="${myId}"></a-entity>`;
+    });
+
+    test('by default, removes the avatar of the participant', () => {
+      dispatch('exitparticipant', { id: myId, position: 1 });
+      assert.equal(room.innerHTML, '');
+    });
+
+    test('if autoremove is disabled, do nothing', () => {
+      room.setAttribute('avatars', { autoremove: false });
+      dispatch('exitparticipant', { id: myId, position: 1 });
+      assert.equal(room.innerHTML, `<a-entity data-sharedspace-id="${myId}"></a-entity>`);
+    });
+
+  });
+
+  suite('on participant message', () => {
+
+    setup(() => {
+      sinon.stub(SceneTree.prototype, 'applyUpdates');
+    });
+
+    teardown(() => {
+      SceneTree.prototype.applyUpdates.restore();
+    });
+
+    test('applies updates on next tick', () => {
+      const avatars = room.components.avatars;
+      const updates = [];
+      dispatch('participantmessage', {
+        id: otherId,
+        message: {
+          type: 'avatarsupdates',
+          updates
+        }
+      });
+      avatars.tick();
+      assert.isTrue(SceneTree.prototype.applyUpdates.calledWith(updates));
+    });
+
+  });
+
+  suite('on participant stream', () => {
+    let assets;
+
+    setup(() => {
+      assets = document.querySelector('a-assets');
+      assets.innerHTML = '';
+      room.innerHTML = `<a-entity data-sharedspace-id="${myId}"></a-entity>`;
+    });
+
+    let original;
+    function fakeMediaStreamSource() {
+      original = AudioContext.prototype.createMediaStreamSource;
+      AudioContext.prototype.createMediaStreamSource = () => ({
+        connect() {}
+      });
+    }
+
+    function restoreMediaStreamSource() {
+      AudioContext.prototype.createMediaStreamSource = original;
+    }
+
+    test('by default, sets a sound component in the avatar', done => {
+      fakeMediaStreamSource();
+      const stream = new MediaStream();
+      const avatar = room.querySelector('a-entity');
+      avatar.addEventListener('componentinitialized', function (evt) {
+        if (evt.detail.name === 'sound') {
+          const audio = document.querySelector('a-assets > audio');
+          assert.isOk(audio);
+          assert.equal(audio, avatar.components.sound.data.src);
+          assert.equal(audio.srcObject, stream);
+          restoreMediaStreamSource();
+          done();
+        }
+      });
+      dispatch('participantstream', { id: myId, stream });
+    });
+
+    test('if audio is set to false, does nothing', () => {
+      room.setAttribute('avatars', { audio: false });
+      const stream = new MediaStream();
+      const assets = document.querySelector('a-assets');
+      assets.innerHTML = '';
+      dispatch('participantstream', { id: myId, stream });
+      return helpers.waitFor(assets)
+      .then(() => {
+        assert.equal(assets.innerHTML, '');
       });
     });
 
