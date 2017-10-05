@@ -1,5 +1,7 @@
 const SceneTree =
   require('../../../src/components/avatars/scene-tree').SceneTree;
+const EntityObserver =
+  require('../../../src/components/avatars/entity-observer').EntityObserver;
 const registerComponent = require('aframe').registerComponent;
 const helpers = require('../../helpers');
 
@@ -42,7 +44,12 @@ suite('avatars component', () => {
   suite('on enterparticipant', () => {
 
     setup(() => {
+      sinon.stub(EntityObserver.prototype, 'observe');
       room.innerHTML = '';
+    });
+
+    teardown(() => {
+      EntityObserver.prototype.observe.restore();
     });
 
     test('if template is disabled, does nothing', () => {
@@ -103,16 +110,14 @@ suite('avatars component', () => {
       dispatch('enterparticipant', { id: 'other-id', position: 1 });
       const avatar =
         room.querySelector(`[data-sharedspace-id="other-id"]`);
-      return new Promise(fulfil => {
-        avatar.addEventListener('loaded', () => {
-          const components = Object.keys(avatar.components);
-          assert.equal(components.length, 4);
-          assert.include(components, 'position');
-          assert.include(components, 'rotation');
-          assert.include(components, 'scale');
-          assert.include(components, 'visible');
-          fulfil();
-        });
+      return helpers.waitFor(avatar)
+      .then(() => {
+        const components = Object.keys(avatar.components);
+        assert.equal(components.length, 4);
+        assert.include(components, 'position');
+        assert.include(components, 'rotation');
+        assert.include(components, 'scale');
+        assert.include(components, 'visible');
       });
     });
 
@@ -121,18 +126,22 @@ suite('avatars component', () => {
       dispatch('enterparticipant', { id: myId, position: 1 });
       const avatar =
         room.querySelector(`[data-sharedspace-id="${myId}"]`);
-      return new Promise(fulfil => {
-        avatar.addEventListener('loaded', () => {
-          const components = Object.keys(avatar.components);
-          assert.equal(components.length, 7);
-          assert.include(components, 'position');
-          assert.include(components, 'rotation');
-          assert.include(components, 'scale');
-          assert.include(components, 'visible');
-          assert.include(components, 'camera');
-          assert.include(components, 'share');
-          fulfil();
-        });
+      return helpers.waitFor(avatar)
+      .then(() => {
+        const components = Object.keys(avatar.components);
+        assert.equal(components.length, 7);
+        assert.include(components, 'position');
+        assert.include(components, 'rotation');
+        assert.include(components, 'scale');
+        assert.include(components, 'visible');
+        assert.include(components, 'camera');
+        assert.include(components, 'share');
+        assert.isTrue(
+          EntityObserver.prototype.observe.calledWith(avatar, {
+            components: true,
+            componentFilter: ['rotation']
+          })
+        );
       });
     });
 
@@ -144,16 +153,17 @@ suite('avatars component', () => {
       dispatch('enterparticipant', { id: myId, position: 1 });
       const avatar =
         room.querySelector(`[data-sharedspace-id="${myId}"]`);
-      return new Promise(fulfil => {
-        avatar.addEventListener('loaded', () => {
-          const components = Object.keys(avatar.components);
-          assert.equal(components.length, 4);
-          assert.include(components, 'position');
-          assert.include(components, 'rotation');
-          assert.include(components, 'scale');
-          assert.include(components, 'visible');
-          fulfil();
-        });
+      return helpers.waitFor(avatar)
+      .then(() => {
+        const components = Object.keys(avatar.components);
+        assert.equal(components.length, 4);
+        assert.include(components, 'position');
+        assert.include(components, 'rotation');
+        assert.include(components, 'scale');
+        assert.include(components, 'visible');
+        assert.isTrue(
+          EntityObserver.prototype.observe.neverCalledWith(avatar)
+        );
       });
     });
 
@@ -167,20 +177,18 @@ suite('avatars component', () => {
       dispatch('enterparticipant', { id: myId, position: 1 });
       const avatar =
         room.querySelector(`[data-sharedspace-id="${myId}"]`);
-      return new Promise(fulfil => {
-        avatar.addEventListener('loaded', () => {
-          const components = Object.keys(avatar.components);
-          assert.equal(components.length, 6);
-          assert.include(components, 'position');
-          assert.include(components, 'rotation');
-          assert.include(components, 'scale');
-          assert.include(components, 'visible');
-          assert.include(components, 'light');
-          // Remove when HACK (see src code) is solved.
-          assert.include(components, 'camera');
-          assert.equal(avatar.getAttribute('mixin'), 'user');
-          fulfil();
-        });
+      return helpers.waitFor(avatar)
+      .then(() => {
+        const components = Object.keys(avatar.components);
+        assert.equal(components.length, 6);
+        assert.include(components, 'position');
+        assert.include(components, 'rotation');
+        assert.include(components, 'scale');
+        assert.include(components, 'visible');
+        assert.include(components, 'light');
+        // Remove when HACK (see src code) is solved.
+        assert.include(components, 'camera');
+        assert.equal(avatar.getAttribute('mixin'), 'user');
       });
     });
 
