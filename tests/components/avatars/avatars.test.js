@@ -1,7 +1,7 @@
 const SceneTree =
-  require('../../src/components/avatars/scene-tree').SceneTree;
+  require('../../../src/components/avatars/scene-tree').SceneTree;
 const registerComponent = require('aframe').registerComponent;
-const helpers = require('../helpers');
+const helpers = require('../../helpers');
 
 suite('avatars component', () => {
   let room;

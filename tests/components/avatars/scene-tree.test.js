@@ -1,6 +1,6 @@
 suite('SceneTree', () => {
   const SceneTree =
-    require('../../src/components/avatars/scene-tree').SceneTree;
+    require('../../../src/components/avatars/scene-tree').SceneTree;
 
   let sceneTree, root, el;
 

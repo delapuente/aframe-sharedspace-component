@@ -1,5 +1,5 @@
 require('aframe');
-const helpers = require('../helpers');
+const helpers = require('../../helpers');
 
 suite('EnitityObserver', () => {
   const noCall = [];
@@ -16,8 +16,9 @@ suite('EnitityObserver', () => {
   let sequence;
 
   suiteSetup(() => {
-    inject =
-      require('inject-loader!../../src/components/avatars/entity-observer');
+    inject = require(
+      'inject-loader!../../../src/components/avatars/entity-observer'
+    );
 
     sequence = defaultSequence();
 
