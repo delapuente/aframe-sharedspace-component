@@ -13,7 +13,7 @@ suite('SceneTree', () => {
     sceneTree = new SceneTree(root);
   });
 
-  test('Handles updates', () => {
+  test('handles updates', () => {
     sceneTree.applyUpdates([
       {
         type: 'components',

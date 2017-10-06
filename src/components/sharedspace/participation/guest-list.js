@@ -16,6 +16,10 @@ class GuestList {
     this._list[index] = null;
   }
 
+  get length() {
+    return this._list.length;
+  }
+
   equals(another) {
     if (this === another) { return true; }
     if (this.timestamp !== another.timestamp) { return false; }
@@ -90,7 +94,8 @@ class GuestList {
   }
 
   getRole(id) {
-    return this.isHost(id) ? 'host' : 'guest';
+    return this.isPresent(id) ?
+           (this.isHost(id) ? 'host' : 'guest') : 'unknown';
   }
 
   isHost(id) {

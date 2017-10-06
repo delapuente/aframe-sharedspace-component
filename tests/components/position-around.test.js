@@ -1,6 +1,6 @@
 const helpers = require('../helpers');
 
-suite.only('position-around component', () => {
+suite('position-around component', () => {
   let entity;
 
   suiteSetup(() => {

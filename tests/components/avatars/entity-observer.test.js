@@ -11,22 +11,24 @@ suite('EnitityObserver', () => {
   };
 
   let inject;
+  let _isSingleProperty;
   let EntityObserver;
   let entity;
   let sequence;
 
-  suiteSetup(() => {
+  setup(() => {
     inject = require(
       'inject-loader!../../../src/components/avatars/entity-observer'
     );
 
     sequence = defaultSequence();
 
+    _isSingleProperty = true;
     const map = new Map();
     EntityObserver = inject({
       'aframe': {
         schema: {
-          isSingleProperty() { return true; },
+          isSingleProperty() { return _isSingleProperty; },
           stringifyProperty(data, schema) {
             if (!map.has(schema)) {
               map.set(schema, 0);
@@ -34,9 +36,14 @@ suite('EnitityObserver', () => {
             const count = map.get(schema);
             map.set(schema, count + 1);
             return sequence.next().value;
+          },
+          stringifyProperties(...args) {
+            return this.stringifyProperty(...args);
           }
         },
-        utils: {}
+        utils: {
+          styleParser: { stringify(props) { return props; }}
+        }
       }
     }).EntityObserver;
 
@@ -61,68 +68,76 @@ suite('EnitityObserver', () => {
     return Promise.resolve(allUpdates);
   }
 
-  test('Poll for all component changes', () => {
-    return testObserverCheck({}, observer => {
-      observer.observe(entity, { components: true });
-    })
-    .then(allUpdates => {
-      const components = Object.keys(entity.components);
-      assert.equal(allUpdates[0].length, components.length);
-    });
-  });
+  [true, false].forEach(isSingleProperty => {
 
-  test('Poll for a subset of component changes', () => {
-    return testObserverCheck({}, observer => {
-      observer.observe(entity, {
-        components: true, componentFilter: ['position']
+    test(`polls for all component changes (${isSingleProperty ? 'single' : 'multi'})`, () => {
+      _isSingleProperty = isSingleProperty;
+      return testObserverCheck({}, observer => {
+        observer.observe(entity, { components: true });
+      })
+      .then(allUpdates => {
+        const components = Object.keys(entity.components);
+        assert.equal(allUpdates[0].length, components.length);
       });
-    })
-    .then(allUpdates => {
-      assert.shallowDeepEqual(allUpdates[0], [{ componentName: 'position' }]);
     });
-  });
 
-  test('Send a key state every N checks', () => {
-    const keyEach = 2;
-    const repetitions = 3;
-    const max = keyEach * repetitions;
-
-    return testObserverCheck({ keyEach }, observer => {
-      observer.observe(entity, {
-        components: true, componentFilter: ['position']
+    test(`polls for a subset of component changes (${isSingleProperty ? 'single' : 'multi'})`, () => {
+      _isSingleProperty = isSingleProperty;
+      return testObserverCheck({}, observer => {
+        observer.observe(entity, {
+          components: true, componentFilter: ['position']
+        });
+      })
+      .then(allUpdates => {
+        assert.shallowDeepEqual(allUpdates[0], [{ componentName: 'position' }]);
       });
-    }, max)
-    .then(allUpdates => {
-      allUpdates.forEach((updates, index) => {
-        const isKey = ((index + 1) % keyEach) === 0;
-        updates.forEach(update => {
-          assert.shallowDeepEqual(update, { isKey });
+    });
+
+    test(`sends a key state every N checks (${isSingleProperty ? 'single' : 'multi'})`, () => {
+      _isSingleProperty = isSingleProperty;
+      const keyEach = 2;
+      const repetitions = 3;
+      const max = keyEach * repetitions;
+
+      return testObserverCheck({ keyEach }, observer => {
+        observer.observe(entity, {
+          components: true, componentFilter: ['position']
+        });
+      }, max)
+      .then(allUpdates => {
+        allUpdates.forEach((updates, index) => {
+          const isKey = ((index + 1) % keyEach) === 0;
+          updates.forEach(update => {
+            assert.shallowDeepEqual(update, { isKey });
+          });
         });
       });
     });
-  });
 
-  test('Send a key state every N checks even if there is no changes.', () => {
-    const keyEach = 2;
-    const repetitions = 3;
-    const max = keyEach * repetitions;
-    sequence = (function* () {
-      while (true) { yield 'const'; }
-    }());
+    test(`sends a key state every N checks even if there is no changes (${isSingleProperty ? 'single' : 'multi'})`, () => {
+      _isSingleProperty = isSingleProperty;
+      const keyEach = 2;
+      const repetitions = 3;
+      const max = keyEach * repetitions;
+      sequence = (function* () {
+        while (true) { yield 'const'; }
+      }());
 
-    return testObserverCheck({ keyEach }, observer => {
-      observer.observe(entity, {
-        components: true, componentFilter: ['position']
-      });
-    }, max)
-    .then(allUpdates => {
-      allUpdates.forEach((updates, index) => {
-        const isKey = ((index + 1) % keyEach) === 0;
-        if (!isKey) { assert.equal(updates, noCall); }
-        updates.forEach(update => {
-          assert.shallowDeepEqual(update, { isKey });
+      return testObserverCheck({ keyEach }, observer => {
+        observer.observe(entity, {
+          components: true, componentFilter: ['position']
+        });
+      }, max)
+      .then(allUpdates => {
+        allUpdates.forEach((updates, index) => {
+          const isKey = ((index + 1) % keyEach) === 0;
+          if (!isKey) { assert.equal(updates, noCall); }
+          updates.forEach(update => {
+            assert.shallowDeepEqual(update, { isKey });
+          });
         });
       });
     });
+
   });
 });
