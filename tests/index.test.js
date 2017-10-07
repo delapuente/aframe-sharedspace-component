@@ -5,4 +5,5 @@ require('./components/avatars/avatars.test');
 require('./components/avatars/entity-observer.test');
 require('./components/avatars/scene-tree.test');
 require('./components/sharedspace/participation/guest-list.test');
+require('./components/sharedspace/rtc-interface.test');
 require('./components/position-around.test');

@@ -11,19 +11,19 @@ suite('EnitityObserver', () => {
   };
 
   let inject;
-  let _isSingleProperty;
   let EntityObserver;
   let entity;
-  let sequence;
+  let _sequence;
+  let _isSingleProperty;
 
   setup(() => {
     inject = require(
       'inject-loader!../../../src/components/avatars/entity-observer'
     );
 
-    sequence = defaultSequence();
-
+    _sequence = defaultSequence();
     _isSingleProperty = true;
+
     const map = new Map();
     EntityObserver = inject({
       'aframe': {
@@ -35,7 +35,7 @@ suite('EnitityObserver', () => {
             }
             const count = map.get(schema);
             map.set(schema, count + 1);
-            return sequence.next().value;
+            return _sequence.next().value;
           },
           stringifyProperties(...args) {
             return this.stringifyProperty(...args);
@@ -119,7 +119,7 @@ suite('EnitityObserver', () => {
       const keyEach = 2;
       const repetitions = 3;
       const max = keyEach * repetitions;
-      sequence = (function* () {
+      _sequence = (function* () {
         while (true) { yield 'const'; }
       }());
 

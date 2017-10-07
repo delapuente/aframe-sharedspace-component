@@ -18,7 +18,7 @@ class RTCInterface extends EventTarget {
   }
 
   get me() {
-    return this._swarm.me;
+    return this._swarm && this._swarm.me;
   }
 
   connect() {
@@ -45,7 +45,8 @@ class RTCInterface extends EventTarget {
     msg.from = this.me;
     const data = JSON.stringify(msg);
     log('sending data:', data);
-    this._peers.get(destination).send(data);
+    const peer = this._peers.get(destination);
+    if (peer) { peer.send(data); }
   }
 
   isConnected(id) {
