@@ -69,13 +69,24 @@ class RTCInterface extends EventTarget {
     this._emit('stream', { id, stream });
   }
 
+  // TODO: Rethink this: the emitted event does not follow the same shape of
+  // other events.
   _onData(data) {
-    const message = JSON.parse(data);
-    if (typeof message !== 'object' || !message.type) {
-      error('Malformed message:', message);
-      panic('Malformed message');
+    try {
+      const message = JSON.parse(data);
+      if (typeof message !== 'object' || !message.type) {
+        error('Malformed message:', message);
+        return panic('Malformed message');
+      }
+      this._emit('message', message);
     }
-    this._emit('message', message);
+    catch (e) {
+      if (e instanceof SyntaxError) {
+        error('Non JSON format:', data, e);
+        return panic('Non JSON format');
+      }
+      throw e;
+    }
   }
 
   _onClose(id) {

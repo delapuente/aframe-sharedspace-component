@@ -1,6 +1,6 @@
 const ee = require('event-emitter')
 
-suite.only('RTCInterface', () => {
+suite('RTCInterface', () => {
   let inject;
   let RTCInterface;
   let network;
@@ -9,6 +9,7 @@ suite.only('RTCInterface', () => {
   let fakeWebRTCSwarmCons, fakeWebRTCSwarm;
   let fakePeerCons, fakePeer;
 
+  const panic = sinon.spy();
   const stream = new MediaStream();
 
   setup(() => {
@@ -36,7 +37,7 @@ suite.only('RTCInterface', () => {
     RTCInterface = inject({
       'signalhub': fakeSignalHubCons,
       'webrtc-swarm': fakeWebRTCSwarmCons,
-      '../../utils': { panic: sinon.spy() }
+      '../../utils': { panic }
     }).RTCInterface;
 
     network = new RTCInterface('test', {
@@ -82,7 +83,7 @@ suite.only('RTCInterface', () => {
     test('initializes WebRTC Swarm', () => {
       return network.connect()
       .then(() => {
-        //assert.isTrue(fakeWebRTCSwarmCons.calledOnce);
+        assert.isTrue(fakeWebRTCSwarmCons.calledOnce);
         assert.isTrue(fakeWebRTCSwarmCons.calledWith(fakeSignalHub, {
           uuid: undefined,
           stream,
@@ -173,13 +174,68 @@ suite.only('RTCInterface', () => {
 
     suite('on peer stream', () => {
 
+      test('emits a stream event', done => {
+        const incomingStream = new MediaStream();
+        network.addEventListener('stream', ({ detail }) => {
+          assert.deepEqual(detail, { id: 'id1', stream });
+          done();
+        });
+        const peer = new fakePeerCons();
+        fakeWebRTCSwarm.emit('peer', peer, 'id1');
+        peer.emit('stream', stream);
+      });
+
     });
 
     suite('on peer data', () => {
 
+      setup(() => {
+        panic.reset();
+      });
+
+      test('panics if data is not a JSON string', () => {
+        const peer = new fakePeerCons();
+        fakeWebRTCSwarm.emit('peer', peer, 'id1');
+        peer.emit('data', 'not a JSON string');
+        assert.isTrue(panic.calledOnce);
+      });
+
+      test('panics if data is not a JSON object', () => {
+        const peer = new fakePeerCons();
+        fakeWebRTCSwarm.emit('peer', peer, 'id1');
+        peer.emit('data', '1');
+        assert.isTrue(panic.calledOnce);
+      });
+
+      test('panics if data lacks type', () => {
+        const peer = new fakePeerCons();
+        fakeWebRTCSwarm.emit('peer', peer, 'id1');
+        peer.emit('data', '{}');
+        assert.isTrue(panic.calledOnce);
+      });
+
+      test('emits a message event', done => {
+        network.addEventListener('message', ({ detail }) => {
+          assert.deepEqual(detail, { type: 'test' });
+          done();
+        });
+        const peer = new fakePeerCons();
+        fakeWebRTCSwarm.emit('peer', peer, 'id1');
+        peer.emit('data', JSON.stringify({type:'test'}));
+      });
     });
 
     suite('on peer close', () => {
+
+      test('emits a stream event', done => {
+        network.addEventListener('close', ({ detail }) => {
+          assert.deepEqual(detail, { id: 'id1' });
+          done();
+        });
+        const peer = new fakePeerCons();
+        fakeWebRTCSwarm.emit('peer', peer, 'id1');
+        peer.emit('close');
+      });
 
     });
 
