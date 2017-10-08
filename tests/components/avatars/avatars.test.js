@@ -26,19 +26,25 @@ suite('avatars component', () => {
   }
 
   suiteSetup(() => {
+    require('../../../src/positional-audio-patch');
+    require('../../../src/components/share');
+    require('../../../src/components/position-around');
+    require('../../../src/components/avatars');
+
     const template = document.createElement('TEMPLATE');
     template.innerHTML = '<a-entity class="avatar"></a-entity>';
     document.body.appendChild(template);
-    return helpers.entityFactory()
-    .then(entity => {
-      room = entity;
-    });
   });
 
   setup(() => {
-    room.components.sharedspace = fakeSharedSpace;
-    room.removeAttribute('avatars');
-    room.setAttribute('avatars', '');
+    const scene = document.querySelector('a-scene');
+    if (scene) { scene.parentNode.removeChild(scene); }
+    return helpers.entityFactory()
+    .then(entity => {
+      room = entity;
+      room.components.sharedspace = fakeSharedSpace;
+      room.setAttribute('avatars', '');
+    });
   });
 
   suite('on sharedspace enterparticipant', () => {
@@ -298,7 +304,7 @@ suite('avatars component', () => {
       avatar.addEventListener('componentinitialized', function (evt) {
         if (evt.detail.name === 'sound') {
           const audio = document.querySelector('a-assets > audio');
-          assert.isOk(audio);
+          assert.isDefined(audio);
           assert.equal(audio, avatar.components.sound.data.src);
           assert.equal(audio.srcObject, stream);
           restoreMediaStreamSource();

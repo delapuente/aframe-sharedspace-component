@@ -4,6 +4,8 @@ suite('position-around component', () => {
   let entity;
 
   suiteSetup(() => {
+    require('../../src/components/position-around');
+
     return helpers.entityFactory()
     .then(newEntity => {
       entity = newEntity;

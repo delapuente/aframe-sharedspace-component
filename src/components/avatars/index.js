@@ -9,7 +9,7 @@ const error = utils.debug('sharedspace:avatars:error');
 
 export default registerComponent('avatars', {
 
-  dependendies: ['sharedspace'],
+  dependencies: ['sharedspace'],
 
   schema: {
     // Should it be a custom type to parse none as null?

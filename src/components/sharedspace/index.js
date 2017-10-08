@@ -80,8 +80,8 @@ export default registerComponent('sharedspace', {
   },
 
   _initParticipation(stream) {
-    const { room, id, provider } = this.data;
-    this._participation = new Participation(room, { id, stream, provider });
+    const { room, me, provider } = this.data;
+    this._participation = new Participation(room, { id: me, stream, provider });
     this._configureParticipation();
     return this._participation.connect()
     .then(result => {

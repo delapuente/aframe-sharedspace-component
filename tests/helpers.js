@@ -4,9 +4,7 @@ const entityFactory = module.exports.entityFactory = function () {
   .then(scene => {
     const entity = document.createElement('a-entity');
     scene.appendChild(entity);
-    return new Promise(fulfill => {
-      entity.addEventListener('loaded', () => fulfill(entity));
-    });
+    return waitFor(entity);
   });
 };
 
@@ -17,12 +15,7 @@ const ensureScene = module.exports.ensureScene = function () {
     scene.innerHTML = '<a-assets></a-assets>';
     document.body.appendChild(scene);
   }
-  if (scene.hasLoaded) {
-    return Promise.resolve(scene);
-  }
-  return new Promise(fulfil => {
-    scene.addEventListener('loaded', () => fulfil(scene));
-  });
+  return waitFor(scene);
 };
 
 const waitFor = module.exports.waitFor = function (el) {
