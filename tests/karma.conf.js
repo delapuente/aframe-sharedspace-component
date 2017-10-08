@@ -18,6 +18,10 @@ module.exports = function (config) {
     webpack: Object.assign(webpackConfig, {
       externals: undefined
     }),
-    reporters: ['mocha']
+    coverageIstanbulReporter: {
+      reports: [ 'text-summary', 'html' ],
+      fixWebpackSourcePaths: true
+    },
+    reporters: ['mocha', 'coverage-istanbul']
   });
 };
