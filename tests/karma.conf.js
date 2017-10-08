@@ -8,7 +8,7 @@ module.exports = function (config) {
       { pattern: 'tests/index.test.js', watched: false }
     ],
     preprocessors: {
-      'tests/**/*.js': ['webpack', 'sourcemap']
+      'tests/**/*.js': ['webpack']
     },
     browsers: ['Firefox', 'Chrome'],
     client: {

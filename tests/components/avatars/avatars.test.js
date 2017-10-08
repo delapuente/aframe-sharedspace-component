@@ -41,7 +41,7 @@ suite('avatars component', () => {
     room.setAttribute('avatars', '');
   });
 
-  suite('on enterparticipant', () => {
+  suite('on sharedspace enterparticipant', () => {
 
     setup(() => {
       sinon.stub(EntityObserver.prototype, 'observe');
@@ -225,7 +225,7 @@ suite('avatars component', () => {
 
   });
 
-  suite('on exitparticipant', () => {
+  suite('on sharedspace exitparticipant', () => {
 
     setup(() => {
       room.innerHTML = `<a-entity data-sharedspace-id="${myId}"></a-entity>`;
@@ -244,7 +244,7 @@ suite('avatars component', () => {
 
   });
 
-  suite('on participant message', () => {
+  suite('on sharedspace participant message', () => {
 
     setup(() => {
       sinon.stub(SceneTree.prototype, 'applyUpdates');
@@ -270,7 +270,7 @@ suite('avatars component', () => {
 
   });
 
-  suite('on participant stream', () => {
+  suite('on sharedspace participant stream', () => {
     let assets;
 
     setup(() => {

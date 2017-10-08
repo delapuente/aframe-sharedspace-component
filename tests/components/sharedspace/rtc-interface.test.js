@@ -1,7 +1,9 @@
 const ee = require('event-emitter')
 
 suite('RTCInterface', () => {
-  let inject;
+  const inject = require(
+    'inject-loader!../../../src/components/sharedspace/rtc-interface'
+  );
   let RTCInterface;
   let network;
 
@@ -13,10 +15,6 @@ suite('RTCInterface', () => {
   const stream = new MediaStream();
 
   setup(() => {
-    inject = require(
-      'inject-loader!../../../src/components/sharedspace/rtc-interface'
-    );
-
     fakeSignalHubCons = sinon.spy(function () {
       return (fakeSignalHub = {
       });
@@ -160,7 +158,7 @@ suite('RTCInterface', () => {
 
     });
 
-    suite('on peer', () => {
+    suite('on WebRTC swarm peer', () => {
 
       test('emits a connect event with the id of the peer', done => {
         network.addEventListener('connect', ({ detail }) => {
@@ -172,7 +170,7 @@ suite('RTCInterface', () => {
 
     });
 
-    suite('on peer stream', () => {
+    suite('on SimplePeer stream', () => {
 
       test('emits a stream event', done => {
         const incomingStream = new MediaStream();
@@ -187,7 +185,7 @@ suite('RTCInterface', () => {
 
     });
 
-    suite('on peer data', () => {
+    suite('on SimplePeer data', () => {
 
       setup(() => {
         panic.reset();
@@ -225,7 +223,7 @@ suite('RTCInterface', () => {
       });
     });
 
-    suite('on peer close', () => {
+    suite('on SimplePeer close', () => {
 
       test('emits a stream event', done => {
         network.addEventListener('close', ({ detail }) => {

@@ -7,10 +7,6 @@ const bind = utils.bind;
 const log = utils.debug('sharedspace:participant:log');
 const warn = utils.debug('sharedspace:participant:warn');
 
-function wait(time) {
-  return new Promise(fulfill => setTimeout(fulfill, time));
-}
-
 /**
  * The Participation class represents the participation model.
  *
@@ -68,8 +64,7 @@ class Participation extends EventTarget {
   }
 
   connect() {
-    return wait(Math.random() * 2000) // XXX: see explanation above.
-    .then(() => this._rtc.connect())
+    return this._rtc.connect()
     .then(() => {
       this._streams = new Map();
       this._enterTime = Date.now();
@@ -85,11 +80,7 @@ class Participation extends EventTarget {
    * RTCInterface Peer (Participant are Peer ids right now).
    */
   get me() {
-   return this._rtc.me;
-  }
-
-  getStreams(id) {
-    return this._streams.get(id).slice(0);
+   return this._rtc && this._rtc.me;
   }
 
   send(target, content) {
@@ -200,7 +191,8 @@ class Participation extends EventTarget {
   _oncontent(message) {
     log('on content:', message);
     const { from: id, content } = message;
-    this._emit('participantmessage', { id, message: content });
+    this._waitForPresence(id)
+    .then(() => this._emit('participantmessage', { id, message: content }));
   }
 
   _setRole(newRole) {
@@ -241,7 +233,7 @@ class Participation extends EventTarget {
 
   _updateList(newList) {
     const changes = this._list.computeChanges(newList);
-    this._list = window.list = newList;
+    this._list = newList;
     if (!this._negotiating) {
       this._informChanges(changes);
     }
