@@ -10,6 +10,7 @@
     "clean": "shx rm -rf site",
     "copy": "shx cp -r index.html assets dist site/",
     "deploy": "npm run build && npm run copy && gh-pages -d site",
+    "prelint": "echo Checking JS style...",
     "lint": "semistandard -v | snazzy",
     "lint:fix": "semistandard --fix | snazzy",
     "postdeploy": "npm run clean",
@@ -19,13 +20,16 @@
     "signalserver": "signalhub listen -p 9000",
     "test": "karma start ./tests/karma.conf.js"
   },
+  "pre-commit": ["lint"],
   "semistandard": {
     "ignore": [
       "build/**",
       "dist/**",
       "node_modules/**"
     ],
-    "env": ["mocha"],
+    "env": [
+      "mocha"
+    ],
     "globals": [
       "assert",
       "sinon"
@@ -69,6 +73,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.4",
     "mocha": "^3.5.3",
+    "pre-commit": "^1.2.2",
     "semistandard": "^11.0.0",
     "shx": "^0.2.2",
     "sinon": "^4.0.0",
