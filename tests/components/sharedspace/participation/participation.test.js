@@ -20,6 +20,8 @@ suite('Participation', () => {
   const now = 2;
   const stream = new window.MediaStream();
 
+  const guestsInside = new Set();
+
   setup(() => {
     Date.now = () => now;
 
@@ -81,6 +83,11 @@ suite('Participation', () => {
 
     participation =
       new Participation('testRoom', { stream, provider: 'test.com' });
+
+    guestsInside.clear();
+    participation.addEventListener('enterparticipant', ({ detail }) => {
+      guestsInside.add(detail.id);
+    });
   });
 
   teardown(() => {
@@ -252,7 +259,7 @@ suite('Participation', () => {
           fakeRTCInterface.emit('stream', { id: 'remoteId2', stream });
         });
 
-        test('holds the event until confirming presence after becoming host', done => {
+        test('holds the event until ending role negotiation (host)', done => {
           participation.addEventListener('participantstream', ({ detail }) => {
             assert.equal(detail.id, 'remoteId2');
             assert.equal(detail.stream, stream);
@@ -262,7 +269,7 @@ suite('Participation', () => {
           becomeHost();
         });
 
-        test('holds the event until confirming presence after becoming guest', done => {
+        test('holds the event until ending role negotiation (guest)', done => {
           participation.addEventListener('participantstream', ({ detail }) => {
             assert.equal(detail.id, 'remoteId2');
             assert.equal(detail.stream, stream);
@@ -284,11 +291,11 @@ suite('Participation', () => {
 
       suite('on RTC message', () => {
         test('becomes host after reciving a more recent guest list', () => {
-          becomeHost();
+          return becomeHost();
         });
 
         test('becomes guest after reciving an older guest list', () => {
-          becomeGuest();
+          return becomeGuest();
         });
 
         suite('content messages', () => {
@@ -300,7 +307,7 @@ suite('Participation', () => {
             });
           });
 
-          test('holds the event until confirming presence after becoming host', done => {
+          test('holds the event until ending role negotiation (host)', done => {
             participation.addEventListener('participantmessage', ({ detail }) => {
               assert.equal(detail.id, 'remoteId');
               assert.equal(detail.message, 'test');
@@ -310,7 +317,7 @@ suite('Participation', () => {
             becomeHost();
           });
 
-          test('holds the event until confirming presence after becoming guest', done => {
+          test('holds the event until ending role negotiation (guest)', done => {
             participation.addEventListener('participantmessage', ({ detail }) => {
               assert.equal(detail.id, 'remoteId');
               assert.equal(detail.message, 'test');
@@ -327,7 +334,7 @@ suite('Participation', () => {
           participation.addEventListener('exitparticipant', () => {
             assert.isTrue(false, 'Should not advertise changes.');
           });
-          fakeRTCInterface.emit('close', { id: 'remoteId' });
+          fakeRTCInterface.fakeDisconnection('remoteId');
           assert.isTrue(fakeRTCInterface.broadcast.calledOnce);
           assert.isTrue(fakeRTCInterface.broadcast.calledWith({
             type: 'list',
@@ -361,10 +368,9 @@ suite('Participation', () => {
           fakeRTCInterface.emit('stream', { id: 'remoteId2', stream });
         });
 
-        test('holds the event until confirming presence', done => {
+        test('enforces participantstream after enterparticipant', done => {
           participation.addEventListener('participantstream', ({ detail }) => {
-            assert.equal(detail.id, 'remoteId2');
-            assert.equal(detail.stream, stream);
+            assert.isTrue(guestsInside.has('remoteId2'));
             done();
           });
 
@@ -458,10 +464,9 @@ suite('Participation', () => {
             });
           });
 
-          test('holds the event until confirming presence', done => {
+          test('enforces participantmessage after enterparticipant', done => {
             participation.addEventListener('participantmessage', ({ detail }) => {
-              assert.equal(detail.id, 'remoteId');
-              assert.equal(detail.message, 'test');
+              assert.isTrue(guestsInside.has('remoteId'));
               done();
             });
             fakeRTCInterface.fakeConnection('remoteId');
@@ -563,10 +568,9 @@ suite('Participation', () => {
           fakeRTCInterface.emit('stream', { id: 'remoteId2', stream });
         });
 
-        test('holds the event until confirming presence', done => {
+        test('enforces participantstream after enterparticipant', done => {
           participation.addEventListener('participantstream', ({ detail }) => {
-            assert.equal(detail.id, 'remoteId2');
-            assert.equal(detail.stream, stream);
+            assert.isTrue(guestsInside.has('remoteId2'));
             done();
           });
 
@@ -598,10 +602,9 @@ suite('Participation', () => {
             });
           });
 
-          test('holds the event until confirming presence', done => {
+          test('enforces participantmessage after enterparticipant', done => {
             participation.addEventListener('participantmessage', ({ detail }) => {
-              assert.equal(detail.id, 'remoteId');
-              assert.equal(detail.message, 'test');
+              assert.isTrue(guestsInside.has('remoteId'));
               done();
             });
             fakeRTCInterface.fakeConnection('remoteId');
