@@ -6,19 +6,18 @@ const warn = utils.debug('sharedspace:scene-tree:warn');
  * Manages the mutations on the scene tree.
  */
 class SceneTree {
-
-  constructor(root) {
+  constructor (root) {
     this._root = root;
   }
 
-  applyUpdates(updates) {
+  applyUpdates (updates) {
     if (!Array.isArray(updates)) {
       updates = [updates];
     }
     updates.forEach(update => this._applyUpdate(update));
   }
 
-  _applyUpdate(update) {
+  _applyUpdate (update) {
     const methodName = `_apply${capitalize(update.type)}Update`;
     const method = this[methodName];
     if (!method) {
@@ -28,7 +27,7 @@ class SceneTree {
     this[methodName](update);
   }
 
-  _applyComponentsUpdate(update) {
+  _applyComponentsUpdate (update) {
     const { target, componentName, newValue } = update;
     const element = this._root.querySelector(target);
 
@@ -39,10 +38,9 @@ class SceneTree {
 
     element.setAttribute(componentName, newValue);
   }
-
 }
 
-function capitalize(str) {
+function capitalize (str) {
   return `${str[0].toUpperCase()}${str.substr(1)}`;
 }
 

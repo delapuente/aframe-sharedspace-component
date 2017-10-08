@@ -5,7 +5,6 @@ import { panic } from '../../utils';
 const bind = utils.bind;
 const log = utils.debug('sharedspace:log');
 const warn = utils.debug('sharedspace:warn');
-const error = utils.debug('sharedspace:error');
 
 export default registerComponent('sharedspace', {
   schema: {
@@ -16,13 +15,13 @@ export default registerComponent('sharedspace', {
     me: { default: '' }
   },
 
-  update() {
+  update () {
     if (!this._initializing && !this._connected && !this.data.hold) {
       this._start();
     }
   },
 
-  init() {
+  init () {
     this._connected = false;
     this._initializing = false;
 
@@ -31,21 +30,20 @@ export default registerComponent('sharedspace', {
     // for an example.
     if (this.el.sceneEl.hasLoaded) {
       this._start();
-    }
-    else {
+    } else {
       this.el.sceneEl.addEventListener('loaded', bind(this._start, this));
     }
   },
 
-  send(target, message) {
+  send (target, message) {
     this._participation.send(target, message);
   },
 
-  isConnected() {
+  isConnected () {
     return this._connected;
   },
 
-  _start() {
+  _start () {
     if (this.data.hold || this._connected || this._initializing) {
       return;
     }
@@ -64,14 +62,14 @@ export default registerComponent('sharedspace', {
     .catch(bind(informAndInit, this))
     .then(bind(this._getIdentity, this));
 
-    function informAndInit(reason) {
+    function informAndInit (reason) {
       warn('getUserMedia() failed. There will be no stream.');
       this.el.emit('getusermediafailed', reason, false);
       return this._initParticipation(null);
     }
   },
 
-  _getUserMedia(constraints) {
+  _getUserMedia (constraints) {
     return navigator.mediaDevices.getUserMedia(constraints)
     .then(stream => {
       log('My stream:', stream);
@@ -79,7 +77,7 @@ export default registerComponent('sharedspace', {
     });
   },
 
-  _initParticipation(stream) {
+  _initParticipation (stream) {
     const { room, me, provider } = this.data;
     this._participation = new Participation(room, { id: me, stream, provider });
     this._configureParticipation();
@@ -91,7 +89,7 @@ export default registerComponent('sharedspace', {
     });
   },
 
-  _configureParticipation() {
+  _configureParticipation () {
     this._passEventsThrough([
       'enterparticipant',
       'exitparticipant',
@@ -100,16 +98,16 @@ export default registerComponent('sharedspace', {
     ]);
   },
 
-  _passEventsThrough(events) {
+  _passEventsThrough (events) {
     events.forEach(eventType => {
       this._participation.addEventListener(eventType, event => {
         log(`on ${eventType}:`, event.detail);
         this.el.emit(eventType, event.detail);
-      })
+      });
     });
   },
 
-  _getIdentity() {
+  _getIdentity () {
     if (!this._participation) { panic('Participation not initialized'); }
     this.data.me = this._participation.me;
     log('Me:', this.data.me);

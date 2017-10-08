@@ -10,12 +10,26 @@
     "clean": "shx rm -rf site",
     "copy": "shx cp -r index.html assets dist site/",
     "deploy": "npm run build && npm run copy && gh-pages -d site",
+    "lint": "semistandard -v | snazzy",
+    "lint:fix": "semistandard --fix | snazzy",
     "postdeploy": "npm run clean",
     "predeploy": "npm run clean && shx mkdir -p site",
     "start": "concurrently \"npm run signalserver\" \"npm run build\"",
     "dev": "webpack-dev-server",
     "signalserver": "signalhub listen -p 9000",
     "test": "karma start ./tests/karma.conf.js"
+  },
+  "semistandard": {
+    "ignore": [
+      "build/**",
+      "dist/**",
+      "node_modules/**"
+    ],
+    "env": ["mocha"],
+    "globals": [
+      "assert",
+      "sinon"
+    ]
   },
   "keywords": [
     "aframevr",
@@ -55,9 +69,11 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.4",
     "mocha": "^3.5.3",
+    "semistandard": "^11.0.0",
     "shx": "^0.2.2",
     "sinon": "^4.0.0",
     "sinon-chai": "^2.14.0",
+    "snazzy": "^7.0.0",
     "uglifyjs-webpack-plugin": "^0.4.6",
     "webpack": "^2.6.1",
     "webpack-bundle-analyzer": "^2.9.0",

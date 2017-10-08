@@ -9,7 +9,7 @@ base.module.rules.push({
   },
   include: path.resolve('src/'),
   enforce: 'post',
-  exclude: /node_modules|\.test\.js$/,
+  exclude: /node_modules|\.test\.js$/
 });
 
 module.exports = base;

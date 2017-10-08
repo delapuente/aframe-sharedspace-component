@@ -1,4 +1,4 @@
-function panic(error) {
+function panic (error) {
   error = (typeof error !== 'string') ? error : new Error(error);
   throw error;
 }

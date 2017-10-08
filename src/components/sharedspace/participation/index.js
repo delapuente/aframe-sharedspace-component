@@ -2,10 +2,12 @@ import { utils } from 'aframe';
 import EventTarget from 'event-target-shim';
 import { GuestList } from './guest-list';
 import { RTCInterface } from '../rtc-interface';
+import { panic } from '../../../utils';
 
 const bind = utils.bind;
 const log = utils.debug('sharedspace:participant:log');
 const warn = utils.debug('sharedspace:participant:warn');
+const error = utils.debug('sharedspace:participant:error');
 
 /**
  * The Participation class represents the participation model.
@@ -51,7 +53,7 @@ const warn = utils.debug('sharedspace:participant:warn');
  * to "host" and will start broadcasting its list periodically.
  */
 class Participation extends EventTarget {
-  constructor(room, { id, stream, provider }) {
+  constructor (room, { id, stream, provider }) {
     super();
 
     this._rtc = new RTCInterface(room, { id, stream, signaling: provider });
@@ -63,7 +65,7 @@ class Participation extends EventTarget {
     this._role = 'unknown';
   }
 
-  connect() {
+  connect () {
     return this._rtc.connect()
     .then(() => {
       this._streams = new Map();
@@ -79,25 +81,24 @@ class Participation extends EventTarget {
    * XXX: There is coupling between the notion of Participant and the
    * RTCInterface Peer (Participant are Peer ids right now).
    */
-  get me() {
-   return this._rtc && this._rtc.me;
+  get me () {
+    return this._rtc && this._rtc.me;
   }
 
-  send(target, content) {
+  send (target, content) {
     const message = contentMessage(content);
     if (target === '*') {
       this._rtc.broadcast(message);
-    }
-    else {
+    } else {
       this._rtc.send(target, message);
     }
   }
 
-  get _negotiating() {
+  get _negotiating () {
     return this._role === 'unknown';
   }
 
-  _onConnect({ detail: { id } }) {
+  _onConnect ({ detail: { id } }) {
     log('on connect:', id);
     if (this._role !== 'guest') {
       const nextList = GuestList.copy(this._list);
@@ -108,20 +109,20 @@ class Participation extends EventTarget {
     this._confirmConnection(id);
   }
 
-  _onStream({ detail: { stream, id } }) {
+  _onStream ({ detail: { stream, id } }) {
     this._addStream(id, stream);
     this._waitForPresence(id)
     .then(() => this._emit('participantstream', { stream, id }));
   }
 
-  _addStream(id, stream) {
+  _addStream (id, stream) {
     if (!this._streams.has(id)) {
       this._streams.set(id, []);
     }
     this._streams.get(id).push(stream);
   }
 
-  _onClose({ detail: { id } }) {
+  _onClose ({ detail: { id } }) {
     log('on close:', id);
     this._takeover(id);
     if (this._role !== 'guest') {
@@ -134,15 +135,14 @@ class Participation extends EventTarget {
    * It only removes the participant if it is the "host", to properly calculate
    * the next "host".
    */
-  _takeover(participant) {
+  _takeover (participant) {
     const isHost = this._list.isHost(participant);
     const meIsNext = this.me === this._list.nextHost();
     if (this._role === 'host') {
       const nextList = GuestList.copy(this._list);
       nextList.remove(participant);
       this._updateList(nextList);
-    }
-    else if (this._role === 'guest' && isHost) {
+    } else if (this._role === 'guest' && isHost) {
       log('host is leaving, be prepared for the takeover');
       const nextList = GuestList.copy(this._list);
       nextList.remove(participant);
@@ -158,7 +158,7 @@ class Participation extends EventTarget {
    * Notice that, by the time the list is received. It is possibly that the
    * local "guest" has not connect with all the other guests yet.
    */
-  _onlist(message) {
+  _onlist (message) {
     log('on list:', message);
 
     const notFromHost = !this._list.isHost(message.from);
@@ -175,11 +175,10 @@ class Participation extends EventTarget {
       nextList = this._selectList(GuestList.copy(this._list), remoteList);
       if (nextList.equals(this._list)) {
         this._setRole('host');
-      }
-      else {
+      } else {
         this._setRole('guest');
       }
-      this._list.clear(); //TODO: Perhaps split into _list and _candidateList
+      this._list.clear(); // TODO: Perhaps split into _list and _candidateList
 
       log('best list:', nextList);
       log('role:', this._role);
@@ -188,14 +187,14 @@ class Participation extends EventTarget {
     this._updateList(nextList);
   }
 
-  _oncontent(message) {
+  _oncontent (message) {
     log('on content:', message);
     const { from: id, content } = message;
     this._waitForPresence(id)
     .then(() => this._emit('participantmessage', { id, message: content }));
   }
 
-  _setRole(newRole) {
+  _setRole (newRole) {
     if (newRole !== this._role) {
       this._role = newRole;
       this._emit('upgrade', { role: newRole });
@@ -205,7 +204,7 @@ class Participation extends EventTarget {
     }
   }
 
-  _heartBeatList() {
+  _heartBeatList () {
     setTimeout(() => {
       this._broadcastList();
       this._heartBeatList();
@@ -217,7 +216,7 @@ class Participation extends EventTarget {
    * Cost of a transformation is given by the method
    * GuestList.transformationCost().
    */
-  _selectList(listA, listB) {
+  _selectList (listA, listB) {
     const [ costAB, costBA ] = this._calculateCosts(listA, listB);
     if (costAB === costBA) {
       error('equal costs for different lists:', listA, listB);
@@ -226,12 +225,12 @@ class Participation extends EventTarget {
     return costAB < costBA ? listB : listA;
   }
 
-  _calculateCosts(listA, listB) {
+  _calculateCosts (listA, listB) {
     const transformationCost = bind(GuestList.transformationCost, GuestList);
     return [transformationCost(listA, listB), transformationCost(listB, listA)];
   }
 
-  _updateList(newList) {
+  _updateList (newList) {
     const changes = this._list.computeChanges(newList);
     this._list = newList;
     if (!this._negotiating) {
@@ -246,7 +245,7 @@ class Participation extends EventTarget {
    * option to keep synchronization with the "host" is to inform it's leaving
    * immediately.
    */
-  _informChanges(changes) {
+  _informChanges (changes) {
     changes.forEach(({ id, role, position, action }) => {
       if (action === 'enter') {
         this._waitForConnection(id)
@@ -254,8 +253,7 @@ class Participation extends EventTarget {
           this._emit('enterparticipant', { id, role, position });
           this._confirmPresence(id);
         });
-      }
-      else {
+      } else {
         // TODO: Rethink if it should be asynchronous at least. It forces the
         // test for entering participant and leaving participant asymmetric.
         this._emit('exitparticipant', { id, role, position });
@@ -263,59 +261,57 @@ class Participation extends EventTarget {
     });
   }
 
-  _waitForConnection(id) {
+  _waitForConnection (id) {
     if (id === this.me || this._rtc.isConnected(id)) {
       return Promise.resolve();
     }
     log('waiting for connection:', id);
-    return new Promise(fulfill => {
-      this._connectionWaitingList.push([id, fulfill]);
+    return new Promise(resolve => {
+      this._connectionWaitingList.push([id, resolve]);
     });
   }
 
-  _confirmConnection(targetId) {
+  _confirmConnection (targetId) {
     for (let i = 0, l = this._connectionWaitingList.length; i < l; i++) {
       const [id, fulfill] = this._connectionWaitingList.shift();
       if (id !== targetId) {
         this._connectionWaitingList.push([id, fulfill]);
-      }
-      else {
+      } else {
         log('no longer waiting for connection:', id);
         fulfill();
       }
     }
   }
 
-  _waitForPresence(id) {
+  _waitForPresence (id) {
     if (id === this.me || (!this._negotiating && this._list.isPresent(id))) {
       return Promise.resolve();
     }
     log('waiting for presence:', id);
-    return new Promise(fulfill => {
-      this._presenceWaitingList.push([id, fulfill]);
+    return new Promise(resolve => {
+      this._presenceWaitingList.push([id, resolve]);
     });
   }
 
-  _confirmPresence(targetId) {
+  _confirmPresence (targetId) {
     for (let i = 0, l = this._presenceWaitingList.length; i < l; i++) {
       const [id, fulfill] = this._presenceWaitingList.shift();
       if (id !== targetId) {
         this._presenceWaitingList.push([id, fulfill]);
-      }
-      else {
+      } else {
         log('no longer waiting for presence:', id);
         fulfill();
       }
     }
   }
 
-  _broadcastList() {
+  _broadcastList () {
     log('broadcasting list:', this._list);
     const message = listMessage(this._list);
     this._rtc.broadcast(message);
   }
 
-  _onMessage(event) {
+  _onMessage (event) {
     const handlerName = `_on${event.detail.type}`;
     if (!this[handlerName]) {
       warn(`missing handler for event type ${event.detail.type}`);
@@ -324,19 +320,19 @@ class Participation extends EventTarget {
     return this[handlerName](event.detail);
   }
 
-  _emit(type, detail) {
-    const event = new CustomEvent(type, { detail });
+  _emit (type, detail) {
+    const event = new window.CustomEvent(type, { detail });
     this.dispatchEvent(event);
   }
 }
 
-function listMessage(guestList) {
+function listMessage (guestList) {
   const message = { type: 'list' };
   Object.assign(message, GuestList.serialize(guestList));
   return message;
 }
 
-function contentMessage(content) {
+function contentMessage (content) {
   return { type: 'content', content };
 }
 

@@ -3,12 +3,12 @@ const helpers = require('../../helpers');
 
 suite('EnitityObserver', () => {
   const noCall = [];
-  function* defaultSequence() {
+  function * defaultSequence () {
     let count = 0;
     while (true) {
       yield (count++ === 0) ? 'init' : `delta-${count}`;
     }
-  };
+  }
 
   let inject;
   let EntityObserver;
@@ -17,9 +17,11 @@ suite('EnitityObserver', () => {
   let _isSingleProperty;
 
   setup(() => {
+    /* eslint-disable import/no-webpack-loader-syntax */
     inject = require(
       'inject-loader!../../../src/components/avatars/entity-observer'
     );
+    /* eslint-enable import/no-webpack-loader-syntax */
 
     _sequence = defaultSequence();
     _isSingleProperty = true;
@@ -28,8 +30,8 @@ suite('EnitityObserver', () => {
     EntityObserver = inject({
       'aframe': {
         schema: {
-          isSingleProperty() { return _isSingleProperty; },
-          stringifyProperty(data, schema) {
+          isSingleProperty () { return _isSingleProperty; },
+          stringifyProperty (data, schema) {
             if (!map.has(schema)) {
               map.set(schema, 0);
             }
@@ -37,21 +39,20 @@ suite('EnitityObserver', () => {
             map.set(schema, count + 1);
             return _sequence.next().value;
           },
-          stringifyProperties(...args) {
+          stringifyProperties (...args) {
             return this.stringifyProperty(...args);
           }
         },
         utils: {
-          styleParser: { stringify(props) { return props; }}
+          styleParser: { stringify (props) { return props; } }
         }
       }
     }).EntityObserver;
 
-    return helpers.entityFactory().then(newEntity => entity = newEntity);
+    return helpers.entityFactory().then(newEntity => { entity = newEntity; });
   });
 
-  function testObserverCheck(options, init, callCount=1) {
-    let fulfill;
+  function testObserverCheck (options, init, callCount = 1) {
     const allUpdates = [];
     const observer = new EntityObserver(updates => {
       allUpdates.push(updates);
@@ -69,7 +70,6 @@ suite('EnitityObserver', () => {
   }
 
   [true, false].forEach(isSingleProperty => {
-
     test(`polls for all component changes (${isSingleProperty ? 'single' : 'multi'})`, () => {
       _isSingleProperty = isSingleProperty;
       return testObserverCheck({}, observer => {
@@ -119,7 +119,7 @@ suite('EnitityObserver', () => {
       const keyEach = 2;
       const repetitions = 3;
       const max = keyEach * repetitions;
-      _sequence = (function* () {
+      _sequence = (function * () {
         while (true) { yield 'const'; }
       }());
 
@@ -138,6 +138,5 @@ suite('EnitityObserver', () => {
         });
       });
     });
-
   });
 });

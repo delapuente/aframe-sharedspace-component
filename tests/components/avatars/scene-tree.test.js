@@ -33,5 +33,4 @@ suite('SceneTree', () => {
     assert.isTrue(
       el.setAttribute.calledWith('test-component-2', 'new-value'));
   });
-
 });

@@ -91,6 +91,5 @@ Sound.prototype.update = function (oldData) {
       if (self.data.autoplay || self.mustPlay) { self.playSound(); }
       self.el.emit('sound-loaded');
     });
-
   }
 };

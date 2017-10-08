@@ -2,27 +2,29 @@ const EventTarget = require('event-target-shim');
 const helpers = require('../../helpers');
 
 suite('sharedspace component', () => {
+  /* eslint-disable import/no-webpack-loader-syntax */
   const inject = require('inject-loader!../../../src/components/sharedspace');
+  /* eslint-enable import/no-webpack-loader-syntax */
 
   let room;
   let fakeParticipationCons, fakeParticipation;
 
-  const stream = new MediaStream();
+  const stream = new window.MediaStream();
   const panic = sinon.spy();
 
   suiteSetup(() => {
     fakeParticipationCons = class extends EventTarget {
-      constructor() {
+      constructor () {
         super();
         fakeParticipation = this;
       }
 
-      connect() {
+      connect () {
         return Promise.resolve();
       }
 
-      emit(type, detail) {
-        const event = new CustomEvent(type, { detail });
+      emit (type, detail) {
+        const event = new window.CustomEvent(type, { detail });
         this.dispatchEvent(event);
       }
     };
@@ -51,7 +53,6 @@ suite('sharedspace component', () => {
   });
 
   suite('if hold is false', () => {
-
     setup(done => {
       room.setAttribute('sharedspace', '');
       setTimeout(done);
@@ -60,11 +61,9 @@ suite('sharedspace component', () => {
     test('autoconnects', () => {
       assert.isTrue(room.components.sharedspace.isConnected());
     });
-
   });
 
   suite('if hold is true', () => {
-
     setup(done => {
       room.setAttribute('sharedspace', 'hold: true');
       setTimeout(done);
@@ -81,11 +80,9 @@ suite('sharedspace component', () => {
         done();
       });
     });
-
   });
 
   suite('hold is false, non default properties', () => {
-
     setup(done => {
       room.setAttribute(
         'sharedspace',
@@ -102,11 +99,9 @@ suite('sharedspace component', () => {
         provider: 'test.com'
       }));
     });
-
   });
 
   suite('hold is true, non default properties', () => {
-
     setup(done => {
       room.setAttribute(
         'sharedspace',
@@ -128,11 +123,9 @@ suite('sharedspace component', () => {
         done();
       });
     });
-
   });
 
   suite('if audio is false', () => {
-
     setup(done => {
       room.setAttribute('sharedspace', 'audio: false');
       setTimeout(done);
@@ -141,11 +134,9 @@ suite('sharedspace component', () => {
     test('does not ask for user media', () => {
       assert.isTrue(navigator.mediaDevices.getUserMedia.notCalled);
     });
-
   });
 
   suite('if audio is true', () => {
-
     setup(done => {
       room.setAttribute('sharedspace', 'audio: true');
       setTimeout(done);
@@ -154,7 +145,6 @@ suite('sharedspace component', () => {
     test('ask for user media', () => {
       assert.isTrue(navigator.mediaDevices.getUserMedia.calledOnce);
     });
-
   });
 
   suite('on participation events', () => {
@@ -179,7 +169,5 @@ suite('sharedspace component', () => {
         fakeParticipation.emit(type, evtDetail);
       });
     });
-
   });
-
 });

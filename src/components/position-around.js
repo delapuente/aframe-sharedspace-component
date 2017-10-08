@@ -10,15 +10,15 @@ export default registerComponent('position-around', {
     position: { default: 1 }
   },
 
-  init() {
+  init () {
     this.update();
   },
 
-  update() {
+  update () {
     this.el.setAttribute('position', this._getPosition(this.data.position));
   },
 
-  _getPosition(roomPosition) {
+  _getPosition (roomPosition) {
     const { height, radius } = this.data;
     const isEven = roomPosition % 2 === 0;
     if (isEven) {
@@ -37,7 +37,7 @@ export default registerComponent('position-around', {
     };
   },
 
-  _inFrontOf({ x, y, z }) {
+  _inFrontOf ({ x, y, z }) {
     return { x: -x, y, z: -z };
   }
 });

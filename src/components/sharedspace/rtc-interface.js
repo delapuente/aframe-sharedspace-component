@@ -9,19 +9,18 @@ const log = utils.debug('sharedspace:rtc-interface:log');
 const error = utils.debug('sharedspace:rtc-interface:error');
 
 class RTCInterface extends EventTarget {
-
-  constructor(room, { id, stream, signaling }) {
+  constructor (room, { id, stream, signaling }) {
     super();
     this._id = id;
     this._stream = stream;
     this._hub = signalhub(room, [signaling]);
   }
 
-  get me() {
+  get me () {
     return this._swarm && this._swarm.me;
   }
 
-  connect() {
+  connect () {
     this._peers = new Map();
     this._swarm = new WebRtcSwarm(this._hub, {
       uuid: this._id,
@@ -37,11 +36,11 @@ class RTCInterface extends EventTarget {
     return Promise.resolve();
   }
 
-  broadcast(msg) {
+  broadcast (msg) {
     Array.from(this._peers.keys()).forEach(id => this.send(id, msg));
   }
 
-  send(destination, msg={}) {
+  send (destination, msg = {}) {
     msg.from = this.me;
     const data = JSON.stringify(msg);
     log('sending data:', data);
@@ -49,29 +48,29 @@ class RTCInterface extends EventTarget {
     if (peer) { peer.send(data); }
   }
 
-  isConnected(id) {
+  isConnected (id) {
     return this._peers.has(id);
   }
 
-  _onPeer(peer, id) {
+  _onPeer (peer, id) {
     this._peers.set(id, peer);
     this._setupPeer(peer, id);
     this._emit('connect', { id });
   }
 
-  _setupPeer(peer, id) {
+  _setupPeer (peer, id) {
     peer.on('stream', bind(this._onStream, this, id));
     peer.on('data', bind(this._onData, this));
     peer.on('close', bind(this._onClose, this, id));
   }
 
-  _onStream(id, stream) {
+  _onStream (id, stream) {
     this._emit('stream', { id, stream });
   }
 
   // TODO: Rethink this: the emitted event does not follow the same shape of
   // other events.
-  _onData(data) {
+  _onData (data) {
     try {
       const message = JSON.parse(data);
       if (typeof message !== 'object' || !message.type) {
@@ -79,8 +78,7 @@ class RTCInterface extends EventTarget {
         return panic('Malformed message');
       }
       this._emit('message', message);
-    }
-    catch (e) {
+    } catch (e) {
       if (e instanceof SyntaxError) {
         error('Non JSON format:', data, e);
         return panic('Non JSON format');
@@ -89,13 +87,13 @@ class RTCInterface extends EventTarget {
     }
   }
 
-  _onClose(id) {
+  _onClose (id) {
     this._peers.delete(id);
     this._emit('close', { id });
   }
 
-  _emit(type, detail) {
-    const event = new CustomEvent(type, { detail });
+  _emit (type, detail) {
+    const event = new window.CustomEvent(type, { detail });
     this.dispatchEvent(event);
   }
 }

@@ -1,5 +1,5 @@
 
-const entityFactory = module.exports.entityFactory = function () {
+module.exports.entityFactory = function () {
   return ensureScene()
   .then(scene => {
     const entity = document.createElement('a-entity');
@@ -19,10 +19,10 @@ const ensureScene = module.exports.ensureScene = function () {
 };
 
 const waitFor = module.exports.waitFor = function (el) {
-  return new Promise(fulfil => {
+  return new Promise(resolve => {
     if (el.hasLoaded) {
-      return fulfil(el);
+      return resolve(el);
     }
-    el.addEventListener('loaded', () => fulfil(el));
+    el.addEventListener('loaded', () => resolve(el));
   });
-}
+};

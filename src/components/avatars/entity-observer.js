@@ -13,20 +13,18 @@ import { schema as schemaUtils, utils } from 'aframe';
  * TODO: Optimize by not comparing with the stringifyed version.
  */
 class EntityObserver {
-
-  constructor(callback, { keyEach=60 }={}) {
-    this._observer = new MutationObserver(callback);
+  constructor (callback, { keyEach = 60 } = {}) {
+    this._observer = new window.MutationObserver(callback);
     this._callback = callback;
     this._observables = new Map();
     this._checkCount = 0;
     this._keyThreshold = keyEach;
   }
 
-  observe(entity, init) {
+  observe (entity, init) {
     try {
       this._observer.observe(entity, init);
-    }
-    catch (e) { /* no-op */ }
+    } catch (e) { /* no-op */ }
     if (init.components) {
       const filter = init.componentFilter;
       this._observables.delete(entity);
@@ -34,21 +32,21 @@ class EntityObserver {
     }
   }
 
-  disconnect() {
+  disconnect () {
     this._observer.disconnect();
     this._observables.clear();
   }
 
-  takeRecords() {
+  takeRecords () {
     return this._observer.takeRecords();
   }
 
-  check() {
+  check () {
     Array.from(this._observables.keys())
     .forEach(entity => this._collectChanges(entity, this._isKey()));
   }
 
-  _isKey() {
+  _isKey () {
     const count = ++this._checkCount;
     if (count === this._keyThreshold) {
       this._checkCount = 0;
@@ -57,7 +55,7 @@ class EntityObserver {
     return false;
   }
 
-  _recordEntity(entity, filter) {
+  _recordEntity (entity, filter) {
     this._observables.set(entity, [{}, filter]);
     Object.values(entity.components).forEach(component => {
       if (!filter || filter.indexOf(component.name) >= 0) {
@@ -66,14 +64,14 @@ class EntityObserver {
     });
   }
 
-  _updateComponent(entity, component) {
+  _updateComponent (entity, component) {
     const schema = component.schema;
     const data = component.data;
     const lastValue = this._stringify(data, schema);
     this._observables.get(entity)[0][component.name] = lastValue;
   }
 
-  _stringify(data, schema) {
+  _stringify (data, schema) {
     if (schemaUtils.isSingleProperty(schema)) {
       return schemaUtils.stringifyProperty(data, schema);
     }
@@ -81,15 +79,15 @@ class EntityObserver {
     return utils.styleParser.stringify(stringifiedData);
   }
 
-  _collectChanges(entity, isKey) {
+  _collectChanges (entity, isKey) {
     const changes = [];
     const filter = this._observables.get(entity)[1];
     Object.values(entity.components).forEach(component => {
       if (!filter || filter.indexOf(component.name) >= 0) {
         // TODO: Refactor this mess
-        const change = isKey ?
-                       this._getCurrentValue(entity, component) :
-                       this._getChanges(entity, component)
+        const change = isKey
+                       ? this._getCurrentValue(entity, component)
+                       : this._getChanges(entity, component);
         if (change) {
           const [oldValue, newValue] = !isKey ? change : [change, change];
           changes.push({
@@ -108,7 +106,7 @@ class EntityObserver {
     }
   }
 
-  _getChanges(entity, component) {
+  _getChanges (entity, component) {
     const oldValue = this._getCurrentValue(entity, component);
     const newValue = this._stringify(component.data, component.schema);
     if (oldValue !== newValue) {
@@ -118,10 +116,9 @@ class EntityObserver {
     return null;
   }
 
-  _getCurrentValue(entity, component) {
+  _getCurrentValue (entity, component) {
     return this._observables.get(entity)[0][component.name];
   }
-
 }
 
 export { EntityObserver };

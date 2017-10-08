@@ -14,14 +14,14 @@ suite('avatars component', () => {
     data: {
       me: myId
     },
-    isConnected() {
+    isConnected () {
       return true;
     },
-    send() { }
-  }
+    send () { }
+  };
 
-  function dispatch(type, detail) {
-    const event = new CustomEvent(type, { detail });
+  function dispatch (type, detail) {
+    const event = new window.CustomEvent(type, { detail });
     room.dispatchEvent(event);
   }
 
@@ -48,7 +48,6 @@ suite('avatars component', () => {
   });
 
   suite('on sharedspace enterparticipant', () => {
-
     setup(() => {
       sinon.stub(EntityObserver.prototype, 'observe');
       room.innerHTML = '';
@@ -85,12 +84,12 @@ suite('avatars component', () => {
       dispatch('enterparticipant', { id: myId, position: 1 });
       const avatar =
         room.querySelector(`[data-sharedspace-id="${myId}"]`);
-      return new Promise(fulfil => {
+      return new Promise(resolve => {
         avatar.addEventListener('componentinitialized', ({ detail }) => {
           if (detail.name === 'position-around') {
             const attr = avatar.getAttribute('position-around');
             assert.equal(attr.position, 1);
-            fulfil();
+            resolve();
           }
         });
       });
@@ -228,11 +227,9 @@ suite('avatars component', () => {
         assert.isTrue(onSetup.calledAfter(onElement));
       });
     });
-
   });
 
   suite('on sharedspace exitparticipant', () => {
-
     setup(() => {
       room.innerHTML = `<a-entity data-sharedspace-id="${myId}"></a-entity>`;
     });
@@ -247,11 +244,9 @@ suite('avatars component', () => {
       dispatch('exitparticipant', { id: myId, position: 1 });
       assert.equal(room.innerHTML, `<a-entity data-sharedspace-id="${myId}"></a-entity>`);
     });
-
   });
 
   suite('on sharedspace participant message', () => {
-
     setup(() => {
       sinon.stub(SceneTree.prototype, 'applyUpdates');
     });
@@ -273,7 +268,6 @@ suite('avatars component', () => {
       avatars.tick();
       assert.isTrue(SceneTree.prototype.applyUpdates.calledWith(updates));
     });
-
   });
 
   suite('on sharedspace participant stream', () => {
@@ -286,20 +280,20 @@ suite('avatars component', () => {
     });
 
     let original;
-    function fakeMediaStreamSource() {
-      original = AudioContext.prototype.createMediaStreamSource;
-      AudioContext.prototype.createMediaStreamSource = () => ({
-        connect() {}
+    function fakeMediaStreamSource () {
+      original = window.AudioContext.prototype.createMediaStreamSource;
+      window.AudioContext.prototype.createMediaStreamSource = () => ({
+        connect () {}
       });
     }
 
-    function restoreMediaStreamSource() {
-      AudioContext.prototype.createMediaStreamSource = original;
+    function restoreMediaStreamSource () {
+      window.AudioContext.prototype.createMediaStreamSource = original;
     }
 
     test('by default, sets a sound component in the avatar', done => {
       fakeMediaStreamSource();
-      const stream = new MediaStream();
+      const stream = new window.MediaStream();
       const avatar = room.querySelector('a-entity');
       avatar.addEventListener('componentinitialized', function (evt) {
         if (evt.detail.name === 'sound') {
@@ -316,7 +310,7 @@ suite('avatars component', () => {
 
     test('if audio is set to false, does nothing', () => {
       room.setAttribute('avatars', { audio: false });
-      const stream = new MediaStream();
+      const stream = new window.MediaStream();
       const assets = document.querySelector('a-assets');
       assets.innerHTML = '';
       dispatch('participantstream', { id: myId, stream });
@@ -325,7 +319,5 @@ suite('avatars component', () => {
         assert.equal(assets.innerHTML, '');
       });
     });
-
   });
-
 });

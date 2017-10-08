@@ -5,7 +5,6 @@ import { EntityObserver } from './entity-observer';
 const bind = utils.bind;
 const log = utils.debug('sharedspace:avatars:log');
 const warn = utils.debug('sharedspace:avatars:warn');
-const error = utils.debug('sharedspace:avatars:error');
 
 export default registerComponent('avatars', {
 
@@ -20,7 +19,7 @@ export default registerComponent('avatars', {
     autoremove: { default: true }
   },
 
-  init() {
+  init () {
     this._tree = new SceneTree(this.el);
     this._ongoingUpdates = [];
     this._incomingUpdates = [];
@@ -39,14 +38,14 @@ export default registerComponent('avatars', {
     this.el.addEventListener('exitparticipant', this._onExit);
   },
 
-  remove() {
+  remove () {
     this.el.removeEventListener('enterparticipant', this._onEnter);
     this.el.removeEventListener('participantstream', this._onStream);
     this.el.removeEventListener('participantmessage', this._onMessage);
     this.el.removeEventListener('exitparticipant', this._onExit);
   },
 
-  tick(...args) {
+  tick (...args) {
     this._observer.check(...args);
     if (this._sharedspace.isConnected()) {
       this._sendUpdates();
@@ -54,13 +53,13 @@ export default registerComponent('avatars', {
     }
   },
 
-  _onEnter({ detail: { id, position }}) {
-    if(this.data.template && !this._getAvatar(id)) {
+  _onEnter ({ detail: { id, position } }) {
+    if (this.data.template && !this._getAvatar(id)) {
       this._addAvatar(id, position);
     }
   },
 
-  _onStream({ detail: { id, stream }}) {
+  _onStream ({ detail: { id, stream } }) {
     if (!this.data.audio) { return; }
 
     const avatar = this._getAvatar(id);
@@ -76,7 +75,7 @@ export default registerComponent('avatars', {
     });
   },
 
-  _onExit({ detail: { id }}) {
+  _onExit ({ detail: { id } }) {
     const isMe = id === this._sharedspace.data.me;
     const avatar = this._getAvatar(id);
     if (avatar) {
@@ -87,18 +86,17 @@ export default registerComponent('avatars', {
     }
   },
 
-  _onMessage({ detail: { id, message } }) {
+  _onMessage ({ detail: { id, message } }) {
     if (message.type === 'avatarsupdates') {
       this._collectToApply(message.updates);
-      return;
     }
   },
 
-  _getAvatar(id) {
+  _getAvatar (id) {
     return this.el.querySelector(`[data-sharedspace-id="${id}"]`);
   },
 
-  _addAvatar(id, position) {
+  _addAvatar (id, position) {
     const isMe = id === this._sharedspace.data.me;
     const avatar = this._newAvatar();
     this.el.emit('avatarelement', { avatar, isMe, action: 'enter' });
@@ -115,7 +113,7 @@ export default registerComponent('avatars', {
     return avatar;
   },
 
-  _newAvatar() {
+  _newAvatar () {
     const empty = document.createElement('A-ENTITY');
 
     const template = this.data.template;
@@ -133,7 +131,7 @@ export default registerComponent('avatars', {
     return instance;
   },
 
-  _setupAvatar(avatar, id, position) {
+  _setupAvatar (avatar, id, position) {
     const isMe = id === this._sharedspace.data.me;
     avatar.dataset.sharedspaceId = id;
     avatar.dataset.sharedspaceRoomPosition = position;
@@ -141,7 +139,7 @@ export default registerComponent('avatars', {
 
     const placement = this.data.placement;
     if (placement !== 'none') {
-      avatar.addEventListener('loaded', function onLoaded() {
+      avatar.addEventListener('loaded', function onLoaded () {
         avatar.removeEventListener('loaded', onLoaded);
         avatar.setAttribute(placement, { position });
       });
@@ -150,20 +148,19 @@ export default registerComponent('avatars', {
     return avatar;
   },
 
-  _setupLocalAvatar(avatar) {
+  _setupLocalAvatar (avatar) {
     if (this.data.onmyself === 'auto') {
       avatar.setAttribute('camera', '');
       avatar.setAttribute('look-controls', '');
       avatar.setAttribute('visible', 'false');
       avatar.setAttribute('share', 'rotation');
-    }
-    else if (this.data.onmyself !== 'none') {
+    } else if (this.data.onmyself !== 'none') {
       // HACK: Remove this when camera can be used inside a mixin.
       // If you want to remove the camera right now, use avatarsetup event
       // and remove it from detail.avatar element.
       avatar.setAttribute('camera', '');
-      const mixinList = avatar.hasAttribute('mixin') ?
-                        avatar.getAttribute('mixin').split(/\s+/) : [];
+      const mixinList = avatar.hasAttribute('mixin')
+                        ? avatar.getAttribute('mixin').split(/\s+/) : [];
 
       mixinList.push(this.data.onmyself);
       avatar.setAttribute('mixin', mixinList.join(' '));
@@ -180,14 +177,14 @@ export default registerComponent('avatars', {
     });
   },
 
-  _share(el, componentFilter) {
-    this._observer.observe(el, { components: true, componentFilter })
+  _share (el, componentFilter) {
+    this._observer.observe(el, { components: true, componentFilter });
   },
 
-  _addStream(id, stream) {
+  _addStream (id, stream) {
     return this._getAssets()
     .then(assets => {
-      const source = new Audio();
+      const source = new window.Audio();
       source.id = `avatar-stream-${id}`;
       source.srcObject = stream;
       assets.appendChild(source);
@@ -195,23 +192,23 @@ export default registerComponent('avatars', {
     });
   },
 
-  _getAssets() {
+  _getAssets () {
     let assets = this.el.sceneEl.querySelector('a-assets');
     if (!assets || !assets.hasLoaded) {
       assets = document.createElement('A-ASSETS');
       this.el.sceneEl.appendChild(assets);
-      return new Promise(fulfill => {
-        assets.addEventListener('loaded', () => fulfill(assets));
+      return new Promise(resolve => {
+        assets.addEventListener('loaded', () => resolve(assets));
       });
     }
     return Promise.resolve(assets);
   },
 
-  _collectToApply(updates) {
+  _collectToApply (updates) {
     this._incomingUpdates.push(...updates);
   },
 
-  _collectToSend(updates) {
+  _collectToSend (updates) {
     updates = updates.map(update => {
       const serializable = Object.assign({}, update);
       const { sharedspaceId } = update.target.dataset;
@@ -221,7 +218,7 @@ export default registerComponent('avatars', {
     this._ongoingUpdates.push(...updates);
   },
 
-  _sendUpdates() {
+  _sendUpdates () {
     if (this._ongoingUpdates.length > 0) {
       const content = avatarsUpdatesMessage(this._ongoingUpdates);
       this._sharedspace.send('*', content);
@@ -229,12 +226,12 @@ export default registerComponent('avatars', {
     }
   },
 
-  _applyUpdates() {
+  _applyUpdates () {
     this._tree.applyUpdates(this._incomingUpdates);
     this._incomingUpdates = [];
   }
 });
 
-function avatarsUpdatesMessage(updates) {
+function avatarsUpdatesMessage (updates) {
   return { type: 'avatarsupdates', updates };
 }
