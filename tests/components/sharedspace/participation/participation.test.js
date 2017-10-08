@@ -52,6 +52,11 @@ suite.only('Participation', () => {
         this.emit('connect', { id });
       }
 
+      fakeDisconnection(id) {
+        this._connections[id] = false;
+        this.emit('close', { id });
+      }
+
       emit(type, detail) {
         const event = new CustomEvent(type, { detail });
         fakeRTCInterface.dispatchEvent(event);
@@ -182,7 +187,9 @@ suite.only('Participation', () => {
 
       return new Promise(f => {
         fulfil = f;
+        fakeRTCInterface.fakeConnection('remoteId');
         fakeRTCInterface.emit('message', {
+          from: 'remoteId',
           type: 'list',
           timestamp: now + 1,
           list: ['remoteId', 'randomId']
@@ -201,7 +208,9 @@ suite.only('Participation', () => {
 
       return new Promise(f => {
         fulfil = f;
+        fakeRTCInterface.fakeConnection('remoteId');
         fakeRTCInterface.emit('message', {
+          from: 'remoteId',
           type: 'list',
           timestamp: now - 1,
           list: ['remoteId', 'randomId']
@@ -209,7 +218,28 @@ suite.only('Participation', () => {
       });
     }
 
-    suite.only('if role unknonw', () => {
+    function becomeDelayedGuest() {
+      let fulfil;
+
+      participation.addEventListener('upgrade', function onUpgrade({ detail }) {
+        participation.removeEventListener('upgrade', onUpgrade);
+        assert.equal(detail.role, 'guest');
+        fulfil();
+      });
+
+      return new Promise(f => {
+        fulfil = f;
+        fakeRTCInterface.fakeConnection('remoteId');
+        fakeRTCInterface.emit('message', {
+          from: 'remoteId',
+          type: 'list',
+          timestamp: now - 1,
+          list: ['remoteId', 'remoteId2', 'randomId']
+        });
+      });
+    }
+
+    suite('if role is unknown', () => {
 
       suite('on RTC connect', () => {
 
@@ -217,7 +247,7 @@ suite.only('Participation', () => {
           participation.addEventListener('enterparticipant', () => {
             assert.isTrue(false, 'Should not advertise changes.');
           });
-          fakeRTCInterface.emit('connect', { id: 'remoteId' });
+          fakeRTCInterface.fakeConnection('remoteId');
           assert.isTrue(fakeRTCInterface.broadcast.calledOnce);
           assert.isTrue(fakeRTCInterface.broadcast.calledWith({
             type: 'list',
@@ -231,27 +261,36 @@ suite.only('Participation', () => {
       suite('on RTC stream', () => {
 
         setup(() => {
-          fakeRTCInterface.emit('stream', { id: 'remoteId', stream });
+          fakeRTCInterface.emit('stream', { id: 'remoteId2', stream });
         });
 
         test('holds the event until confirming presence after becoming host', done => {
           participation.addEventListener('participantstream', ({ detail }) => {
-            assert.equal(detail.id, 'remoteId');
+            assert.equal(detail.id, 'remoteId2');
             assert.equal(detail.stream, stream);
             done();
           });
-          fakeRTCInterface.fakeConnection('remoteId');
+          fakeRTCInterface.fakeConnection('remoteId2');
           becomeHost();
         });
 
         test('holds the event until confirming presence after becoming guest', done => {
           participation.addEventListener('participantstream', ({ detail }) => {
-            assert.equal(detail.id, 'remoteId');
+            assert.equal(detail.id, 'remoteId2');
             assert.equal(detail.stream, stream);
             done();
           });
-          fakeRTCInterface.fakeConnection('remoteId');
+          fakeRTCInterface.fakeConnection('remoteId2');
           becomeGuest();
+
+          // Need to receive both connection and the updated list to finish
+          // confirming presence of remoteId2.
+          fakeRTCInterface.emit('message', {
+            from: 'remoteId',
+            type: 'list',
+            timestamp: now - 1,
+            list: ['remoteId', 'randomId', 'remoteId2']
+          });
         });
 
       });
@@ -315,6 +354,191 @@ suite.only('Participation', () => {
           }));
         });
 
+      });
+
+    });
+
+    suite('if role is guest', () => {
+
+      setup(() => {
+        return becomeGuest()
+        .then(() => {
+          fakeRTCInterface.broadcast.reset();
+        });
+      });
+
+      suite('on RTC connect', () => {
+
+        test('ignores connection', () => {
+          participation.addEventListener('enterparticipant', () => {
+            assert.isTrue(false, 'Should not advertise changes.');
+          });
+          fakeRTCInterface.fakeConnection('remoteId2');
+          assert.isTrue(fakeRTCInterface.broadcast.notCalled);
+        });
+
+      });
+
+      suite('on RTC stream', () => {
+
+        setup(() => {
+          fakeRTCInterface.emit('stream', { id: 'remoteId2', stream });
+        });
+
+        test('holds the event until confirming presence', done => {
+          participation.addEventListener('participantstream', ({ detail }) => {
+            assert.equal(detail.id, 'remoteId2');
+            assert.equal(detail.stream, stream);
+            done();
+          });
+
+          // Need to receive both connection and the updated list to finish
+          // confirming presence of remoteId2.
+          fakeRTCInterface.fakeConnection('remoteId2');
+          fakeRTCInterface.emit('message', {
+            from: 'remoteId',
+            type: 'list',
+            timestamp: now - 1,
+            list: ['remoteId', 'randomId', 'remoteId2']
+          });
+        });
+
+      });
+
+      suite('on RTC message', () => {
+
+        suite('list messages', () => {
+
+          test('ignores if the list comes from a peer other than host', () => {
+            participation.addEventListener('enterparticipant', () => {
+              assert.isTrue(false, 'Should not advertise changes');
+            });
+            fakeRTCInterface.emit('message', {
+              from: 'remoteId2',
+              type: 'list',
+              timestamp: now - 1,
+              list: ['remoteId', 'randomId', 'remoteId2']
+            });
+          });
+
+          test('advertises a participant is entering after receiving the list update and the participant connection', done => {
+            participation.addEventListener('enterparticipant', ({ detail }) => {
+              assert.equal(detail.id, 'remoteId2');
+              assert.equal(detail.position, '3');
+              assert.equal(detail.role, 'guest');
+              done();
+            });
+            fakeRTCInterface.emit('message', {
+              from: 'remoteId',
+              type: 'list',
+              timestamp: now - 1,
+              list: ['remoteId', 'randomId', 'remoteId2']
+            });
+            fakeRTCInterface.fakeConnection('remoteId2');
+          });
+
+          test('advertises a participant is entering after receiving the participant connection and the list update', done => {
+            participation.addEventListener('enterparticipant', ({ detail }) => {
+              assert.equal(detail.id, 'remoteId2');
+              assert.equal(detail.position, '3');
+              assert.equal(detail.role, 'guest');
+              done();
+            });
+            fakeRTCInterface.fakeConnection('remoteId2');
+            fakeRTCInterface.emit('message', {
+              from: 'remoteId',
+              type: 'list',
+              timestamp: now - 1,
+              list: ['remoteId', 'randomId', 'remoteId2']
+            });
+          });
+
+          test('advertises a participant is leaving after receiving the list update (not waiting for the actual disconnection)', done => {
+            participation.addEventListener('exitparticipant', ({ detail }) => {
+              assert.equal(detail.id, 'remoteId2');
+              assert.equal(detail.position, '3');
+              assert.equal(detail.role, 'guest');
+              done();
+            });
+            fakeRTCInterface.fakeConnection('remoteId2');
+            fakeRTCInterface.emit('message', {
+              from: 'remoteId',
+              type: 'list',
+              timestamp: now - 1,
+              list: ['remoteId', 'randomId', 'remoteId2']
+            });
+            fakeRTCInterface.emit('message', {
+              from: 'remoteId',
+              type: 'list',
+              timestamp: now - 1,
+              list: ['remoteId', 'randomId', null]
+            });
+          });
+
+        });
+
+        suite('content messages', () => {
+
+          setup(() => {
+            fakeRTCInterface.emit('message', {
+              from: 'remoteId',
+              type: 'content',
+              content: 'test'
+            });
+          });
+
+          test('holds the event until confirming presence', done => {
+            participation.addEventListener('participantmessage', ({ detail }) => {
+              assert.equal(detail.id, 'remoteId');
+              assert.equal(detail.message, 'test');
+              done();
+            });
+            fakeRTCInterface.fakeConnection('remoteId');
+          });
+
+        });
+
+      });
+
+      suite('on RTC close', () => {
+
+        setup(() => {
+          fakeRTCInterface.fakeConnection('remoteId2');
+          fakeRTCInterface.emit('message', {
+            from: 'remoteId',
+            type: 'list',
+            timestamp: now - 1,
+            list: ['remoteId', 'randomId', 'remoteId2']
+          });
+        });
+
+        test('if a guest peer is leaving, do nothing', () => {
+          participation.addEventListener('upgrade', () => {
+            assert.isTrue(false, 'There should be no upgrade');
+          });
+          fakeRTCInterface.fakeDisconnection('removeId2');
+        });
+
+        test('if the host peer is leaving and local is next host, take over', done => {
+          participation.addEventListener('upgrade', ({ detail }) => {
+            assert.equal(detail.role, 'host');
+            done();
+          });
+          fakeRTCInterface.fakeDisconnection('remoteId');
+        });
+
+        test('if the host peer is leaving and local is not the next host, do nothing', () => {
+          participation =
+            new Participation('testRoom', { stream, provider: 'test.com' });
+          return participation.connect()
+          .then(() => becomeDelayedGuest())
+          .then(() => {
+            participation.addEventListener('upgrade', () => {
+              assert.isTrue(false, 'There should be no upgrade');
+            });
+            fakeRTCInterface.fakeDisconnection('removeId2');
+          });
+        });
       });
 
     });
