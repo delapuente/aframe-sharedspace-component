@@ -256,6 +256,8 @@ class Participation extends EventTarget {
         });
       }
       else {
+        // TODO: Rethink if it should be asynchronous at least. It forces the
+        // test for entering participant and leaving participant asymmetric.
         this._emit('exitparticipant', { id, role, position });
       }
     });
