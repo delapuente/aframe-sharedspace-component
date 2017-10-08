@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "dist";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 38);
+/******/ 	return __webpack_require__(__webpack_require__.s = 81);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -2227,7 +2227,7 @@ var objectKeys = Object.keys || function (obj) {
 module.exports = Duplex;
 
 /*<replacement>*/
-var processNextTick = __webpack_require__(12);
+var processNextTick = __webpack_require__(13);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -2236,7 +2236,7 @@ util.inherits = __webpack_require__(1);
 /*</replacement>*/
 
 var Readable = __webpack_require__(22);
-var Writable = __webpack_require__(13);
+var Writable = __webpack_require__(14);
 
 util.inherits(Duplex, Readable);
 
@@ -2852,7 +2852,7 @@ function base64DetectIncompleteChar(buffer) {
 exports = module.exports = __webpack_require__(22);
 exports.Stream = exports;
 exports.Readable = exports;
-exports.Writable = __webpack_require__(13);
+exports.Writable = __webpack_require__(14);
 exports.Duplex = __webpack_require__(5);
 exports.Transform = __webpack_require__(23);
 exports.PassThrough = __webpack_require__(57);
@@ -2860,6 +2860,23 @@ exports.PassThrough = __webpack_require__(57);
 
 /***/ }),
 /* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+function panic(error) {
+  error = typeof error !== 'string' ? error : new Error(error);
+  throw error;
+}
+
+exports.panic = panic;
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2959,7 +2976,7 @@ module.exports.newNode = function newNode(listener, kind, options) {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var wrappy = __webpack_require__(77)
@@ -3007,7 +3024,7 @@ function onceStrict (fn) {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3058,7 +3075,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3071,7 +3088,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 module.exports = Writable;
 
 /*<replacement>*/
-var processNextTick = __webpack_require__(12);
+var processNextTick = __webpack_require__(13);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -3100,7 +3117,7 @@ var Stream = __webpack_require__(24);
 /*</replacement>*/
 
 /*<replacement>*/
-var Buffer = __webpack_require__(14).Buffer;
+var Buffer = __webpack_require__(15).Buffer;
 /*</replacement>*/
 
 util.inherits(Writable, Stream);
@@ -3608,14 +3625,14 @@ function CorkedRequest(state) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0), __webpack_require__(70).setImmediate))
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(4)
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -3748,7 +3765,7 @@ Stream.prototype.pipe = function(dest, options) {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = extend
@@ -3771,23 +3788,6 @@ function extend() {
     return target
 }
 
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-function panic(error) {
-  error = typeof error !== 'string' ? error : new Error(error);
-  throw error;
-}
-
-exports.panic = panic;
 
 /***/ }),
 /* 18 */
@@ -3999,7 +3999,7 @@ function localstorage() {
 
 /*globals window */
 
-var Commons = __webpack_require__(10)
+var Commons = __webpack_require__(11)
 var CustomEventTarget = __webpack_require__(44)
 var EventWrapper = __webpack_require__(45)
 var isObject = Commons.isObject
@@ -4243,7 +4243,7 @@ module.exports = Array.isArray || function (arr) {
 module.exports = Readable;
 
 /*<replacement>*/
-var processNextTick = __webpack_require__(12);
+var processNextTick = __webpack_require__(13);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -4269,7 +4269,7 @@ var Stream = __webpack_require__(24);
 /*</replacement>*/
 
 /*<replacement>*/
-var Buffer = __webpack_require__(14).Buffer;
+var Buffer = __webpack_require__(15).Buffer;
 /*</replacement>*/
 
 /*<replacement>*/
@@ -6072,564 +6072,18 @@ function hasOwnProperty(obj, prop) {
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+__webpack_require__(38);
 
-var _aframe = __webpack_require__(3);
+__webpack_require__(34);
 
-var _sceneTree = __webpack_require__(34);
+__webpack_require__(30);
 
-var _entityObserver = __webpack_require__(33);
+__webpack_require__(33);
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var bind = _aframe.utils.bind;
-var log = _aframe.utils.debug('sharedspace:avatars:log');
-var warn = _aframe.utils.debug('sharedspace:avatars:warn');
-var error = _aframe.utils.debug('sharedspace:avatars:error');
-
-exports.default = (0, _aframe.registerComponent)('avatars', {
-
-  dependendies: ['sharedspace'],
-
-  schema: {
-    template: { type: 'selector', default: 'template' },
-    placement: { type: 'string', default: 'position-around' },
-    onmyself: { type: 'string', default: 'auto' },
-    audio: { default: true },
-    autoremove: { default: true }
-  },
-
-  init: function init() {
-    this._tree = new _sceneTree.SceneTree(this.el);
-    this._ongoingUpdates = [];
-    this._incomingUpdates = [];
-    this._collectToSend = bind(this._collectToSend, this);
-    this._observer = new _entityObserver.EntityObserver(this._collectToSend);
-    this._sharedspace = this.el.components.sharedspace;
-
-    this.el.addEventListener('enterparticipant', bind(this._onEnter, this));
-    this.el.addEventListener('participantstream', bind(this._onStream, this));
-    this.el.addEventListener('participantmessage', bind(this._onMessage, this));
-    this.el.addEventListener('exitparticipant', bind(this._onExit, this));
-  },
-  tick: function tick() {
-    var _observer;
-
-    (_observer = this._observer).check.apply(_observer, arguments);
-    if (this._sharedspace.isConnected()) {
-      this._sendUpdates();
-      this._applyUpdates();
-    }
-  },
-  _onEnter: function _onEnter(_ref) {
-    var _ref$detail = _ref.detail,
-        id = _ref$detail.id,
-        position = _ref$detail.position;
-
-    if (this.data.template !== 'none' && !this._getAvatar(id)) {
-      this._addAvatar(id, position);
-    }
-  },
-  _onStream: function _onStream(_ref2) {
-    var _ref2$detail = _ref2.detail,
-        id = _ref2$detail.id,
-        stream = _ref2$detail.stream;
-
-    if (!this.data.audio) {
-      return;
-    }
-
-    var avatar = this._getAvatar(id);
-    if (!avatar) {
-      warn('Avatar ' + id + ' avatar is not in the DOM');
-      return;
-    }
-
-    this._addStream(id, stream).then(function (source) {
-      log('streaming: ' + id, stream);
-      avatar.setAttribute('sound', 'src: #' + source.id);
-    });
-  },
-  _onExit: function _onExit(_ref3) {
-    var id = _ref3.detail.id;
-
-    var isMe = id === this._sharedspace.data.me;
-    var avatar = this._getAvatar(id);
-    if (avatar) {
-      this.el.emit('avatarelement', { avatar: avatar, isMe: isMe, action: 'exit' });
-      if (this.data.autoremove) {
-        avatar.parentNode.removeChild(avatar);
-      }
-    }
-  },
-  _onMessage: function _onMessage(_ref4) {
-    var _ref4$detail = _ref4.detail,
-        id = _ref4$detail.id,
-        message = _ref4$detail.message;
-
-    if (message.type === 'avatarsupdates') {
-      this._collectToApply(message.updates);
-      return;
-    }
-  },
-  _getAvatar: function _getAvatar(id) {
-    return this.el.querySelector('[data-sharedspace-id="' + id + '"]');
-  },
-  _addAvatar: function _addAvatar(id, position) {
-    var isMe = id === this._sharedspace.data.me;
-    var avatar = this._newAvatar();
-    this.el.emit('avatarelement', { avatar: avatar, isMe: isMe, action: 'enter' });
-
-    this._setupAvatar(avatar, id, position);
-    if (isMe) {
-      this._setupLocalAvatar(avatar);
-    }
-    this.el.emit('avatarsetup', { avatar: avatar, isMe: isMe });
-
-    this.el.appendChild(avatar);
-    this.el.emit('avataradded', { avatar: avatar, isMe: isMe });
-
-    return avatar;
-  },
-  _newAvatar: function _newAvatar() {
-    var empty = document.createElement('A-ENTITY');
-
-    var template = this.data.template;
-    if (!template) {
-      warn('Template not found. Using an empty entity.');
-      return empty;
-    }
-
-    var instance = document.importNode(template.content, true).children[0];
-    if (!instance) {
-      warn('Template was empty. Using an empty entity.');
-      return empty;
-    }
-
-    return instance;
-  },
-  _setupAvatar: function _setupAvatar(avatar, id, position) {
-    var isMe = id === this._sharedspace.data.me;
-    avatar.dataset.sharedspaceId = id;
-    avatar.dataset.sharedspaceRoomPosition = position;
-    avatar.dataset.isMe = isMe;
-
-    var placement = this.data.placement;
-    if (placement !== 'none') {
-      avatar.addEventListener('loaded', function onLoaded() {
-        avatar.removeEventListener('loaded', onLoaded);
-        avatar.setAttribute(placement, { position: position });
-      });
-    }
-
-    return avatar;
-  },
-  _setupLocalAvatar: function _setupLocalAvatar(avatar) {
-    var _this = this;
-
-    // HACK: Move this inside the conditional when camera can be used in mixins.
-    // If you want to remove the camera right now, use avatarsetup event
-    // and remove from detail.avatar element.
-    avatar.setAttribute('camera', '');
-    if (this.data.onmyself === 'auto') {
-      avatar.setAttribute('look-controls', '');
-      avatar.setAttribute('visible', 'false');
-      avatar.setAttribute('share', 'rotation');
-    } else if (this.data.myself !== 'none') {
-      var mixinList = avatar.hasAttribute('mixin') ? avatar.getAttribute('mixin').split(/\s+/) : [];
-
-      mixinList.push(this.data.onmyself);
-      avatar.setAttribute('mixin', mixinList.join(' '));
-    }
-
-    avatar.addEventListener('componentinitialized', function (_ref5) {
-      var detail = _ref5.detail;
-      var name = detail.name;
-
-      if (name === 'share') {
-        var share = avatar.components.share;
-        var filter = share.data.split(',').map(function (str) {
-          return str.trim();
-        });
-        log('sharing:', filter);
-        _this._share(avatar, filter.length > 0 ? filter : null);
-      }
-    });
-  },
-  _share: function _share(el, componentFilter) {
-    this._observer.observe(el, { components: true, componentFilter: componentFilter });
-  },
-  _addStream: function _addStream(id, stream) {
-    return this._getAssets().then(function (assets) {
-      var source = new Audio();
-      source.id = 'avatar-stream-' + id;
-      source.srcObject = stream;
-      assets.appendChild(source);
-      return source;
-    });
-  },
-  _getAssets: function _getAssets() {
-    var assets = this.el.sceneEl.querySelector('a-assets');
-    if (!assets || !assets.hasLoaded) {
-      assets = document.createElement('A-ASSETS');
-      this.el.sceneEl.appendChild(assets);
-      return new Promise(function (fulfill) {
-        assets.addEventListener('loaded', function () {
-          return fulfill(assets);
-        });
-      });
-    }
-    return Promise.resolve(assets);
-  },
-  _collectToApply: function _collectToApply(updates) {
-    var _incomingUpdates;
-
-    (_incomingUpdates = this._incomingUpdates).push.apply(_incomingUpdates, _toConsumableArray(updates));
-  },
-  _collectToSend: function _collectToSend(updates) {
-    var _ongoingUpdates;
-
-    updates = updates.map(function (update) {
-      var serializable = Object.assign({}, update);
-      var sharedspaceId = update.target.dataset.sharedspaceId;
-
-      serializable.target = '[data-sharedspace-id="' + sharedspaceId + '"]';
-      return serializable;
-    });
-    (_ongoingUpdates = this._ongoingUpdates).push.apply(_ongoingUpdates, _toConsumableArray(updates));
-  },
-  _sendUpdates: function _sendUpdates() {
-    if (this._ongoingUpdates.length > 0) {
-      var content = avatarsUpdatesMessage(this._ongoingUpdates);
-      this._sharedspace.send('*', content);
-      this._ongoingUpdates = [];
-    }
-  },
-  _applyUpdates: function _applyUpdates() {
-    this._tree.applyUpdates(this._incomingUpdates);
-    this._incomingUpdates = [];
-  }
-});
-
-
-function avatarsUpdatesMessage(updates) {
-  return { type: 'avatarsupdates', updates: updates };
-}
+__webpack_require__(32);
 
 /***/ }),
 /* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _aframe = __webpack_require__(3);
-
-exports.default = (0, _aframe.registerComponent)('position-around', {
-  dependencies: ['position'],
-
-  schema: {
-    center: { type: 'vec3' },
-    radius: { default: 1.1 },
-    height: { default: 1.6 },
-    position: { default: 1 }
-  },
-
-  init: function init() {
-    this.update();
-  },
-  update: function update() {
-    this.el.setAttribute('position', this._getPosition(this.data.position));
-  },
-  _getPosition: function _getPosition(roomPosition) {
-    var _data = this.data,
-        height = _data.height,
-        radius = _data.radius;
-
-    var isEven = roomPosition % 2 === 0;
-    if (isEven) {
-      return this._inFrontOf(this._getPosition(roomPosition - 1));
-    }
-
-    var layer = Math.ceil(Math.log2(roomPosition));
-    var capacity = Math.pow(2, layer);
-    var previousCapacity = layer > 1 ? Math.pow(2, layer - 1) : 0;
-    var positionInLayer = roomPosition - previousCapacity;
-    var positionAroundTable = 2 * Math.PI / capacity * positionInLayer;
-    return {
-      x: Math.cos(positionAroundTable) * radius + this.data.center.x,
-      y: height + this.data.center.y,
-      z: Math.sin(positionAroundTable) * radius + this.data.center.z
-    };
-  },
-  _inFrontOf: function _inFrontOf(_ref) {
-    var x = _ref.x,
-        y = _ref.y,
-        z = _ref.z;
-
-    return { x: -x, y: y, z: -z };
-  }
-});
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _aframe = __webpack_require__(3);
-
-exports.default = (0, _aframe.registerComponent)('share', {
-  schema: { type: 'string', default: '' }
-});
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _aframe = __webpack_require__(3);
-
-var _participation = __webpack_require__(36);
-
-var _utils = __webpack_require__(17);
-
-var bind = _aframe.utils.bind;
-var log = _aframe.utils.debug('sharedspace:log');
-var warn = _aframe.utils.debug('sharedspace:warn');
-var error = _aframe.utils.debug('sharedspace:error');
-
-exports.default = (0, _aframe.registerComponent)('sharedspace', {
-  schema: {
-    hold: { default: false },
-    provider: { default: 'https://salvadelapuente.com:9000' },
-    room: { default: 'room-101' },
-    audio: { default: false },
-    me: { default: '' }
-  },
-
-  update: function update() {
-    if (!this._initializing && !this._connected && !this.data.hold) {
-      this._start();
-    }
-  },
-  init: function init() {
-    this._connected = false;
-    this._initializing = false;
-
-    // Delay connection until all the scene is complete so other dependant
-    // components can set their event handlers up. See `participants` component
-    // for an example.
-    if (this.el.sceneEl.hasLoaded) {
-      this._start();
-    } else {
-      this.el.sceneEl.addEventListener('loaded', bind(this._start, this));
-    }
-  },
-  send: function send(target, message) {
-    this._participation.send(target, message);
-  },
-  isConnected: function isConnected() {
-    return this._connected;
-  },
-  _start: function _start() {
-    if (this.data.hold || this._connected || this._initializing) {
-      return;
-    }
-
-    this._initializing = true;
-
-    var audio = this.data.audio;
-
-    if (!audio) {
-      this._initParticipation(null).then(bind(this._getIdentity, this));
-      return;
-    }
-
-    this._getUserMedia({ audio: audio }).then(bind(this._initParticipation, this)).catch(bind(informAndInit, this)).then(bind(this._getIdentity, this));
-
-    function informAndInit(reason) {
-      warn('getUserMedia() failed. There will be no stream.');
-      this.el.emit('getusermediafailed', reason, false);
-      return this._initParticipation(null);
-    }
-  },
-  _getUserMedia: function _getUserMedia(constraints) {
-    return navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-      log('My stream:', stream);
-      return stream;
-    });
-  },
-  _initParticipation: function _initParticipation(stream) {
-    var _this = this;
-
-    var _data = this.data,
-        room = _data.room,
-        id = _data.id,
-        provider = _data.provider;
-
-    this._participation = new _participation.Participation(room, { id: id, stream: stream, provider: provider });
-    this._configureParticipation();
-    return this._participation.connect().then(function (result) {
-      _this._connected = true;
-      _this._initializing = false;
-      return result;
-    });
-  },
-  _configureParticipation: function _configureParticipation() {
-    this._passEventsThrough(['enterparticipant', 'exitparticipant', 'participantstream', 'participantmessage']);
-  },
-  _passEventsThrough: function _passEventsThrough(events) {
-    var _this2 = this;
-
-    events.forEach(function (eventType) {
-      _this2._participation.addEventListener(eventType, function (event) {
-        log('on ' + eventType + ':', event.detail);
-        _this2.el.emit(eventType, event.detail);
-      });
-    });
-  },
-  _getIdentity: function _getIdentity() {
-    if (!this._participation) {
-      (0, _utils.panic)('Participation not initialized');
-    }
-    this.data.me = this._participation.me;
-    log('Me:', this.data.me);
-  }
-});
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _aframe = __webpack_require__(3);
-
-var AFRAME = _interopRequireWildcard(_aframe);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-var warn = AFRAME.utils.debug('components:sound:warn');
-
-AFRAME.components.sound.schema.src.parse = function assetParse(value) {
-  var el;
-  var parsedUrl;
-
-  // If an element was provided (e.g. canvas or video), just return it.
-  if (typeof value !== 'string') {
-    return value;
-  }
-
-  // Wrapped `url()` in case of data URI.
-  parsedUrl = value.match(/\url\((.+)\)/);
-  if (parsedUrl) {
-    return parsedUrl[1];
-  }
-
-  // ID.
-  if (value.charAt(0) === '#') {
-    el = document.getElementById(value.substring(1));
-    if (el) {
-      // Pass through media elements. If we have the elements, we don't have to call
-      // three.js loaders which would re-request the assets.
-      if (['CANVAS', 'VIDEO', 'IMG', 'AUDIO'].indexOf(el.tagName) >= 0) {
-        return el;
-      }
-      return el.getAttribute('src');
-    }
-    warn('"' + value + '" asset not found.');
-    return;
-  }
-
-  // Non-wrapped url().
-  return value;
-};
-
-var Sound = AFRAME.components.sound.Component;
-Sound.prototype.update = function (oldData) {
-  var data = this.data;
-  var srcChanged = data.src !== oldData.src;
-  // Create new sound if not yet created or changing `src`.
-  if (srcChanged) {
-    if (!data.src) {
-      warn('Audio source was not specified with `src`');
-      return;
-    }
-    this.setupSound();
-  }
-
-  this.pool.children.forEach(function (sound) {
-    if (data.positional) {
-      sound.setDistanceModel(data.distanceModel);
-      sound.setMaxDistance(data.maxDistance);
-      sound.setRefDistance(data.refDistance);
-      sound.setRolloffFactor(data.rolloffFactor);
-    }
-    sound.setLoop(data.loop);
-    sound.setVolume(data.volume);
-    sound.isPaused = false;
-  });
-
-  if (data.on !== oldData.on) {
-    this.updateEventListener(oldData.on);
-  }
-  // All sound values set. Load in `src`.
-  if (srcChanged) {
-    var self = this;
-
-    if (window.MediaStream) {
-      var isStream = data.src.srcObject instanceof window.MediaStream;
-
-      if (isStream) {
-        var stream = data.src.srcObject;
-        self.pool.children.forEach(function (sound) {
-          sound.setNodeSource(sound.context.createMediaStreamSource(stream));
-        });
-        self.loaded = true;
-        self.el.emit('sound-loaded');
-        return;
-      }
-    }
-
-    var src = data.src.src;
-    this.loaded = false;
-    this.audioLoader.load(src, function (buffer) {
-      self.pool.children.forEach(function (sound) {
-        sound.setBuffer(buffer);
-      });
-      self.loaded = true;
-
-      // Remove this key from cache, otherwise we can't play it again
-      AFRAME.THREE.Cache.remove(src);
-      if (self.data.autoplay || self.mustPlay) {
-        self.playSound();
-      }
-      self.el.emit('sound-loaded');
-    });
-  }
-};
-
-/***/ }),
-/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6668,7 +6122,7 @@ var EntityObserver = function () {
 
     _classCallCheck(this, EntityObserver);
 
-    this._observer = new MutationObserver(callback);
+    this._observer = new window.MutationObserver(callback);
     this._callback = callback;
     this._observables = new Map();
     this._checkCount = 0;
@@ -6802,7 +6256,271 @@ var EntityObserver = function () {
 exports.EntityObserver = EntityObserver;
 
 /***/ }),
-/* 34 */
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _aframe = __webpack_require__(3);
+
+var _sceneTree = __webpack_require__(31);
+
+var _entityObserver = __webpack_require__(29);
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var bind = _aframe.utils.bind;
+var log = _aframe.utils.debug('sharedspace:avatars:log');
+var warn = _aframe.utils.debug('sharedspace:avatars:warn');
+
+exports.default = (0, _aframe.registerComponent)('avatars', {
+
+  dependencies: ['sharedspace'],
+
+  schema: {
+    // Should it be a custom type to parse none as null?
+    template: { type: 'selector', default: 'template' },
+    placement: { type: 'string', default: 'position-around' },
+    onmyself: { type: 'string', default: 'auto' },
+    audio: { default: true },
+    autoremove: { default: true }
+  },
+
+  init: function init() {
+    this._tree = new _sceneTree.SceneTree(this.el);
+    this._ongoingUpdates = [];
+    this._incomingUpdates = [];
+    this._collectToSend = bind(this._collectToSend, this);
+    this._observer = new _entityObserver.EntityObserver(this._collectToSend);
+    this._sharedspace = this.el.components.sharedspace;
+
+    this._onEnter = bind(this._onEnter, this);
+    this._onStream = bind(this._onStream, this);
+    this._onMessage = bind(this._onMessage, this);
+    this._onExit = bind(this._onExit, this);
+
+    this.el.addEventListener('enterparticipant', this._onEnter);
+    this.el.addEventListener('participantstream', this._onStream);
+    this.el.addEventListener('participantmessage', this._onMessage);
+    this.el.addEventListener('exitparticipant', this._onExit);
+  },
+  remove: function remove() {
+    this.el.removeEventListener('enterparticipant', this._onEnter);
+    this.el.removeEventListener('participantstream', this._onStream);
+    this.el.removeEventListener('participantmessage', this._onMessage);
+    this.el.removeEventListener('exitparticipant', this._onExit);
+  },
+  tick: function tick() {
+    var _observer;
+
+    (_observer = this._observer).check.apply(_observer, arguments);
+    if (this._sharedspace.isConnected()) {
+      this._sendUpdates();
+      this._applyUpdates();
+    }
+  },
+  _onEnter: function _onEnter(_ref) {
+    var _ref$detail = _ref.detail,
+        id = _ref$detail.id,
+        position = _ref$detail.position;
+
+    if (this.data.template && !this._getAvatar(id)) {
+      this._addAvatar(id, position);
+    }
+  },
+  _onStream: function _onStream(_ref2) {
+    var _ref2$detail = _ref2.detail,
+        id = _ref2$detail.id,
+        stream = _ref2$detail.stream;
+
+    if (!this.data.audio) {
+      return;
+    }
+
+    var avatar = this._getAvatar(id);
+    if (!avatar) {
+      warn('Avatar ' + id + ' avatar is not in the DOM');
+      return;
+    }
+
+    this._addStream(id, stream).then(function (source) {
+      log('streaming: ' + id, stream);
+      avatar.setAttribute('sound', 'src: #' + source.id);
+    });
+  },
+  _onExit: function _onExit(_ref3) {
+    var id = _ref3.detail.id;
+
+    var isMe = id === this._sharedspace.data.me;
+    var avatar = this._getAvatar(id);
+    if (avatar) {
+      this.el.emit('avatarelement', { avatar: avatar, isMe: isMe, action: 'exit' });
+      if (this.data.autoremove) {
+        avatar.parentNode.removeChild(avatar);
+      }
+    }
+  },
+  _onMessage: function _onMessage(_ref4) {
+    var _ref4$detail = _ref4.detail,
+        id = _ref4$detail.id,
+        message = _ref4$detail.message;
+
+    if (message.type === 'avatarsupdates') {
+      this._collectToApply(message.updates);
+    }
+  },
+  _getAvatar: function _getAvatar(id) {
+    return this.el.querySelector('[data-sharedspace-id="' + id + '"]');
+  },
+  _addAvatar: function _addAvatar(id, position) {
+    var isMe = id === this._sharedspace.data.me;
+    var avatar = this._newAvatar();
+    this.el.emit('avatarelement', { avatar: avatar, isMe: isMe, action: 'enter' });
+
+    this._setupAvatar(avatar, id, position);
+    if (isMe) {
+      this._setupLocalAvatar(avatar);
+    }
+    this.el.emit('avatarsetup', { avatar: avatar, isMe: isMe });
+
+    this.el.appendChild(avatar);
+    this.el.emit('avataradded', { avatar: avatar, isMe: isMe });
+
+    return avatar;
+  },
+  _newAvatar: function _newAvatar() {
+    var empty = document.createElement('A-ENTITY');
+
+    var template = this.data.template;
+    if (!template) {
+      warn('Template not found. Using an empty entity.');
+      return empty;
+    }
+
+    var instance = document.importNode(template.content, true).children[0];
+    if (!instance) {
+      warn('Template was empty. Using an empty entity.');
+      return empty;
+    }
+
+    return instance;
+  },
+  _setupAvatar: function _setupAvatar(avatar, id, position) {
+    var isMe = id === this._sharedspace.data.me;
+    avatar.dataset.sharedspaceId = id;
+    avatar.dataset.sharedspaceRoomPosition = position;
+    avatar.dataset.isMe = isMe;
+
+    var placement = this.data.placement;
+    if (placement !== 'none') {
+      avatar.addEventListener('loaded', function onLoaded() {
+        avatar.removeEventListener('loaded', onLoaded);
+        avatar.setAttribute(placement, { position: position });
+      });
+    }
+
+    return avatar;
+  },
+  _setupLocalAvatar: function _setupLocalAvatar(avatar) {
+    var _this = this;
+
+    if (this.data.onmyself === 'auto') {
+      avatar.setAttribute('camera', '');
+      avatar.setAttribute('look-controls', '');
+      avatar.setAttribute('visible', 'false');
+      avatar.setAttribute('share', 'rotation');
+    } else if (this.data.onmyself !== 'none') {
+      // HACK: Remove this when camera can be used inside a mixin.
+      // If you want to remove the camera right now, use avatarsetup event
+      // and remove it from detail.avatar element.
+      avatar.setAttribute('camera', '');
+      var mixinList = avatar.hasAttribute('mixin') ? avatar.getAttribute('mixin').split(/\s+/) : [];
+
+      mixinList.push(this.data.onmyself);
+      avatar.setAttribute('mixin', mixinList.join(' '));
+    }
+
+    avatar.addEventListener('componentinitialized', function (_ref5) {
+      var detail = _ref5.detail;
+      var name = detail.name;
+
+      if (name === 'share') {
+        var share = avatar.components.share;
+        var filter = share.data.split(',').map(function (str) {
+          return str.trim();
+        });
+        log('sharing:', filter);
+        _this._share(avatar, filter.length > 0 ? filter : null);
+      }
+    });
+  },
+  _share: function _share(el, componentFilter) {
+    this._observer.observe(el, { components: true, componentFilter: componentFilter });
+  },
+  _addStream: function _addStream(id, stream) {
+    return this._getAssets().then(function (assets) {
+      var source = new window.Audio();
+      source.id = 'avatar-stream-' + id;
+      source.srcObject = stream;
+      assets.appendChild(source);
+      return source;
+    });
+  },
+  _getAssets: function _getAssets() {
+    var assets = this.el.sceneEl.querySelector('a-assets');
+    if (!assets || !assets.hasLoaded) {
+      assets = document.createElement('A-ASSETS');
+      this.el.sceneEl.appendChild(assets);
+      return new Promise(function (resolve) {
+        assets.addEventListener('loaded', function () {
+          return resolve(assets);
+        });
+      });
+    }
+    return Promise.resolve(assets);
+  },
+  _collectToApply: function _collectToApply(updates) {
+    var _incomingUpdates;
+
+    (_incomingUpdates = this._incomingUpdates).push.apply(_incomingUpdates, _toConsumableArray(updates));
+  },
+  _collectToSend: function _collectToSend(updates) {
+    var _ongoingUpdates;
+
+    updates = updates.map(function (update) {
+      var serializable = Object.assign({}, update);
+      var sharedspaceId = update.target.dataset.sharedspaceId;
+
+      serializable.target = '[data-sharedspace-id="' + sharedspaceId + '"]';
+      return serializable;
+    });
+    (_ongoingUpdates = this._ongoingUpdates).push.apply(_ongoingUpdates, _toConsumableArray(updates));
+  },
+  _sendUpdates: function _sendUpdates() {
+    if (this._ongoingUpdates.length > 0) {
+      var content = avatarsUpdatesMessage(this._ongoingUpdates);
+      this._sharedspace.send('*', content);
+      this._ongoingUpdates = [];
+    }
+  },
+  _applyUpdates: function _applyUpdates() {
+    this._tree.applyUpdates(this._incomingUpdates);
+    this._incomingUpdates = [];
+  }
+});
+
+
+function avatarsUpdatesMessage(updates) {
+  return { type: 'avatarsupdates', updates: updates };
+}
+
+/***/ }),
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6882,6 +6600,202 @@ function capitalize(str) {
 exports.SceneTree = SceneTree;
 
 /***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _aframe = __webpack_require__(3);
+
+exports.default = (0, _aframe.registerComponent)('position-around', {
+  dependencies: ['position'],
+
+  schema: {
+    center: { type: 'vec3' },
+    radius: { default: 1.1 },
+    height: { default: 1.6 },
+    position: { default: 1 }
+  },
+
+  init: function init() {
+    this.update();
+  },
+  update: function update() {
+    this.el.setAttribute('position', this._getPosition(this.data.position));
+  },
+  _getPosition: function _getPosition(roomPosition) {
+    var _data = this.data,
+        height = _data.height,
+        radius = _data.radius;
+
+    var isEven = roomPosition % 2 === 0;
+    if (isEven) {
+      return this._inFrontOf(this._getPosition(roomPosition - 1));
+    }
+
+    var layer = Math.ceil(Math.log2(roomPosition));
+    var capacity = Math.pow(2, layer);
+    var previousCapacity = layer > 1 ? Math.pow(2, layer - 1) : 0;
+    var positionInLayer = roomPosition - previousCapacity;
+    var positionAroundTable = 2 * Math.PI / capacity * positionInLayer;
+    return {
+      x: Math.cos(positionAroundTable) * radius + this.data.center.x,
+      y: height + this.data.center.y,
+      z: Math.sin(positionAroundTable) * radius + this.data.center.z
+    };
+  },
+  _inFrontOf: function _inFrontOf(_ref) {
+    var x = _ref.x,
+        y = _ref.y,
+        z = _ref.z;
+
+    return { x: -x, y: y, z: -z };
+  }
+});
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _aframe = __webpack_require__(3);
+
+exports.default = (0, _aframe.registerComponent)('share', {
+  schema: { type: 'string', default: '' }
+});
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _aframe = __webpack_require__(3);
+
+var _participation = __webpack_require__(36);
+
+var _utils = __webpack_require__(10);
+
+var bind = _aframe.utils.bind;
+var log = _aframe.utils.debug('sharedspace:log');
+var warn = _aframe.utils.debug('sharedspace:warn');
+
+exports.default = (0, _aframe.registerComponent)('sharedspace', {
+  schema: {
+    hold: { default: false },
+    provider: { default: 'https://salvadelapuente.com:9000' },
+    room: { default: 'room-101' },
+    audio: { default: false },
+    me: { default: '' }
+  },
+
+  update: function update() {
+    if (!this._initializing && !this._connected && !this.data.hold) {
+      this._start();
+    }
+  },
+  init: function init() {
+    this._connected = false;
+    this._initializing = false;
+
+    // Delay connection until all the scene is complete so other dependant
+    // components can set their event handlers up. See `participants` component
+    // for an example.
+    if (this.el.sceneEl.hasLoaded) {
+      this._start();
+    } else {
+      this.el.sceneEl.addEventListener('loaded', bind(this._start, this));
+    }
+  },
+  send: function send(target, message) {
+    this._participation.send(target, message);
+  },
+  isConnected: function isConnected() {
+    return this._connected;
+  },
+  _start: function _start() {
+    if (this.data.hold || this._connected || this._initializing) {
+      return;
+    }
+
+    this._initializing = true;
+
+    var audio = this.data.audio;
+
+    if (!audio) {
+      this._initParticipation(null).then(bind(this._getIdentity, this));
+      return;
+    }
+
+    this._getUserMedia({ audio: audio }).then(bind(this._initParticipation, this)).catch(bind(informAndInit, this)).then(bind(this._getIdentity, this));
+
+    function informAndInit(reason) {
+      warn('getUserMedia() failed. There will be no stream.');
+      this.el.emit('getusermediafailed', reason, false);
+      return this._initParticipation(null);
+    }
+  },
+  _getUserMedia: function _getUserMedia(constraints) {
+    return navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+      log('My stream:', stream);
+      return stream;
+    });
+  },
+  _initParticipation: function _initParticipation(stream) {
+    var _this = this;
+
+    var _data = this.data,
+        room = _data.room,
+        me = _data.me,
+        provider = _data.provider;
+
+    this._participation = new _participation.Participation(room, { id: me, stream: stream, provider: provider });
+    this._configureParticipation();
+    return this._participation.connect().then(function (result) {
+      _this._connected = true;
+      _this._initializing = false;
+      return result;
+    });
+  },
+  _configureParticipation: function _configureParticipation() {
+    this._passEventsThrough(['enterparticipant', 'exitparticipant', 'participantstream', 'participantmessage']);
+  },
+  _passEventsThrough: function _passEventsThrough(events) {
+    var _this2 = this;
+
+    events.forEach(function (eventType) {
+      _this2._participation.addEventListener(eventType, function (event) {
+        log('on ' + eventType + ':', event.detail);
+        _this2.el.emit(eventType, event.detail);
+      });
+    });
+  },
+  _getIdentity: function _getIdentity() {
+    if (!this._participation) {
+      (0, _utils.panic)('Participation not initialized');
+    }
+    this.data.me = this._participation.me;
+    log('Me:', this.data.me);
+  }
+});
+
+/***/ }),
 /* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -6947,7 +6861,6 @@ var GuestList = function () {
           return guest;
         }
       }
-      return;
     }
 
     /*
@@ -6996,7 +6909,6 @@ var GuestList = function () {
           return guest;
         }
       }
-      return;
     }
   }, {
     key: 'isPresent',
@@ -7016,7 +6928,7 @@ var GuestList = function () {
   }, {
     key: 'getRole',
     value: function getRole(id) {
-      return this.isHost(id) ? 'host' : 'guest';
+      return this.isPresent(id) ? this.isHost(id) ? 'host' : 'guest' : 'unknown';
     }
   }, {
     key: 'isHost',
@@ -7027,6 +6939,11 @@ var GuestList = function () {
     key: 'clear',
     value: function clear() {
       this._list = [];
+    }
+  }, {
+    key: 'length',
+    get: function get() {
+      return this._list.length;
     }
   }], [{
     key: 'serialize',
@@ -7081,6 +6998,8 @@ var _guestList = __webpack_require__(35);
 
 var _rtcInterface = __webpack_require__(37);
 
+var _utils = __webpack_require__(10);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -7092,12 +7011,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var bind = _aframe.utils.bind;
 var log = _aframe.utils.debug('sharedspace:participant:log');
 var warn = _aframe.utils.debug('sharedspace:participant:warn');
-
-function wait(time) {
-  return new Promise(function (fulfill) {
-    return setTimeout(fulfill, time);
-  });
-}
+var error = _aframe.utils.debug('sharedspace:participant:error');
 
 /**
  * The Participation class represents the participation model.
@@ -7170,10 +7084,7 @@ var Participation = function (_EventTarget) {
     value: function connect() {
       var _this2 = this;
 
-      return wait(Math.random() * 2000 // XXX: see explanation above.
-      ).then(function () {
-        return _this2._rtc.connect();
-      }).then(function () {
+      return this._rtc.connect().then(function () {
         _this2._streams = new Map();
         _this2._enterTime = Date.now();
         _this2._list = window.list = new _guestList.GuestList(_this2._enterTime, [_this2.me]);
@@ -7188,11 +7099,6 @@ var Participation = function (_EventTarget) {
      * RTCInterface Peer (Participant are Peer ids right now).
      */
 
-  }, {
-    key: 'getStreams',
-    value: function getStreams(id) {
-      return this._streams.get(id).slice(0);
-    }
   }, {
     key: 'send',
     value: function send(target, content) {
@@ -7307,7 +7213,7 @@ var Participation = function (_EventTarget) {
         } else {
           this._setRole('guest');
         }
-        this._list.clear(); //TODO: Perhaps split into _list and _candidateList
+        this._list.clear(); // TODO: Perhaps split into _list and _candidateList
 
         log('best list:', nextList);
         log('role:', this._role);
@@ -7318,11 +7224,15 @@ var Participation = function (_EventTarget) {
   }, {
     key: '_oncontent',
     value: function _oncontent(message) {
+      var _this4 = this;
+
       log('on content:', message);
       var id = message.from,
           content = message.content;
 
-      this._emit('participantmessage', { id: id, message: content });
+      this._waitForPresence(id).then(function () {
+        return _this4._emit('participantmessage', { id: id, message: content });
+      });
     }
   }, {
     key: '_setRole',
@@ -7338,11 +7248,11 @@ var Participation = function (_EventTarget) {
   }, {
     key: '_heartBeatList',
     value: function _heartBeatList() {
-      var _this4 = this;
+      var _this5 = this;
 
       setTimeout(function () {
-        _this4._broadcastList();
-        _this4._heartBeatList();
+        _this5._broadcastList();
+        _this5._heartBeatList();
       }, 3000);
     }
 
@@ -7362,7 +7272,7 @@ var Participation = function (_EventTarget) {
 
       if (costAB === costBA) {
         error('equal costs for different lists:', listA, listB);
-        panic('Costs for transforming into different lists must be different.');
+        (0, _utils.panic)('Costs for transforming into different lists must be different.');
       }
       return costAB < costBA ? listB : listA;
     }
@@ -7376,7 +7286,7 @@ var Participation = function (_EventTarget) {
     key: '_updateList',
     value: function _updateList(newList) {
       var changes = this._list.computeChanges(newList);
-      this._list = window.list = newList;
+      this._list = newList;
       if (!this._negotiating) {
         this._informChanges(changes);
       }
@@ -7393,7 +7303,7 @@ var Participation = function (_EventTarget) {
   }, {
     key: '_informChanges',
     value: function _informChanges(changes) {
-      var _this5 = this;
+      var _this6 = this;
 
       changes.forEach(function (_ref5) {
         var id = _ref5.id,
@@ -7402,26 +7312,28 @@ var Participation = function (_EventTarget) {
             action = _ref5.action;
 
         if (action === 'enter') {
-          _this5._waitForConnection(id).then(function () {
-            _this5._emit('enterparticipant', { id: id, role: role, position: position });
-            _this5._confirmPresence(id);
+          _this6._waitForConnection(id).then(function () {
+            _this6._emit('enterparticipant', { id: id, role: role, position: position });
+            _this6._confirmPresence(id);
           });
         } else {
-          _this5._emit('exitparticipant', { id: id, role: role, position: position });
+          // TODO: Rethink if it should be asynchronous at least. It forces the
+          // test for entering participant and leaving participant asymmetric.
+          _this6._emit('exitparticipant', { id: id, role: role, position: position });
         }
       });
     }
   }, {
     key: '_waitForConnection',
     value: function _waitForConnection(id) {
-      var _this6 = this;
+      var _this7 = this;
 
       if (id === this.me || this._rtc.isConnected(id)) {
         return Promise.resolve();
       }
       log('waiting for connection:', id);
-      return new Promise(function (fulfill) {
-        _this6._connectionWaitingList.push([id, fulfill]);
+      return new Promise(function (resolve) {
+        _this7._connectionWaitingList.push([id, resolve]);
       });
     }
   }, {
@@ -7444,14 +7356,14 @@ var Participation = function (_EventTarget) {
   }, {
     key: '_waitForPresence',
     value: function _waitForPresence(id) {
-      var _this7 = this;
+      var _this8 = this;
 
       if (id === this.me || !this._negotiating && this._list.isPresent(id)) {
         return Promise.resolve();
       }
       log('waiting for presence:', id);
-      return new Promise(function (fulfill) {
-        _this7._presenceWaitingList.push([id, fulfill]);
+      return new Promise(function (resolve) {
+        _this8._presenceWaitingList.push([id, resolve]);
       });
     }
   }, {
@@ -7491,13 +7403,13 @@ var Participation = function (_EventTarget) {
   }, {
     key: '_emit',
     value: function _emit(type, detail) {
-      var event = new CustomEvent(type, { detail: detail });
+      var event = new window.CustomEvent(type, { detail: detail });
       this.dispatchEvent(event);
     }
   }, {
     key: 'me',
     get: function get() {
-      return this._rtc.me;
+      return this._rtc && this._rtc.me;
     }
   }, {
     key: '_negotiating',
@@ -7551,7 +7463,7 @@ var _eventTargetShim = __webpack_require__(19);
 
 var _eventTargetShim2 = _interopRequireDefault(_eventTargetShim);
 
-var _utils = __webpack_require__(17);
+var _utils = __webpack_require__(10);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7621,7 +7533,10 @@ var RTCInterface = function (_EventTarget) {
       msg.from = this.me;
       var data = JSON.stringify(msg);
       log('sending data:', data);
-      this._peers.get(destination).send(data);
+      var peer = this._peers.get(destination);
+      if (peer) {
+        peer.send(data);
+      }
     }
   }, {
     key: 'isConnected',
@@ -7647,15 +7562,27 @@ var RTCInterface = function (_EventTarget) {
     value: function _onStream(id, stream) {
       this._emit('stream', { id: id, stream: stream });
     }
+
+    // TODO: Rethink this: the emitted event does not follow the same shape of
+    // other events.
+
   }, {
     key: '_onData',
     value: function _onData(data) {
-      var message = JSON.parse(data);
-      if ((typeof message === 'undefined' ? 'undefined' : _typeof(message)) !== 'object' || !message.type) {
-        error('Malformed message:', message);
-        (0, _utils.panic)('Malformed message');
+      try {
+        var message = JSON.parse(data);
+        if ((typeof message === 'undefined' ? 'undefined' : _typeof(message)) !== 'object' || !message.type) {
+          error('Malformed message:', message);
+          return (0, _utils.panic)('Malformed message');
+        }
+        this._emit('message', message);
+      } catch (e) {
+        if (e instanceof SyntaxError) {
+          error('Non JSON format:', data, e);
+          return (0, _utils.panic)('Non JSON format');
+        }
+        throw e;
       }
-      this._emit('message', message);
     }
   }, {
     key: '_onClose',
@@ -7666,13 +7593,13 @@ var RTCInterface = function (_EventTarget) {
   }, {
     key: '_emit',
     value: function _emit(type, detail) {
-      var event = new CustomEvent(type, { detail: detail });
+      var event = new window.CustomEvent(type, { detail: detail });
       this.dispatchEvent(event);
     }
   }, {
     key: 'me',
     get: function get() {
-      return this._swarm.me;
+      return this._swarm && this._swarm.me;
     }
   }]);
 
@@ -7688,15 +7615,111 @@ exports.RTCInterface = RTCInterface;
 "use strict";
 
 
-__webpack_require__(32);
+var _aframe = __webpack_require__(3);
 
-__webpack_require__(31);
+var AFRAME = _interopRequireWildcard(_aframe);
 
-__webpack_require__(28);
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-__webpack_require__(30);
+var warn = AFRAME.utils.debug('components:sound:warn');
 
-__webpack_require__(29);
+AFRAME.components.sound.schema.src.parse = function assetParse(value) {
+  var el;
+  var parsedUrl;
+
+  // If an element was provided (e.g. canvas or video), just return it.
+  if (typeof value !== 'string') {
+    return value;
+  }
+
+  // Wrapped `url()` in case of data URI.
+  parsedUrl = value.match(/\url\((.+)\)/);
+  if (parsedUrl) {
+    return parsedUrl[1];
+  }
+
+  // ID.
+  if (value.charAt(0) === '#') {
+    el = document.getElementById(value.substring(1));
+    if (el) {
+      // Pass through media elements. If we have the elements, we don't have to call
+      // three.js loaders which would re-request the assets.
+      if (['CANVAS', 'VIDEO', 'IMG', 'AUDIO'].indexOf(el.tagName) >= 0) {
+        return el;
+      }
+      return el.getAttribute('src');
+    }
+    warn('"' + value + '" asset not found.');
+    return;
+  }
+
+  // Non-wrapped url().
+  return value;
+};
+
+var Sound = AFRAME.components.sound.Component;
+Sound.prototype.update = function (oldData) {
+  var data = this.data;
+  var srcChanged = data.src !== oldData.src;
+  // Create new sound if not yet created or changing `src`.
+  if (srcChanged) {
+    if (!data.src) {
+      warn('Audio source was not specified with `src`');
+      return;
+    }
+    this.setupSound();
+  }
+
+  this.pool.children.forEach(function (sound) {
+    if (data.positional) {
+      sound.setDistanceModel(data.distanceModel);
+      sound.setMaxDistance(data.maxDistance);
+      sound.setRefDistance(data.refDistance);
+      sound.setRolloffFactor(data.rolloffFactor);
+    }
+    sound.setLoop(data.loop);
+    sound.setVolume(data.volume);
+    sound.isPaused = false;
+  });
+
+  if (data.on !== oldData.on) {
+    this.updateEventListener(oldData.on);
+  }
+  // All sound values set. Load in `src`.
+  if (srcChanged) {
+    var self = this;
+
+    if (window.MediaStream) {
+      var isStream = data.src.srcObject instanceof window.MediaStream;
+
+      if (isStream) {
+        var stream = data.src.srcObject;
+        self.pool.children.forEach(function (sound) {
+          sound.setNodeSource(sound.context.createMediaStreamSource(stream));
+        });
+        self.loaded = true;
+        self.el.emit('sound-loaded');
+        return;
+      }
+    }
+
+    var src = data.src.src;
+    this.loaded = false;
+    this.audioLoader.load(src, function (buffer) {
+      self.pool.children.forEach(function (sound) {
+        sound.setBuffer(buffer);
+      });
+      self.loaded = true;
+
+      // Remove this key from cache, otherwise we can't play it again
+      AFRAME.THREE.Cache.remove(src);
+      if (self.data.autoplay || self.mustPlay) {
+        self.playSound();
+      }
+      self.el.emit('sound-loaded');
+    });
+  }
+};
 
 /***/ }),
 /* 39 */
@@ -8147,7 +8170,7 @@ function coerce(val) {
 /* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var once = __webpack_require__(11);
+var once = __webpack_require__(12);
 
 var noop = function() {};
 
@@ -8236,7 +8259,7 @@ module.exports = eos;
 /* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var stream = __webpack_require__(15)
+var stream = __webpack_require__(16)
 
 module.exports = function(url, opts) {
   if (!opts) opts = {}
@@ -8295,7 +8318,7 @@ module.exports = function(url, opts) {
 // Requirements
 //-----------------------------------------------------------------------------
 
-var Commons = __webpack_require__(10)
+var Commons = __webpack_require__(11)
 var LISTENERS = Commons.LISTENERS
 var ATTRIBUTE = Commons.ATTRIBUTE
 var newNode = Commons.newNode
@@ -8428,7 +8451,7 @@ module.exports.defineCustomEventTarget = function(EventTargetBase, types) {
 // Requirements
 //-----------------------------------------------------------------------------
 
-var createUniqueKey = __webpack_require__(10).createUniqueKey
+var createUniqueKey = __webpack_require__(11).createUniqueKey
 
 //-----------------------------------------------------------------------------
 // Constsnts
@@ -8986,7 +9009,7 @@ module.exports = function (headers) {
 /* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var once = __webpack_require__(11)
+var once = __webpack_require__(12)
 var eos = __webpack_require__(42)
 var fs = __webpack_require__(79) // we only need fs to get the ReadStream and WriteStream prototypes
 
@@ -9228,7 +9251,7 @@ PassThrough.prototype._transform = function (chunk, encoding, cb) {
 
 /*<replacement>*/
 
-var Buffer = __webpack_require__(14).Buffer;
+var Buffer = __webpack_require__(15).Buffer;
 /*</replacement>*/
 
 module.exports = BufferList;
@@ -9300,7 +9323,7 @@ module.exports = __webpack_require__(9).PassThrough
 /* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(13);
+module.exports = __webpack_require__(14);
 
 
 /***/ }),
@@ -10433,7 +10456,7 @@ if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {
 };
 /*</replacement>*/
 
-var Stream = __webpack_require__(15);
+var Stream = __webpack_require__(16);
 
 /*<replacement>*/
 var util = __webpack_require__(2);
@@ -11635,7 +11658,7 @@ var util = __webpack_require__(2);
 util.inherits = __webpack_require__(1);
 /*</replacement>*/
 
-var Stream = __webpack_require__(15);
+var Stream = __webpack_require__(16);
 
 util.inherits(Writable, Stream);
 
@@ -11998,7 +12021,7 @@ module.exports = __webpack_require__(66)
 
 /* WEBPACK VAR INJECTION */(function(process) {var Transform = __webpack_require__(68)
   , inherits  = __webpack_require__(27).inherits
-  , xtend     = __webpack_require__(16)
+  , xtend     = __webpack_require__(17)
 
 function DestroyableTransform(opts) {
   Transform.call(this, opts)
@@ -12297,7 +12320,7 @@ var inherits = __webpack_require__(1)
 var events = __webpack_require__(6)
 var through = __webpack_require__(76)
 var cuid = __webpack_require__(40)
-var once = __webpack_require__(11)
+var once = __webpack_require__(12)
 var debug = __webpack_require__(18)('webrtc-swarm')
 
 module.exports = WebRTCSwarm
@@ -12499,7 +12522,7 @@ function connect (swarm, hub) {
 
 /* WEBPACK VAR INJECTION */(function(process) {var Transform = __webpack_require__(25)
   , inherits  = __webpack_require__(27).inherits
-  , xtend     = __webpack_require__(16)
+  , xtend     = __webpack_require__(17)
 
 function DestroyableTransform(opts) {
   Transform.call(this, opts)
@@ -12644,7 +12667,7 @@ function wrappy (fn, cb) {
 var window = __webpack_require__(48)
 var isFunction = __webpack_require__(20)
 var parseHeaders = __webpack_require__(52)
-var xtend = __webpack_require__(16)
+var xtend = __webpack_require__(17)
 
 module.exports = createXHR
 createXHR.XMLHttpRequest = window.XMLHttpRequest || noop
@@ -12894,6 +12917,13 @@ function noop() {}
 /***/ (function(module, exports) {
 
 /* (ignored) */
+
+/***/ }),
+/* 81 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(28);
+
 
 /***/ })
 /******/ ]);
