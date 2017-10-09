@@ -147,6 +147,21 @@ suite('sharedspace component', () => {
     });
   });
 
+  suite('if audio is true, but fails', () => {
+    const error = {};
+
+    test('reports the error', done => {
+      navigator.mediaDevices.getUserMedia.restore();
+      sinon.stub(navigator.mediaDevices, 'getUserMedia').rejects(error);
+      room.addEventListener('getusermediafailed', ({ detail }) => {
+        assert.isTrue(navigator.mediaDevices.getUserMedia.calledOnce);
+        assert.equal(detail, error);
+        done();
+      });
+      room.setAttribute('sharedspace', 'audio: true');
+    });
+  });
+
   suite('on participation events', () => {
     const evtDetail = {};
 
