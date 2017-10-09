@@ -3,7 +3,7 @@ const GuestList = require(
   '../../../../src/components/sharedspace/participation/guest-list'
 ).GuestList;
 
-suite('Participation', () => {
+suite.only('Participation', () => {
   /* eslint-disable import/no-webpack-loader-syntax */
   const inject = require(
     'inject-loader!../../../../src/components/sharedspace/participation'
@@ -20,7 +20,7 @@ suite('Participation', () => {
   const now = 2;
   const stream = new window.MediaStream();
 
-  const guestsInside = new Set();
+  const enterGuests = new Set();
 
   setup(() => {
     Date.now = () => now;
@@ -84,9 +84,9 @@ suite('Participation', () => {
     participation =
       new Participation('testRoom', { stream, provider: 'test.com' });
 
-    guestsInside.clear();
+    enterGuests.clear();
     participation.addEventListener('enterparticipant', ({ detail }) => {
-      guestsInside.add(detail.id);
+      enterGuests.add(detail.id);
     });
   });
 
@@ -370,7 +370,7 @@ suite('Participation', () => {
 
         test('enforces participantstream after enterparticipant', done => {
           participation.addEventListener('participantstream', ({ detail }) => {
-            assert.isTrue(guestsInside.has('remoteId2'));
+            assert.isTrue(enterGuests.has('remoteId2'));
             done();
           });
 
@@ -432,6 +432,26 @@ suite('Participation', () => {
             });
           });
 
+          test('ignores the event if no previous enterparticipant', () => {
+            participation.addEventListener('exitparticipant', ({ detail }) => {
+              assert.isTrue(false, 'Should not emit exitparticipant');
+            });
+            fakeRTCInterface.fakeConnection('remoteId2');
+            fakeRTCInterface.emit('message', {
+              from: 'remoteId',
+              type: 'list',
+              timestamp: now - 1,
+              list: ['remoteId', 'randomId', 'remoteId2']
+            });
+            assert.isFalse(enterGuests.has('remoteId2'));
+            fakeRTCInterface.emit('message', {
+              from: 'remoteId',
+              type: 'list',
+              timestamp: now - 1,
+              list: ['remoteId', 'randomId', null]
+            });
+          });
+
           test('advertises a participant is leaving after receiving the list update (not waiting for the actual disconnection)', done => {
             participation.addEventListener('exitparticipant', ({ detail }) => {
               assert.equal(detail.id, 'remoteId2');
@@ -446,11 +466,14 @@ suite('Participation', () => {
               timestamp: now - 1,
               list: ['remoteId', 'randomId', 'remoteId2']
             });
-            fakeRTCInterface.emit('message', {
-              from: 'remoteId',
-              type: 'list',
-              timestamp: now - 1,
-              list: ['remoteId', 'randomId', null]
+            setTimeout(() => {
+              assert.isTrue(enterGuests.has('remoteId2'));
+              fakeRTCInterface.emit('message', {
+                from: 'remoteId',
+                type: 'list',
+                timestamp: now - 1,
+                list: ['remoteId', 'randomId', null]
+              });
             });
           });
         });
@@ -466,7 +489,7 @@ suite('Participation', () => {
 
           test('enforces participantmessage after enterparticipant', done => {
             participation.addEventListener('participantmessage', ({ detail }) => {
-              assert.isTrue(guestsInside.has('remoteId'));
+              assert.isTrue(enterGuests.has('remoteId'));
               done();
             });
             fakeRTCInterface.fakeConnection('remoteId');
@@ -515,7 +538,7 @@ suite('Participation', () => {
       });
     });
 
-    suite('if role is host', () => {
+    suite('if role is host, guest list heartbeat', () => {
       let clock;
 
       setup(() => {
@@ -530,19 +553,26 @@ suite('Participation', () => {
         clock.restore();
       });
 
-      suite('guest list heartbeat', () => {
-        test('send the guest list every 3 seconds', () => {
-          clock.tick(10000);
-          console.log(fakeRTCInterface.broadcast.callCount);
-          assert.isTrue(fakeRTCInterface.broadcast.calledThrice);
-          for (let i = 0; i < 3; i++) {
-            const call = fakeRTCInterface.broadcast.getCall(i);
-            assert.deepEqual(call.args[0], {
-              type: 'list',
-              timestamp: now,
-              list: ['randomId', 'remoteId']
-            });
-          }
+      test('send the guest list every 3 seconds', () => {
+        clock.tick(10000);
+        console.log(fakeRTCInterface.broadcast.callCount);
+        assert.isTrue(fakeRTCInterface.broadcast.calledThrice);
+        for (let i = 0; i < 3; i++) {
+          const call = fakeRTCInterface.broadcast.getCall(i);
+          assert.deepEqual(call.args[0], {
+            type: 'list',
+            timestamp: now,
+            list: ['randomId', 'remoteId']
+          });
+        }
+      });
+    });
+
+    suite('if role is host', () => {
+      setup(() => {
+        return becomeHost()
+        .then(() => {
+          fakeRTCInterface.broadcast.reset();
         });
       });
 
@@ -570,7 +600,7 @@ suite('Participation', () => {
 
         test('enforces participantstream after enterparticipant', done => {
           participation.addEventListener('participantstream', ({ detail }) => {
-            assert.isTrue(guestsInside.has('remoteId2'));
+            assert.isTrue(enterGuests.has('remoteId2'));
             done();
           });
 
@@ -604,7 +634,7 @@ suite('Participation', () => {
 
           test('enforces participantmessage after enterparticipant', done => {
             participation.addEventListener('participantmessage', ({ detail }) => {
-              assert.isTrue(guestsInside.has('remoteId'));
+              assert.isTrue(enterGuests.has('remoteId'));
               done();
             });
             fakeRTCInterface.fakeConnection('remoteId');
@@ -615,29 +645,38 @@ suite('Participation', () => {
       suite('on RTC close', () => {
         setup(() => {
           fakeRTCInterface.fakeConnection('remoteId2');
-          fakeRTCInterface.emit('message', {
-            from: 'remoteId',
-            type: 'list',
-            timestamp: now + 1,
-            list: ['randomId', 'remoteId', 'remoteId2']
-          });
         });
 
-        test('advertises a participant is exiting and broadcast the list', () => {
-          let exitparticipantDone = false;
+        test('ignores the event if no previous enterparticipant', () => {
           participation.addEventListener('exitparticipant', ({ detail }) => {
-            assert.equal(detail.id, 'remoteId2');
-            assert.equal(detail.position, '3');
-            assert.equal(detail.role, 'guest');
-            exitparticipantDone = true;
+            assert.isTrue(false, 'Should not emit exitparticipant');
           });
+          assert.isFalse(enterGuests.has('remoteId2'));
           fakeRTCInterface.fakeDisconnection('remoteId2');
-          assert.isTrue(exitparticipantDone);
-          assert.isTrue(fakeRTCInterface.broadcast.calledWith({
-            type: 'list',
-            timestamp: now,
-            list: ['randomId', 'remoteId', null]
-          }));
+        });
+
+        suite('after enterparticipant', () => {
+          setup(done => {
+            setTimeout(done);
+          });
+
+          test('advertises a participant is exiting and broadcast the list', () => {
+            let exitparticipantDone = false;
+            participation.addEventListener('exitparticipant', ({ detail }) => {
+              assert.isTrue(enterGuests.has('remoteId2'));
+              assert.equal(detail.id, 'remoteId2');
+              assert.equal(detail.position, '3');
+              assert.equal(detail.role, 'guest');
+              exitparticipantDone = true;
+            });
+            fakeRTCInterface.fakeDisconnection('remoteId2');
+            assert.isTrue(exitparticipantDone);
+            assert.isTrue(fakeRTCInterface.broadcast.calledWith({
+              type: 'list',
+              timestamp: now,
+              list: ['randomId', 'remoteId', null]
+            }));
+          });
         });
       });
     });

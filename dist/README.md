@@ -87,7 +87,7 @@ room.components.sharedspace.send('*', { myName: 'Salva' });
 | `participantstream`  | A remote participant shares audio.                |
 | `participantmessage` | A remote participant sends a message.             |
 
-Events `participantstream` and `participantmessage` for a participant are guaranteed to be received after the `enterparticipant` event of the same participant. Otherwise is a [bug](https://github.com/delapuente/aframe-sharedspace-component/issues).
+Events `exitparticipant`, `participantstream` and `participantmessage` for a participant are guaranteed to be received after the `enterparticipant` event of the same participant. Otherwise is a [bug](https://github.com/delapuente/aframe-sharedspace-component/issues).
 
 All the events are emitted in the component's element:
 
