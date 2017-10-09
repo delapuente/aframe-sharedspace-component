@@ -3,7 +3,7 @@ const GuestList = require(
   '../../../../src/components/sharedspace/participation/guest-list'
 ).GuestList;
 
-suite.only('Participation', () => {
+suite('Participation', () => {
   /* eslint-disable import/no-webpack-loader-syntax */
   const inject = require(
     'inject-loader!../../../../src/components/sharedspace/participation'
