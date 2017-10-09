@@ -20,7 +20,7 @@ $ npm install --save aframe-sharedspace-component
 Or add the script tag to the component after including A-Frame:
 
 ```html
-<script src="https://unpkg.com/aframe-sharedspace-component@1.0.0/dist/aframe-sharedspace-component.min.js"></script>
+<script src="https://unpkg.com/aframe-sharedspace-component@1.0.1/dist/aframe-sharedspace-component.min.js"></script>
 ```
 
 ## Minimal setup

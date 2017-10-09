@@ -403,7 +403,7 @@ function objectToString(o) {
 /* 3 */
 /***/ (function(module, exports) {
 
-module.exports = undefined;
+module.exports = AFRAME;
 
 /***/ }),
 /* 4 */

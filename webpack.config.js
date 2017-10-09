@@ -13,11 +13,7 @@ module.exports = {
     publicPath: 'dist'
   },
   externals: {
-    aframe: {
-      commonjs: 'aframe',
-      amd: 'aframe',
-      root: 'AFRAME'
-    }
+    aframe: 'AFRAME'
   },
   module: {
     rules: [
