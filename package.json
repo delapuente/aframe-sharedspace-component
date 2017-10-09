@@ -1,6 +1,6 @@
 {
   "name": "aframe-sharedspace-component",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "A-Frame VR component to create multi-user experiences with WebRTC",
   "main": "dist/aframe-sharedspace-component.js",
   "scripts": {
