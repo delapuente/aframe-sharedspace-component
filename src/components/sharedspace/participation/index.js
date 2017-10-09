@@ -255,8 +255,11 @@ class Participation extends EventTarget {
         });
       } else {
         // TODO: Rethink if it should be asynchronous at least. It forces the
-        // test for entering participant and leaving participant asymmetric.
-        this._emit('exitparticipant', { id, role, position });
+        // test for entering participant and leaving participant to be
+        // asymmetric.
+        if (!this._clearWaitings(id)) {
+          this._emit('exitparticipant', { id, role, position });
+        }
       }
     });
   }
@@ -303,6 +306,27 @@ class Participation extends EventTarget {
         fulfill();
       }
     }
+  }
+
+  _clearWaitings (targetId) {
+    let wasWaiting = false;
+    for (let i = 0, l = this._presenceWaitingList.length; i < l; i++) {
+      const [id, fulfill] = this._presenceWaitingList.shift();
+      if (id !== targetId) {
+        this._presenceWaitingList.push([id, fulfill]);
+      } else {
+        wasWaiting = true;
+      }
+    }
+    for (let i = 0, l = this._connectionWaitingList.length; i < l; i++) {
+      const [id, fulfill] = this._connectionWaitingList.shift();
+      if (id !== targetId) {
+        this._connectionWaitingList.push([id, fulfill]);
+      } else {
+        wasWaiting = true;
+      }
+    }
+    return wasWaiting;
   }
 
   _broadcastList () {
