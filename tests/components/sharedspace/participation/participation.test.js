@@ -60,41 +60,46 @@ suite.only('Participation', () => {
         return this._connected && (this._id || 'randomId');
       }
 
+      fakeStream (from) {
+        return this._emit('stream', { id: from, stream });
+      }
+
       fakeConnection (id) {
-        return freeEventLoop()
-        .then(() => {
+        if (!this._connections[id]) {
           this._connections[id] = true;
-          this.emit('connect', { id });
-        });
+          return this._emit('connect', { id });
+        }
+        return freeEventLoop();
       }
 
       fakeDisconnection (id) {
-        return freeEventLoop()
-        .then(() => {
+        if (this._connections[id]) {
           this._connections[id] = false;
-          this.emit('close', { id });
-        });
+          return this._emit('close', { id });
+        }
+        return freeEventLoop();
       }
 
       fakeList (from, timestamp, list) {
         return this.fakeConnection(from)
-        .then(() => freeEventLoop())
         .then(() => {
-          this.emit('message', { type: 'list', from, timestamp, list });
+          this._emit('message', { type: 'list', from, timestamp, list });
         });
       }
 
       fakeContent (from, content) {
         return this.fakeConnection(from)
-        .then(() => freeEventLoop())
         .then(() => {
-          this.emit('message', { type: 'content', from, content });
+          this._emit('message', { type: 'content', from, content });
         });
       }
 
-      emit (type, detail) {
-        const event = new window.CustomEvent(type, { detail });
-        fakeRTCInterface.dispatchEvent(event);
+      _emit (type, detail) {
+        return freeEventLoop()
+        .then(() => {
+          const event = new window.CustomEvent(type, { detail });
+          fakeRTCInterface.dispatchEvent(event);
+        });
       }
 
       broadcast () {}
@@ -253,11 +258,15 @@ suite.only('Participation', () => {
     suite('if role is unknown', () => {
       suite('on RTC connect', () => {
         test('updates and broadcast list', () => {
-          participation.addEventListener('enterparticipant', () => {
-            assert.isTrue(false, 'Should not advertise changes.');
-          });
+          const onEnter = sinon.spy();
+          participation.addEventListener('enterparticipant', onEnter);
           return fakeRTCInterface.fakeConnection('remoteId')
+          .then(() => freeEventLoop())
           .then(() => {
+            assert.isTrue(
+              onEnter.notCalled,
+              'should not emit enterparticipant'
+            );
             assert.isTrue(fakeRTCInterface.broadcast.calledOnce);
             assert.isTrue(fakeRTCInterface.broadcast.calledWith({
               type: 'list',
@@ -270,7 +279,7 @@ suite.only('Participation', () => {
 
       suite('on RTC stream', () => {
         setup(() => {
-          fakeRTCInterface.emit('stream', { id: 'remoteId2', stream });
+          fakeRTCInterface.fakeStream('remoteId2');
         });
 
         test('holds the event until ending role negotiation (host)', () => {
@@ -356,19 +365,18 @@ suite.only('Participation', () => {
       });
 
       suite('on RTC close', () => {
-        test('updates and broadcast list', () => {
-          participation.addEventListener('exitparticipant', () => {
-            assert.isTrue(false, 'Should not advertise changes.');
-          });
-          return fakeRTCInterface.fakeDisconnection('remoteId')
+        test('ignores and broadcast the same list', () => {
+          const onExit = sinon.spy();
+          participation.addEventListener('exitparticipant', onExit);
+          return fakeRTCInterface.fakeConnection('remoteId')
+          .then(() => fakeRTCInterface.fakeDisconnection('remoteId'))
           .then(() => freeEventLoop())
           .then(() => {
-            assert.isTrue(fakeRTCInterface.broadcast.calledOnce);
-            assert.isTrue(fakeRTCInterface.broadcast.calledWith({
-              type: 'list',
-              timestamp: now,
-              list: ['randomId']
-            }));
+            assert.isTrue(onExit.notCalled, 'should not emit exitparticipant');
+            assert.isTrue(fakeRTCInterface.broadcast.calledTwice);
+            const firstList = fakeRTCInterface.broadcast.getCall(0).args[0];
+            const secondList = fakeRTCInterface.broadcast.getCall(1).args[0];
+            assert.deepEqual(firstList, secondList);
           });
         });
       });
@@ -384,12 +392,15 @@ suite.only('Participation', () => {
 
       suite('on RTC connect', () => {
         test('ignores connection', () => {
-          participation.addEventListener('enterparticipant', () => {
-            assert.isTrue(false, 'Should not advertise changes.');
-          });
+          const onEnter = sinon.spy();
+          participation.addEventListener('enterparticipant', onEnter);
           return fakeRTCInterface.fakeConnection('remoteId2')
           .then(() => freeEventLoop())
           .then(() => {
+            assert.isTrue(
+              onEnter.notCalled,
+              'should not emit enterparticipant'
+            );
             assert.isTrue(fakeRTCInterface.broadcast.notCalled);
           });
         });
@@ -397,7 +408,7 @@ suite.only('Participation', () => {
 
       suite('on RTC stream', () => {
         setup(() => {
-          fakeRTCInterface.emit('stream', { id: 'remoteId2', stream });
+          fakeRTCInterface.fakeStream('remoteId2');
         });
 
         test('enforces participantstream after enterparticipant', () => {
@@ -424,13 +435,18 @@ suite.only('Participation', () => {
       suite('on RTC message', () => {
         suite('list messages', () => {
           test('ignores if the list comes from a peer other than host', () => {
-            participation.addEventListener('enterparticipant', () => {
-              assert.isTrue(false, 'Should not advertise changes');
-            });
+            const onEnter = sinon.spy();
+            participation.addEventListener('enterparticipant', onEnter);
             return fakeRTCInterface.fakeList(
               'remoteId2', elderList, ['remoteId', 'randomId', 'remoteId2']
             )
-            .then(() => freeEventLoop());
+            .then(() => freeEventLoop())
+            .then(() => {
+              assert.isTrue(
+                onEnter.notCalled,
+                'should not emit enterparticipant'
+              );
+            });
           });
 
           test('advertises a participant is entering after receiving the list update and the participant connection', () => {
@@ -474,8 +490,9 @@ suite.only('Participation', () => {
           });
 
           test('ignores exitparticipant if no previous enterparticipant', () => {
+            let emitted = false;
             participation.addEventListener('exitparticipant', ({ detail }) => {
-              assert.isTrue(false, 'Should not emit exitparticipant');
+              emitted = true;
             });
             return fakeRTCInterface.fakeList(
               'remoteId', elderList, ['remoteId', 'randomId', 'remoteId2']
@@ -483,7 +500,10 @@ suite.only('Participation', () => {
             .then(() => fakeRTCInterface.fakeList(
               'remoteId', elderList, ['remoteId', 'randomId', null]
             ))
-            .then(() => freeEventLoop());
+            .then(() => freeEventLoop())
+            .then(() => {
+              assert.isFalse(emitted, 'should not emit exitparticipant');
+            });
           });
 
           test('advertises a participant is leaving after receiving the list update (not waiting for the actual disconnection)', () => {
@@ -501,6 +521,7 @@ suite.only('Participation', () => {
             .then(() => fakeRTCInterface.fakeList(
               'remoteId', elderList, ['remoteId', 'randomId', null]
             ))
+            .then(() => freeEventLoop())
             .then(() => {
               assert.isTrue(emitted, 'exitparticipant not emitted');
             });
@@ -532,11 +553,13 @@ suite.only('Participation', () => {
         });
 
         test('if a guest peer is leaving, do nothing', () => {
-          participation.addEventListener('upgrade', () => {
-            assert.isTrue(false, 'There should be no upgrade');
-          });
+          const onUpgrade = sinon.spy();
+          participation.addEventListener('upgrade', onUpgrade);
           return fakeRTCInterface.fakeDisconnection('removeId2')
-          .then(() => freeEventLoop());
+          .then(() => freeEventLoop())
+          .then(() => {
+            assert.isTrue(onUpgrade.notCalled, 'should not upgrade');
+          });
         });
 
         test('if the host peer is leaving and local is next host, take over', () => {
@@ -553,18 +576,20 @@ suite.only('Participation', () => {
         });
 
         test('if the host peer is leaving and local is not the next host, do nothing', () => {
+          const onUpgrade = sinon.spy();
           participation =
             new Participation('testRoom', { stream, provider: 'test.com' });
 
           return participation.connect()
           .then(() => becomeDelayedGuest())
           .then(() => {
-            participation.addEventListener('upgrade', () => {
-              assert.isTrue(false, 'There should be no upgrade');
-            });
+            participation.addEventListener('upgrade', onUpgrade);
             return fakeRTCInterface.fakeDisconnection('removeId2');
           })
-          .then(() => freeEventLoop());
+          .then(() => freeEventLoop())
+          .then(() => {
+            assert.isTrue(onUpgrade.notCalled, 'should not upgrade');
+          });
         });
       });
     });
@@ -631,29 +656,39 @@ suite.only('Participation', () => {
 
       suite('on RTC stream', () => {
         setup(() => {
-          fakeRTCInterface.emit('stream', { id: 'remoteId2', stream });
+          fakeRTCInterface.fakeStream('remoteId2');
         });
 
-        test('enforces participantstream after enterparticipant', done => {
+        test('enforces participantstream after enterparticipant', () => {
+          let emitted = false;
           participation.addEventListener('participantstream', ({ detail }) => {
             assert.isTrue(enterGuests.has('remoteId2'));
-            done();
+            emitted = true;
           });
 
-          fakeRTCInterface.fakeConnection('remoteId2');
+          return fakeRTCInterface.fakeConnection('remoteId2')
+          .then(() => freeEventLoop())
+          .then(() => {
+            assert.isTrue(emitted, 'participantstream not emitted');
+          });
         });
       });
 
       suite('on RTC message', () => {
         suite('list messages', () => {
           test('ignores lists', () => {
-            participation.addEventListener('enterparticipant', () => {
-              assert.isTrue(false, 'Should not advertise changes');
-            });
+            const onEnter = sinon.spy();
+            participation.addEventListener('enterparticipant', onEnter);
             return fakeRTCInterface.fakeList(
               'remoteId', elderList, ['remoteId', 'randomId', 'remoteId2']
             )
-            .then(() => freeEventLoop());
+            .then(() => freeEventLoop())
+            .then(() => {
+              assert.isTrue(
+                onEnter.notCalled,
+                'should not emit enterparticipant'
+              );
+            });
           });
         });
 
