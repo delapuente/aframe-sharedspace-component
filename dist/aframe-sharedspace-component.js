@@ -7318,8 +7318,11 @@ var Participation = function (_EventTarget) {
           });
         } else {
           // TODO: Rethink if it should be asynchronous at least. It forces the
-          // test for entering participant and leaving participant asymmetric.
-          _this6._emit('exitparticipant', { id: id, role: role, position: position });
+          // test for entering participant and leaving participant to be
+          // asymmetric.
+          if (!_this6._clearWaitings(id)) {
+            _this6._emit('exitparticipant', { id: id, role: role, position: position });
+          }
         }
       });
     }
@@ -7382,6 +7385,36 @@ var Participation = function (_EventTarget) {
           fulfill();
         }
       }
+    }
+  }, {
+    key: '_clearWaitings',
+    value: function _clearWaitings(targetId) {
+      var wasWaiting = false;
+      for (var i = 0, l = this._presenceWaitingList.length; i < l; i++) {
+        var _presenceWaitingList$3 = this._presenceWaitingList.shift(),
+            _presenceWaitingList$4 = _slicedToArray(_presenceWaitingList$3, 2),
+            id = _presenceWaitingList$4[0],
+            fulfill = _presenceWaitingList$4[1];
+
+        if (id !== targetId) {
+          this._presenceWaitingList.push([id, fulfill]);
+        } else {
+          wasWaiting = true;
+        }
+      }
+      for (var _i = 0, _l = this._connectionWaitingList.length; _i < _l; _i++) {
+        var _connectionWaitingLis3 = this._connectionWaitingList.shift(),
+            _connectionWaitingLis4 = _slicedToArray(_connectionWaitingLis3, 2),
+            id = _connectionWaitingLis4[0],
+            fulfill = _connectionWaitingLis4[1];
+
+        if (id !== targetId) {
+          this._connectionWaitingList.push([id, fulfill]);
+        } else {
+          wasWaiting = true;
+        }
+      }
+      return wasWaiting;
     }
   }, {
     key: '_broadcastList',
