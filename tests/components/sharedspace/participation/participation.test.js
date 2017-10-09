@@ -212,35 +212,22 @@ suite.only('Participation', () => {
     });
 
     function becomeHost (onHost = () => {}) {
-      let end;
-      waitForUpgradeTo('host', () => {
-        onHost();
-        end();
-      });
-      fakeRTCInterface.fakeList(
-        'remoteId', youngerList, ['remoteId', 'randomId']
-      );
-      return new Promise(resolve => {
-        end = resolve;
-      });
+      return upgrade('host', ['remoteId', 'randomId'], onHost);
     }
 
     function becomeGuest () {
-      let end;
-      waitForUpgradeTo('guest', () => end());
-      fakeRTCInterface.fakeList(
-        'remoteId', elderList, ['remoteId', 'randomId']
-      );
-      return new Promise(resolve => {
-        end = resolve;
-      });
+      return upgrade('guest', ['remoteId', 'randomId']);
     }
 
     function becomeDelayedGuest () {
+      return upgrade('guest', ['remoteId', 'remoteId2', 'randomId']);
+    }
+
+    function upgrade (role, list, cb = () => {}) {
       let end;
-      waitForUpgradeTo('guest', () => end());
+      waitForUpgradeTo(role, () => { cb(); end(); });
       fakeRTCInterface.fakeList(
-        'remoteId', elderList, ['remoteId', 'remoteId2', 'randomId']
+        'remoteId', role === 'host' ? youngerList : elderList, list
       );
       return new Promise(resolve => {
         end = resolve;
@@ -714,18 +701,17 @@ suite.only('Participation', () => {
         });
 
         test('advertises a participant is exiting and broadcast the list', () => {
-          let emitted = false;
-          participation.addEventListener('exitparticipant', ({ detail }) => {
+          const onExit = sinon.spy(({ detail }) => {
             assert.isTrue(enterGuests.has('remoteId2'));
             assert.equal(detail.id, 'remoteId2');
             assert.equal(detail.position, '3');
             assert.equal(detail.role, 'guest');
-            emitted = true;
           });
+          participation.addEventListener('exitparticipant', onExit);
           return fakeRTCInterface.fakeDisconnection('remoteId2')
           .then(() => freeEventLoop())
           .then(() => {
-            assert.isTrue(emitted);
+            assert.equal(onExit.callCount, 1, 'exitparticipant not emitted');
             assert.isTrue(fakeRTCInterface.broadcast.calledWith({
               type: 'list',
               timestamp: now,
